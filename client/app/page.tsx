@@ -13,19 +13,8 @@ export default function LandingPage() {
       <div className="w-full max-w-sm overflow-hidden rounded-xl bg-card shadow-lg">
         <div className="p-6 sm:p-8">
           {/* Logo */}
-          {/* <div className="mb-4">
-            <span className="text-2xl font-bold text-foreground">Fisho</span>
-          </div> */}
-
-          {/* Ilustracja Hero */}
           <div className="mb-6">
-            <Image
-              src="/logo_marlin.svg"
-              alt="Ilustracja Fisho"
-              width={100}
-              height={100}
-              className="mx-auto h-auto w-full object-contain"
-            />
+            <Image src="/logo_shark.svg" alt="Ilustracja Fisho" width={100} height={100} className="mx-auto" />
           </div>
 
           {/* Nagłówek */}
