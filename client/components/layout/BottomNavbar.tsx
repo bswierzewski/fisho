@@ -11,14 +11,14 @@ export default function BottomNavbar() {
   return (
     <>
       <nav className="container fixed inset-x-0 bottom-0 z-50 mx-auto mb-2">
-        <div className="mx-2 flex h-[42px] items-center justify-around rounded-full bg-card shadow-xl">
+        <div className="mx-2 flex h-[42px] items-center justify-around rounded-full bg-card-foreground text-card shadow-xl">
           {navLinks.map((link) => {
             const IconComponent = link.icon;
-            const isActive = pathname !== link.href;
+            const isActive = pathname === link.href;
 
             return (
               <Link key={link.href} href={link.href} title={link.title}>
-                <IconComponent className={`h-6 w-6 ${isActive && 'text-gray-400'}`} aria-hidden="true" />
+                <IconComponent className={`h-6 w-6 ${!isActive && 'opacity-50'}`} />
               </Link>
             );
           })}

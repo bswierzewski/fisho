@@ -33,7 +33,7 @@ export default function Navbar() {
       <div className="container mx-auto flex justify-between items-center">
         <Menu onClick={() => setOpen(true)} />
 
-        <span className="text-lg font-semibold uppercase">{pageTitle}</span>
+        <span className="text-lg font-semibold uppercase tracking-widest">{pageTitle}</span>
 
         <UserButton />
       </div>

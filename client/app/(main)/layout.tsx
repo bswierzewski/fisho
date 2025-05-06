@@ -1,4 +1,4 @@
-import Bottombar from '@/components/layout/BottomNavbar';
+import BottomNavbar from '@/components/layout/BottomNavbar';
 import Navbar from '@/components/layout/Navbar';
 import { Sidebar } from '@/components/shared/Sidebar';
 
