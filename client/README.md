@@ -98,3 +98,114 @@ fisho-app/
 ├── prettier.config.js
 ├── tailwind.config.ts
 └── tsconfig.json
+
+V2
+
+fisho-frontend/
+├── app/ # Main App Router directory
+│ ├── (auth)/ # Routing group for authentication pages (Clerk might handle some)
+│ │ ├── sign-in/[[...sign-in]]/page.tsx
+│ │ └── sign-up/[[...sign-up]]/page.tsx
+│ ├── (main)/ # Main routing group for logged-in users
+│ │ ├── layout.tsx # Main application layout (e.g., with navigation)
+│ │ ├── dashboard/ # (Optional) Main dashboard after login
+│ │ │ └── page.tsx
+│ │ ├── competitions/ # Competitions section
+│ │ │ ├── page.tsx # List of open competitions / "My Competitions" (may require filtering logic)
+│ │ │ ├── new/ # Create a new competition
+│ │ │ │ └── page.tsx
+│ │ │ └── [id]/ # Details of a specific competition
+│ │ │ ├── page.tsx # Competition details view (info, participants, results)
+│ │ │ └── settings/ # (Optional) Competition settings for the organizer
+│ │ │ └── page.tsx
+│ │ ├── log/ # Personal fishing log
+│ │ │ ├── page.tsx # Log view (gallery/list)
+│ │ │ └── new/ # Add a new catch/entry
+│ │ │ └── page.tsx
+│ │ ├── fisheries/ # Fisheries/Fishing Spots section
+│ │ │ ├── page.tsx # List of fisheries
+│ │ │ └── [id]/ # Fishery details
+│ │ │ └── page.tsx
+│ │ ├── profile/ # User profile
+│ │ │ └── page.tsx
+│ │ └── (admin)/ # (Optional) Admin section (if in the same app)
+│ │ └── layout.tsx # Layout for the admin section
+│ │ └── page.tsx # Main admin dashboard
+│ ├── api/ # Route Handlers (Next.js API endpoints - if needed besides Server Actions)
+│ │ └── webhook/ # E.g., for webhooks from Clerk or payment systems
+│ │ └── clerk/
+│ │ └── route.ts
+│ ├── results/ # Public results page
+│ │ └── [token]/ # Unique access token for results
+│ │ └── page.tsx
+│ ├── layout.tsx # Root application layout (e.g., <ClerkProvider>, global contexts)
+│ ├── page.tsx # Application home page (landing page)
+│ └── globals.css # Global styles
+├── components/ # UI Components
+│ ├── ui/ # Components from shadcn/ui (following shadcn convention)
+│ │ ├── button.tsx
+│ │ ├── card.tsx
+│ │ └── ...
+│ ├── shared/ # Shared, reusable application components
+│ │ ├── AuthButtons.tsx # Login/Logout buttons (using Clerk)
+│ │ ├── DataTable.tsx # Reusable data table
+│ │ ├── LoadingSpinner.tsx
+│ │ ├── Modal.tsx
+│ │ ├── PageHeader.tsx
+│ │ └── PhotoUploader.tsx # Component for uploading photos (e.g., to Cloudinary)
+│ └── features/ # Components specific to a feature/domain
+│ ├── competitions/ # Components related to competitions
+│ │ ├── CompetitionCard.tsx
+│ │ ├── CompetitionForm.tsx
+│ │ ├── CompetitionList.tsx
+│ │ ├── ParticipantManager.tsx # Manage participants (add, remove, roles)
+│ │ └── ResultsTable.tsx
+│ ├── fishing-log/ # Components related to the fishing log
+│ │ ├── CatchCard.tsx
+│ │ ├── CatchForm.tsx
+│ │ └── LogView.tsx # Component to display the log (list/gallery)
+│ ├── fisheries/ # Components related to fisheries
+│ │ ├── FisheryCard.tsx
+│ │ └── FisheryForm.tsx
+│ └── user/ # Components related to the user profile
+│ └── UserProfileForm.tsx
+├── lib/ # Helper modules, business logic, configuration
+│ ├── actions/ # Server Actions (preferred way to interact with the .NET backend)
+│ │ ├── competitionActions.ts
+│ │ ├── logActions.ts
+│ │ ├── fisheryActions.ts
+│ │ └── userActions.ts
+│ ├── api/ # (Alternative/Supplement to actions) API client functions for .NET backend communication
+│ │ ├── client.ts # HTTP client configuration (e.g., axios, fetch)
+│ │ ├── competitions.ts # API functions for competitions
+│ │ ├── catches.ts # API functions for catches/log entries
+│ │ ├── fisheries.ts # API functions for fisheries
+│ │ └── index.ts
+│ ├── validators/ # Validation schemas (e.g., Zod)
+│ │ ├── competitionSchema.ts
+│ │ ├── catchSchema.ts
+│ │ └── fisherySchema.ts
+│ ├── hooks/ # Custom React Hooks
+│ │ └── useMediaQuery.ts # E.g., for responsiveness logic
+│ ├── types/ # TypeScript type definitions
+│ │ ├── index.ts
+│ │ ├── competition.ts
+│ │ ├── user.ts
+│ │ ├── catch.ts
+│ │ └── fishery.ts
+│ ├── utils.ts # Utility functions (e.g., date formatting, cn from shadcn)
+│ ├── constants.ts # Constants used throughout the application
+│ └── auth.ts # Clerk-related configuration (e.g., roles, helpers)
+├── public/ # Static assets (images, fonts)
+│ ├── images/
+│ └── favicon.ico
+├── styles/ # Additional global styles (if globals.css is not enough)
+├── .env.local # Environment variables (local)
+├── .eslintrc.json # ESLint configuration
+├── .gitignore
+├── middleware.ts # Next.js Middleware (e.g., for route protection with Clerk)
+├── next.config.mjs # Next.js configuration
+├── package.json
+├── postcss.config.js # PostCSS configuration (for Tailwind)
+├── tailwind.config.ts # TailwindCSS configuration
+└── tsconfig.json # TypeScript configuration
