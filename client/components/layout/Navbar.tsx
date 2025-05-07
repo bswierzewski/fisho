@@ -21,16 +21,16 @@ export default function Navbar() {
       }
     }
 
-    return 'Fisho'; // Default title if no match is found
+    return 'Fishio'; // Default title if no match is found
   };
 
   const pageTitle = getCurrentPageTitle();
 
   return (
-    <nav className="p-2 bg-card z-50 shadow-md ">
+    <nav className="p-2 z-50 shadow-lg">
       <div className="container mx-auto flex justify-between items-center">
         <Image src="/logo_shark.svg" alt="logo" width={32} height={32} />
-        <span className="text-lg font-semibold uppercase">{pageTitle}</span>
+        <span className="font-light uppercase">{pageTitle}</span>
 
         <BellAlertIcon className="h-7" />
       </div>

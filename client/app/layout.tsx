@@ -4,7 +4,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Fisho',
+  title: 'Fishio',
   description: 'Aplikacja do organizacji zawodów wędkarskich'
 };
 

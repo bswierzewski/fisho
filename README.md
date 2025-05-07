@@ -1,6 +1,6 @@
-# 🐟 Fisho — Aplikacja dla wędkarzy i organizatorów zawodów
+# 🐟 Fishio — Aplikacja dla wędkarzy i organizatorów zawodów
 
-**Fisho** to platforma webowa (zoptymalizowana pod kątem urządzeń mobilnych) służąca do organizacji i uczestnictwa w zawodach wędkarskich oraz prowadzenia osobistego rejestru połowów. Głównym celem jest zapewnienie intuicyjnego narzędzia, które ułatwi zarządzanie zawodami dla organizatorów i usprawni udział dla wędkarzy na różnych poziomach zaawansowania.
+**Fishio** to platforma webowa (zoptymalizowana pod kątem urządzeń mobilnych) służąca do organizacji i uczestnictwa w zawodach wędkarskich oraz prowadzenia osobistego rejestru połowów. Głównym celem jest zapewnienie intuicyjnego narzędzia, które ułatwi zarządzanie zawodami dla organizatorów i usprawni udział dla wędkarzy na różnych poziomach zaawansowania.
 
 ## 🛠️ Stack technologiczny
 

@@ -12,7 +12,7 @@ export default function BottomNavbar() {
   return (
     <>
       <nav className="container fixed inset-x-0 bottom-0 z-50 mx-auto mb-2 ">
-        <div className="mx-2 flex items-center justify-around rounded-full bg-background p-2 shadow-xl">
+        <div className="mx-2 flex items-center justify-around rounded-full bg-background p-2 shadow-lg">
           {navLinks.map((link) => {
             const IconComponent = link.icon;
             const isActive = pathname === link.href;
@@ -26,7 +26,7 @@ export default function BottomNavbar() {
                   ${
                     isActive
                       ? 'bg-card-foreground text-card'
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                      : 'opacity-50 hover:bg-accent hover:text-accent-foreground'
                   }
                 `}
               >

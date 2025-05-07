@@ -14,12 +14,12 @@ export default function LandingPage() {
         <div className="p-6 sm:p-8">
           {/* Logo */}
           <div className="mb-6">
-            <Image src="/logo_shark.svg" alt="Ilustracja Fisho" width={100} height={100} className="mx-auto" />
+            <Image src="/logo_shark.svg" alt="Ilustracja Fishio" width={100} height={100} className="mx-auto" />
           </div>
 
           {/* Nagłówek */}
           <h1 className="mb-6 text-center text-2xl font-bold leading-tight text-foreground sm:text-3xl">
-            Odkryj Pełnię Możliwości Fisho!
+            Odkryj Pełnię Możliwości Fishio!
           </h1>
 
           {/* Lista Korzyści */}

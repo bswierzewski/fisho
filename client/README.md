@@ -1,4 +1,4 @@
-fisho-app/
+fishio-app/
 ├── app/ # Główny katalog routingu (App Router)
 │ ├── (auth)/ # Grupa routingu dla stron/API związanych z uwierzytelnianiem (Clerk może zarządzać tym inaczej)
 │ │ └── api/
@@ -101,7 +101,7 @@ fisho-app/
 
 V2
 
-fisho-frontend/
+fishio-frontend/
 ├── app/ # Main App Router directory
 │ ├── (auth)/ # Routing group for authentication pages (Clerk might handle some)
 │ │ ├── sign-in/[[...sign-in]]/page.tsx
