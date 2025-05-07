@@ -1,5 +1,6 @@
 'use client';
 
+import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -10,18 +11,31 @@ export default function BottomNavbar() {
 
   return (
     <>
-      <nav className="container fixed inset-x-0 bottom-0 z-50 mx-auto mb-2">
-        <div className="mx-2 flex h-[42px] items-center justify-around rounded-full bg-card-foreground text-card shadow-xl">
+      <nav className="container fixed inset-x-0 bottom-0 z-50 mx-auto mb-2 ">
+        <div className="mx-2 flex items-center justify-around rounded-full bg-background p-2 shadow-xl">
           {navLinks.map((link) => {
             const IconComponent = link.icon;
             const isActive = pathname === link.href;
 
             return (
-              <Link key={link.href} href={link.href} title={link.title}>
-                <IconComponent className={`h-6 w-6 ${!isActive && 'opacity-50'}`} />
+              <Link
+                key={link.href}
+                href={link.href}
+                title={link.title}
+                className={`flex h-10 w-10 items-center justify-center rounded-full
+                  ${
+                    isActive
+                      ? 'bg-card-foreground text-card'
+                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                  }
+                `}
+              >
+                <IconComponent className={`h-6 w-6`} />
               </Link>
             );
           })}
+
+          <UserButton />
         </div>
       </nav>
     </>

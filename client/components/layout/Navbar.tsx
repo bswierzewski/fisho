@@ -1,14 +1,12 @@
 'use client';
 
-import { useSidebarStore } from '@/lib/store/sidebarStore';
-import { UserButton } from '@clerk/nextjs';
-import { Menu } from 'lucide-react';
+import { BellAlertIcon } from '@heroicons/react/24/outline';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 import { navLinks } from '@/lib/config';
 
 export default function Navbar() {
-  const { setOpen } = useSidebarStore();
   const pathname = usePathname();
 
   const getCurrentPageTitle = (): string => {
@@ -29,13 +27,12 @@ export default function Navbar() {
   const pageTitle = getCurrentPageTitle();
 
   return (
-    <nav className="p-4 bg-card z-50 shadow-md">
+    <nav className="p-2 bg-card z-50 shadow-md ">
       <div className="container mx-auto flex justify-between items-center">
-        <Menu onClick={() => setOpen(true)} />
+        <Image src="/logo_shark.svg" alt="logo" width={32} height={32} />
+        <span className="text-lg font-semibold uppercase">{pageTitle}</span>
 
-        <span className="text-lg font-semibold uppercase tracking-widest">{pageTitle}</span>
-
-        <UserButton />
+        <BellAlertIcon className="h-7" />
       </div>
     </nav>
   );
