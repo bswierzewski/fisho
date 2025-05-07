@@ -30,7 +30,7 @@ export default function Navbar() {
     <nav className="p-2 z-50 shadow-lg">
       <div className="container mx-auto flex justify-between items-center">
         <Image src="/logo_shark.svg" alt="logo" width={32} height={32} />
-        <span className="font-light uppercase">{pageTitle}</span>
+        <span className="font-bold uppercase">{pageTitle}</span>
 
         <BellAlertIcon className="h-7" />
       </div>
