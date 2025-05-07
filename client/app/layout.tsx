@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider localization={plPL}>
-      <html lang="pl" suppressHydrationWarning>
+      <html lang="pl">
         <body>{children}</body>
       </html>
     </ClerkProvider>

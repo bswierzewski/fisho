@@ -1,7 +1,8 @@
 'use client';
 
+import { ClerkLoaded, ClerkLoading } from '@clerk/clerk-react';
+import { UserButton } from '@clerk/nextjs';
 import { BellAlertIcon } from '@heroicons/react/24/outline';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 import { navLinks } from '@/lib/config';
@@ -27,12 +28,20 @@ export default function Navbar() {
   const pageTitle = getCurrentPageTitle();
 
   return (
-    <nav className="p-2 z-50 shadow-lg">
+    <nav className="px-5 p-2 z-50 shadow bg-gray-800 rounded-b-md">
       <div className="container mx-auto flex justify-between items-center">
-        <Image src="/logo_shark.svg" alt="logo" width={32} height={32} />
-        <span className="font-bold uppercase">{pageTitle}</span>
+        <div className="h-7 w-7">
+          <ClerkLoading>
+            <div className="h-7 w-7 animate-pulse rounded-full bg-gray-700" />
+          </ClerkLoading>
+          <ClerkLoaded>
+            <UserButton />
+          </ClerkLoaded>
+        </div>
 
-        <BellAlertIcon className="h-7" />
+        <span className="font-bold uppercase text-white tracking-widest">{pageTitle}</span>
+
+        <BellAlertIcon className="h-7 text-white" />
       </div>
     </nav>
   );

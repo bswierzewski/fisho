@@ -150,3 +150,18 @@
 body {
   letter-spacing: var(--tracking-normal);
 }
+
+body::before {
+  content: ""; /* Niezbędne dla pseudo-elementów */
+  position: fixed; /* Tło pozostaje na miejscu podczas przewijania */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/fisherman.svg'); /* Ścieżka do SVG w folderze public */
+  background-repeat: no-repeat; /* Zapobiega powtarzaniu tła */
+  background-size: cover; /* Rozciąga obraz, aby pokrył cały obszar, może przyciąć */
+  background-position: center center ; /* Centruje obraz */
+  opacity: 0.1; /* Ustawia przezroczystość na 30% */
+  z-index: -1; /* Umieszcza pseudo-element za zawartością body */
+}
