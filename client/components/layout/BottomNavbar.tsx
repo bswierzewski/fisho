@@ -11,7 +11,7 @@ export default function BottomNavbar() {
   return (
     <>
       <nav className="fixed inset-x-0 bottom-0 z-50 mx-auto mb-2 max-w-md px-2">
-        <div className="flex items-center justify-around rounded-full bg-gray-800 p-2 shadow-lg">
+        <div className="flex items-center justify-around rounded-full bg-secondary p-2 shadow-lg">
           {navLinks.map((link) => {
             const IconComponent = link.icon;
             const isActive = pathname === link.href;
@@ -21,8 +21,8 @@ export default function BottomNavbar() {
                 key={link.href}
                 href={link.href}
                 title={link.title}
-                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-white
-                  ${isActive ? 'bg-primary' : 'opacity-80 hover:bg-white hover:opacity-100 hover:text-gray-800'}
+                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-background
+                  ${isActive ? 'bg-primary' : 'opacity-80 hover:bg-background hover:opacity-100 hover:text-secondary'}
                 `}
               >
                 <IconComponent className={`h-6 w-6`} />
