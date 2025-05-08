@@ -7,6 +7,8 @@ import { ArrowRight, MapPin, Plus, Trophy } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { useMediaQuery } from '@/hooks/use-media-query';
+
 const cardHeaderBgClass = 'bg-secondary'; // Przykład: ciemny szaro-niebieski
 const cardHeaderTextColorClass = 'text-secondary-foreground'; // Jasny tekst dla ciemnego tła
 const cardBodyBgClass = 'bg-card'; // Tło reszty karty (np. białe lub jasnoszare)
@@ -28,14 +30,29 @@ const ActionCard = ({ href, text, icon: Icon }: { href: string; text: string; ic
 
 // --- Główny Komponent Dashboardu ---
 export default function DashboardPage() {
-  // Ograniczamy liczbę elementów do wyświetlenia
-  const upcomingCompetitions = staticCompetitions.filter((c) => c.status === 'upcoming').slice(0, 2);
-  const recentCatches = staticLogbookEntries.slice(0, 2);
-  // Dla "Odkryj Otwarte Zawody" weźmy inne niż nadchodzące, jeśli są
+  // --- Logika Responsywnego Slice ---
+  const isSm = useMediaQuery('(min-width: 640px)'); // np. małe tablety w pionie
+  const isMd = useMediaQuery('(min-width: 768px)'); // np. tablety
+  const isLg = useMediaQuery('(min-width: 1024px)'); // np. desktopy
+
+  // Określ liczbę kart do wyświetlenia
+  let sliceCount = 2; // Domyślnie (mobile)
+  if (isLg) {
+    sliceCount = 8; // Duże ekrany
+  } else if (isMd) {
+    sliceCount = 6; // Średnie ekrany
+  } else if (isSm) {
+    sliceCount = 4; // Małe tablety - nadal 2 lub można dać 3 jeśli się mieszczą
+  }
+  // ------------------------------------
+
+  // Użyj sliceCount do pobrania odpowiedniej liczby danych
+  const upcomingCompetitions = staticCompetitions.filter((c) => c.status === 'upcoming').slice(0, sliceCount);
+  const recentCatches = staticLogbookEntries.slice(0, sliceCount);
   const openCompetitions = staticCompetitions
     .filter((c) => c.type === 'open' && c.status !== 'finished' && !upcomingCompetitions.some((uc) => uc.id === c.id))
-    .slice(0, 2);
-  const featuredFisheries = staticFisheries.slice(0, 2);
+    .slice(0, sliceCount);
+  const featuredFisheries = staticFisheries.slice(0, sliceCount);
 
   return (
     <div className="space-y-8">

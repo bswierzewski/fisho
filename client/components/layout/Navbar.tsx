@@ -2,7 +2,7 @@
 
 import { ClerkLoaded, ClerkLoading } from '@clerk/clerk-react';
 import { UserButton } from '@clerk/nextjs';
-import { BellAlertIcon } from '@heroicons/react/24/outline';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 import { navLinks } from '@/lib/config';
@@ -31,17 +31,17 @@ export default function Navbar() {
     <nav className="px-5 p-2 z-50 shadow bg-secondary rounded-b-md">
       <div className="container mx-auto flex justify-between items-center">
         <div className="h-7 w-7">
-          <ClerkLoading>
-            <div className="h-7 w-7 animate-pulse rounded-full bg-secondary" />
-          </ClerkLoading>
-          <ClerkLoaded>
-            <UserButton />
-          </ClerkLoaded>
+          <Image src={'/logo.svg'} alt="logo" width={40} height={40} className="" />
         </div>
 
         <span className="font-bold uppercase text-background tracking-widest">{pageTitle}</span>
 
-        <BellAlertIcon className="h-7 text-background" />
+        <ClerkLoading>
+          <div className="h-7 w-7 animate-pulse rounded-full bg-secondary" />
+        </ClerkLoading>
+        <ClerkLoaded>
+          <UserButton />
+        </ClerkLoaded>
       </div>
     </nav>
   );

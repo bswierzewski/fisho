@@ -29,6 +29,8 @@ export default function BottomNavbar() {
               </Link>
             );
           })}
+          {/* Przycisk ukryty do czasu implementacji notyfikacji np o dodaniu nowego wpisu na tablicy wyników, o dodaniu nowych zawodów w obserwowanych łowiskach */}
+          {/* <BellAlertIcon className="h-7 text-background" /> */}
         </div>
       </nav>
     </>
