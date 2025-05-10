@@ -2,7 +2,9 @@
 
 import { ClerkLoaded, ClerkLoading } from '@clerk/clerk-react';
 import { UserButton } from '@clerk/nextjs';
+import { InformationCircleIcon } from '@heroicons/react/24/solid';
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { navLinks } from '@/lib/config';
@@ -30,7 +32,9 @@ export default function Navbar() {
   return (
     <nav className="px-5 p-2 z-50 shadow bg-secondary rounded-b-md">
       <div className="container mx-auto flex justify-between items-center">
-        <span className="text-xl">🐟</span>
+        <Link href="/about">
+          <InformationCircleIcon className="text-background h-8" />
+        </Link>
 
         <span className="font-bold uppercase text-background tracking-widest">{pageTitle}</span>
 
