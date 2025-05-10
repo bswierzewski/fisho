@@ -25,8 +25,9 @@ const formatDate = (date: Date) => {
   });
 };
 
-export default function LogbookEntryDetailPage({ params }: { params: { id: string } }) {
-  const entry = staticLogbookEntries.find((e) => e.id === params.id);
+export default async function LogbookEntryDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const entry = staticLogbookEntries.find((e) => e.id === id);
 
   if (!entry) {
     notFound();

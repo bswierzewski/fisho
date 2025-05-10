@@ -29,8 +29,9 @@ const formatDate = (date: Date) => {
   });
 };
 
-export default function FisheryDetailPage({ params }: { params: { id: string } }) {
-  const fishery = staticFisheries.find((f) => f.id === params.id);
+export default async function FisheryDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const fishery = staticFisheries.find((f) => f.id === id);
 
   if (!fishery) {
     notFound();

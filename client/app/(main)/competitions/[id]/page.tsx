@@ -1,5 +1,4 @@
 // app/(main)/competitions/[id]/page.tsx
-import { Competition } from '@/lib/definitions';
 import { availableMainScoringCategories, availableSpecialCategories, staticCompetitions } from '@/lib/static-data';
 import {
   Activity,
@@ -40,8 +39,9 @@ const formatDateTime = (date: Date) => {
   });
 };
 
-export default function CompetitionDetailPage({ params }: { params: { id: string } }) {
-  const competition = staticCompetitions.find((c) => c.id === params.id);
+export default async function CompetitionDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const competition = staticCompetitions.find((c) => c.id === id);
 
   if (!competition) {
     notFound();

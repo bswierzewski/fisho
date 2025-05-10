@@ -43,8 +43,9 @@ const findWinnerByMaxField = (
     );
 };
 
-export default function PublicResultsPage({ params }: { params: { token: string } }) {
-  const competition = staticCompetitions.find((c) => c.resultsToken === params.token);
+export default async function PublicResultsPage({ params }: { params: Promise<{ token: string }> }) {
+  const { token } = await params;
+  const competition = staticCompetitions.find((c) => c.resultsToken === token);
 
   if (!competition) {
     notFound();
