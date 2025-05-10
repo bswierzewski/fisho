@@ -14,7 +14,7 @@ export default function LandingPage() {
         <div className="p-6 sm:p-8">
           {/* Logo */}
           <div className="mb-6">
-            <Image src="/fisherman.svg" alt="Ilustracja Fishio" width={350} height={350} className="mx-auto" />
+            <Image src="/fisherman_blue.svg" alt="Ilustracja Fishio" width={350} height={350} className="mx-auto" />
           </div>
 
           {/* Nagłówek */}

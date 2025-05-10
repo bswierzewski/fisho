@@ -30,9 +30,7 @@ export default function Navbar() {
   return (
     <nav className="px-5 p-2 z-50 shadow bg-secondary rounded-b-md">
       <div className="container mx-auto flex justify-between items-center">
-        <div className="h-7 w-7">
-          <Image src={'/logo.svg'} alt="logo" width={40} height={40} className="" />
-        </div>
+        <span className="text-xl">🐟</span>
 
         <span className="font-bold uppercase text-background tracking-widest">{pageTitle}</span>
 

@@ -5,7 +5,7 @@ const isPublicRoute = createRouteMatcher([
   '/', // Strona główna (Landing Page) JEST TERAZ PUBLICZNA
   '/sign-in(.*)', // Strony logowania Clerk
   '/sign-up(.*)', // Strony rejestracji Clerk
-  '/results/(.*)', // Publiczne wyniki zawodów
+  '/results', // Publiczne wyniki zawodów
   '/api/webhooks/clerk' // Webhooki Clerk (jeśli używasz)
 ]);
 
