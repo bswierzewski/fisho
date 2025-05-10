@@ -1,0 +1,70 @@
+name: Build and Push Client (Next.js) Docker Image
+
+on:
+  push:
+    branches:
+      - main
+    paths: # Uruchom workflow tylko, gdy zmiany dotyczą folderu client lub tego pliku workflow
+      - "client/**"
+      - ".github/workflows/docker-build-push-client.yml"
+  pull_request: # Uruchom również dla Pull Requestów na gałąź main (bez wypychania obrazu)
+    branches:
+      - main
+    paths:
+      - "client/**"
+      - ".github/workflows/docker-build-push-client.yml"
+  workflow_dispatch: # Umożliwia ręczne uruchomienie
+
+env:
+  # Nazwa obrazu dla klienta w GitHub Container Registry
+  # Format: ghcr.io/TWOJ_USERNAME_LUB_ORGANIZACJA/NAZWA_REPOZYTORIUM-client
+  # Dodajemy "-client", aby odróżnić od potencjalnego obrazu dla API
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}-client
+
+jobs:
+  build-and-push-client: # Nazwa zadania specyficzna dla klienta
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image for Client
+        uses: docker/build-push-action@v5
+        with:
+          # Kontekst budowania to teraz folder 'client'
+          context: ./client
+          # Ścieżka do Dockerfile wewnątrz folderu 'client'
+          file: ./client/Dockerfile
+          # Wypychaj tylko przy push na gałąź main (nie dla pull requestów)
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+            # Dodaj inne publiczne zmienne środowiskowe potrzebne podczas budowania klienta
+            # NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL_PROD }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
