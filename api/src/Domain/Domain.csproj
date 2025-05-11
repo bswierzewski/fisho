@@ -10,4 +10,13 @@
 	  <PackageReference Include="MediatR" Version="12.5.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Common\" />
+	  <Folder Include="Constants\" />
+	  <Folder Include="Events\" />
+	  <Folder Include="Exceptions\" />
+	  <Folder Include="Interfaces\" />
+	  <Folder Include="ValueObjects\" />
+	</ItemGroup>
+
 </Project>
