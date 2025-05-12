@@ -51,6 +51,7 @@ public static class DependencyInjection
         builder.Services.AddHttpContextAccessor();
 
         var clerkIssuer = builder.Configuration["Clerk:Issuer"] ?? throw new ArgumentNullException("Clerk:Issuer");
+        var clerkAudience = builder.Configuration["Clerk:Audience"] ?? throw new ArgumentNullException("Clerk:Audience");
         var clerkJwksUri = builder.Configuration["Clerk:JwksUri"];
 
         // Authentication and Authorization
@@ -58,7 +59,7 @@ public static class DependencyInjection
             .AddJwtBearer(options =>
             {
                 options.Authority = clerkIssuer; // Issuer z Twojego dashboardu Clerk
-                options.Audience = clerkIssuer;  // Często issuer i audience są takie same dla Clerk
+                options.Audience = clerkAudience;  // Często issuer i audience są takie same dla Clerk
                 options.RequireHttpsMetadata = builder.Environment.IsProduction(); // Wymagaj HTTPS na produkcji
 
                 // Konfiguracja pobierania kluczy publicznych JWKS
@@ -72,7 +73,7 @@ public static class DependencyInjection
                     ValidateIssuer = true,
                     ValidIssuer = clerkIssuer,
                     ValidateAudience = true, // Zazwyczaj true, jeśli Audience jest ustawione
-                    ValidAudience = clerkIssuer, // Lub specyficzna publiczna publiczna wartość Audience, jeśli ją masz
+                    ValidAudience = clerkAudience, // Lub specyficzna publiczna publiczna wartość Audience, jeśli ją masz
                     ValidateIssuerSigningKey = true, // Kluczowe dla weryfikacji podpisu
                                                      // NameClaimType i RoleClaimType mogą być potrzebne, jeśli używasz ról z JWT
                     NameClaimType = ClaimTypes.NameIdentifier, // Mapuje 'sub' z JWT na User.Identity.Name

@@ -36,6 +36,5 @@ app.UseExceptionHandler(options => { });
 app.UseMiddleware<UserSyncMiddleware>();
 
 app.MapEndpoints();
-//app.MapControllers();
 
 app.Run();
