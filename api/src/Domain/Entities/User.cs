@@ -1,20 +1,53 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Domain.Entities;
+﻿namespace Domain.Entities;
 
 // Plik: User.cs (Podstawowe dane, reszta w Clerk)
 public class User : BaseAuditableEntity
 {
-    public string ClerkUserId { get; set; } = string.Empty; // Wymagane, unikalne (skonfigurujemy w DbContext)
-    public string Name { get; set; } = string.Empty; // Wymagane
-    public string? Email { get; set; } // Opcjonalne, unikalne (skonfigurujemy w DbContext)
+    public string ClerkUserId { get; private set; } = string.Empty; // Identyfikator z Clerk
+    public string Name { get; private set; } = string.Empty;
+    public string? Email { get; private set; }
 
 
     // Właściwości nawigacyjne
-    public virtual ICollection<Competition> OrganizedCompetitions { get; set; } = new List<Competition>();
-    public virtual ICollection<CompetitionParticipant> CompetitionParticipations { get; set; } = new List<CompetitionParticipant>();
-    public virtual ICollection<CompetitionFishCatch> JudgedCatches { get; set; } = new List<CompetitionFishCatch>();
-    public virtual ICollection<LogbookEntry> LogbookEntries { get; set; } = new List<LogbookEntry>();
-    public virtual ICollection<Fishery> CreatedFisheries { get; set; } = new List<Fishery>();
+    public virtual ICollection<Competition> OrganizedCompetitions { get; private set; } = new List<Competition>();
+    public virtual ICollection<CompetitionParticipant> CompetitionParticipations { get; private set; } = new List<CompetitionParticipant>();
+    public virtual ICollection<CompetitionFishCatch> JudgedCatches { get; private set; } = new List<CompetitionFishCatch>();
+    public virtual ICollection<LogbookEntry> LogbookEntries { get; private set; } = new List<LogbookEntry>();
+    public virtual ICollection<Fishery> CreatedFisheries { get; private set; } = new List<Fishery>();
+
+    // Prywatny konstruktor dla EF Core i fabryki
+    private User() { }
+
+    // Metoda fabryczna do tworzenia nowego użytkownika na podstawie danych z Clerk
+    public static User CreateFromClerk(string clerkUserId, string name, string? email)
+    {
+        if (string.IsNullOrWhiteSpace(clerkUserId))
+            throw new ArgumentNullException(nameof(clerkUserId));
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentNullException(nameof(name)); // Można ustawić domyślną, jeśli Clerk nie zawsze zwraca
+
+        var user = new User
+        {
+            ClerkUserId = clerkUserId,
+            Name = name,
+            Email = email
+            // Pola audytowe (Created, CreatedBy, etc.) zostaną ustawione przez AuditableEntityInterceptor
+        };
+        // Można tu dodać zdarzenie domenowe UserRegisteredEvent
+        return user;
+    }
+
+    // Metoda do aktualizacji danych użytkownika na podstawie danych z Clerk
+    public void UpdateDetailsFromClerk(string newName, string? newEmail)
+    {
+        if (Name != newName && !string.IsNullOrWhiteSpace(newName))
+        {
+            Name = newName;
+        }
+
+        if (Email != newEmail) // Pozwalamy na ustawienie emaila na null, jeśli tak przyjdzie z Clerk
+        {
+            Email = newEmail;
+        }
+    }
 }

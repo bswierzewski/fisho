@@ -29,7 +29,7 @@ public static class DependencyInjection
         builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
         builder.Services.AddScoped<ApplicationDbContextInitialiser>();
 
-        builder.Services.AddScoped<IUser, UserService>();
+        builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         builder.Services.AddSingleton(TimeProvider.System);
     }

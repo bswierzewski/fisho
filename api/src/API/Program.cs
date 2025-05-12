@@ -1,4 +1,5 @@
-﻿using Application;
+﻿using API.Middlewares;
+using Application;
 using Infrastructure.Persistence;
 using Web;
 
@@ -31,6 +32,8 @@ app.UseAuthentication(); // Najpierw uwierzytelnianie
 app.UseAuthorization();  // Potem autoryzacja
 
 app.UseExceptionHandler(options => { });
+
+app.UseMiddleware<UserSyncMiddleware>();
 
 app.MapControllers();
 

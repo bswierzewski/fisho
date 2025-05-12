@@ -7,9 +7,9 @@ namespace Application.Common.Behaviours;
 public class LoggingBehaviour<TRequest> : IRequestPreProcessor<TRequest> where TRequest : notnull
 {
     private readonly ILogger _logger;
-    private readonly IUser _user;
+    private readonly ICurrentUserService _user;
 
-    public LoggingBehaviour(ILogger<TRequest> logger, IUser user)
+    public LoggingBehaviour(ILogger<TRequest> logger, ICurrentUserService user)
     {
         _logger = logger;
         _user = user;

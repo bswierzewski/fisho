@@ -41,7 +41,7 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
         // Rozwiązujemy IUserService dynamicznie wewnątrz metody, używając scope'u
         using (var scope = _serviceProvider.CreateScope())
         {
-            var user = scope.ServiceProvider.GetService<IUser>();
+            var user = scope.ServiceProvider.GetService<ICurrentUserService>();
             var utcNow = _dateTime.GetUtcNow();
 
             foreach (var entry in context.ChangeTracker.Entries<BaseAuditableEntity>())
