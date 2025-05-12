@@ -2,6 +2,7 @@
 using Application;
 using Infrastructure.Persistence;
 using Web;
+using Web.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 
-
     await app.SeedDatabaseAsync();
 }
 
@@ -35,6 +35,7 @@ app.UseExceptionHandler(options => { });
 
 app.UseMiddleware<UserSyncMiddleware>();
 
-app.MapControllers();
+app.MapEndpoints();
+//app.MapControllers();
 
 app.Run();
