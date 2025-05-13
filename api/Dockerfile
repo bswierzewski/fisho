@@ -3,7 +3,7 @@
 # Etap 1: Budowanie aplikacji
 # Użyj oficjalnego obrazu .NET SDK. Zmień na 9.0, gdy będzie stabilny i dostępny.
 # Na razie używam 8.0 jako przykładu stabilnego SDK.
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-env
 # Jeśli chcesz użyć .NET 9 Preview: FROM mcr.microsoft.com/dotnet/sdk:9.0-preview AS build-env
 
 WORKDIR /app
@@ -41,7 +41,7 @@ RUN dotnet publish ./src/API/API.csproj -c Release --no-restore -o /app/publish
 
 # Etap 2: Tworzenie finalnego obrazu uruchomieniowego
 # Użyj odpowiedniej wersji środowiska uruchomieniowego ASP.NET Core
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime-env
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime-env
 # Jeśli używasz .NET 9 Preview: FROM mcr.microsoft.com/dotnet/aspnet:9.0-preview AS runtime-env
 
 WORKDIR /app
