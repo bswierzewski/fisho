@@ -6,18 +6,40 @@ namespace Domain.Entities;
 // Plik: CompetitionFishCatch.cs
 public class CompetitionFishCatch : BaseAuditableEntity // Zgłoszenie połowu też audytowalne
 {
-    // Id, Created, CreatedBy, LastModified, LastModifiedBy dziedziczone
-    public int CompetitionId { get; set; }
-    public int ParticipantId { get; set; }
-    public int JudgeId { get; set; } // Powinno być mapowane na CreatedBy, jeśli sędzia to twórca zgłoszenia
-    public string SpeciesName { get; set; } = string.Empty;
-    public decimal? LengthCm { get; set; }
-    public decimal? WeightKg { get; set; }
-    public string PhotoUrl { get; set; } = string.Empty;
-    public DateTimeOffset CatchTime { get; set; } // Zmieniono na DateTimeOffset
+    public int CompetitionId { get; private set; }
+    public virtual Competition Competition { get; private set; } = null!;
 
-    // Właściwości nawigacyjne
-    public virtual Competition Competition { get; set; } = null!;
-    public virtual CompetitionParticipant Participant { get; set; } = null!;
-    public virtual User Judge { get; set; } = null!;
+    public int ParticipantId { get; private set; }
+    public virtual CompetitionParticipant Participant { get; private set; } = null!;
+
+    public int JudgeId { get; private set; }
+    public virtual User Judge { get; private set; } = null!;
+
+    public string SpeciesName { get; private set; } = string.Empty; // Could link to FishSpecies if catches are always predefined species
+    public decimal? LengthCm { get; private set; }
+    public decimal? WeightKg { get; private set; }
+    public string PhotoUrl { get; private set; } = string.Empty;
+    public DateTimeOffset CatchTime { get; private set; }
+
+    // Private constructor for EF Core
+    private CompetitionFishCatch() { }
+
+    public CompetitionFishCatch(
+        Competition competition,
+        CompetitionParticipant participant,
+        User judge,
+        string speciesName,
+        string photoUrl,
+        DateTimeOffset catchTime)
+    {
+        Competition = competition;
+        CompetitionId = competition.Id;
+        Participant = participant;
+        ParticipantId = participant.Id;
+        Judge = judge;
+        JudgeId = judge.Id;
+        SpeciesName = speciesName;
+        PhotoUrl = photoUrl;
+        CatchTime = catchTime;
+    }
 }

@@ -73,27 +73,22 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("StartTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
+                    b.Property<int>("Status")
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
+                    b.Property<int>("Type")
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<int?>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("MainScoringCategoryId");
 
+                    b.HasIndex("OrganizerId");
+
                     b.HasIndex("ResultsToken")
                         .IsUnique();
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Competitions");
                 });
@@ -188,10 +183,9 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<int?>("LastModifiedBy")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
+                    b.Property<int>("Role")
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("UserId")
                         .HasColumnType("integer");
@@ -349,7 +343,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("ScoringCategoryOptions");
                 });
 
-            modelBuilder.Entity("Domain.Entities.SpecialCategoryOption", b =>
+            modelBuilder.Entity("Domain.Entities.SpecialCompetitionCategory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -357,7 +351,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CompetitionId")
+                    b.Property<int>("CompetitionId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Description")
@@ -371,7 +365,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasIndex("CompetitionId");
 
-                    b.ToTable("SpecialCategoryOptions");
+                    b.ToTable("SpecialCompetitionCategories");
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
@@ -437,14 +431,18 @@ namespace Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Domain.Entities.Competition", b =>
                 {
                     b.HasOne("Domain.Entities.ScoringCategoryOption", "MainScoringCategory")
-                        .WithMany()
+                        .WithMany("Competitions")
                         .HasForeignKey("MainScoringCategoryId");
 
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", "Organizer")
                         .WithMany("OrganizedCompetitions")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("OrganizerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("MainScoringCategory");
+
+                    b.Navigation("Organizer");
                 });
 
             modelBuilder.Entity("Domain.Entities.CompetitionFishCatch", b =>
@@ -456,7 +454,7 @@ namespace Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "Judge")
-                        .WithMany("JudgedCatches")
+                        .WithMany("JudgedFishCatches")
                         .HasForeignKey("JudgeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -494,9 +492,11 @@ namespace Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Fishery", b =>
                 {
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", "User")
                         .WithMany("CreatedFisheries")
                         .HasForeignKey("UserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.LogbookEntry", b =>
@@ -517,11 +517,15 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Domain.Entities.SpecialCategoryOption", b =>
+            modelBuilder.Entity("Domain.Entities.SpecialCompetitionCategory", b =>
                 {
-                    b.HasOne("Domain.Entities.Competition", null)
-                        .WithMany("SelectedSpecialCategories")
-                        .HasForeignKey("CompetitionId");
+                    b.HasOne("Domain.Entities.Competition", "Competition")
+                        .WithMany("SpecialCategories")
+                        .HasForeignKey("CompetitionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Competition");
                 });
 
             modelBuilder.Entity("FishSpeciesFishery", b =>
@@ -545,7 +549,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Navigation("Participants");
 
-                    b.Navigation("SelectedSpecialCategories");
+                    b.Navigation("SpecialCategories");
                 });
 
             modelBuilder.Entity("Domain.Entities.CompetitionParticipant", b =>
@@ -558,13 +562,18 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("LogbookEntries");
                 });
 
+            modelBuilder.Entity("Domain.Entities.ScoringCategoryOption", b =>
+                {
+                    b.Navigation("Competitions");
+                });
+
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
                     b.Navigation("CompetitionParticipations");
 
                     b.Navigation("CreatedFisheries");
 
-                    b.Navigation("JudgedCatches");
+                    b.Navigation("JudgedFishCatches");
 
                     b.Navigation("LogbookEntries");
 

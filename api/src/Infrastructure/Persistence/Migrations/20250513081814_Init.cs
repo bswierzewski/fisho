@@ -69,13 +69,12 @@ namespace Infrastructure.Persistence.Migrations
                     EndTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     LocationText = table.Column<string>(type: "text", nullable: true),
                     RulesText = table.Column<string>(type: "text", nullable: true),
-                    Type = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Type = table.Column<int>(type: "integer", maxLength: 50, nullable: false),
+                    Status = table.Column<int>(type: "integer", maxLength: 50, nullable: false),
                     ImageUrl = table.Column<string>(type: "text", nullable: true),
-                    OrganizerId = table.Column<int>(type: "integer", nullable: false),
                     ResultsToken = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    OrganizerId = table.Column<int>(type: "integer", nullable: false),
                     MainScoringCategoryId = table.Column<int>(type: "integer", nullable: true),
-                    UserId = table.Column<int>(type: "integer", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<int>(type: "integer", nullable: true),
                     LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -90,10 +89,11 @@ namespace Infrastructure.Persistence.Migrations
                         principalTable: "ScoringCategoryOptions",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Competitions_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Competitions_Users_OrganizerId",
+                        column: x => x.OrganizerId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -131,7 +131,7 @@ namespace Infrastructure.Persistence.Migrations
                     UserId = table.Column<int>(type: "integer", nullable: true),
                     GuestName = table.Column<string>(type: "text", nullable: true),
                     GuestIdentifier = table.Column<string>(type: "text", nullable: true),
-                    Role = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Role = table.Column<int>(type: "integer", maxLength: 50, nullable: false),
                     AddedByOrganizer = table.Column<bool>(type: "boolean", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<int>(type: "integer", nullable: true),
@@ -156,23 +156,24 @@ namespace Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SpecialCategoryOptions",
+                name: "SpecialCompetitionCategories",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    CompetitionId = table.Column<int>(type: "integer", nullable: true)
+                    CompetitionId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SpecialCategoryOptions", x => x.Id);
+                    table.PrimaryKey("PK_SpecialCompetitionCategories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SpecialCategoryOptions_Competitions_CompetitionId",
+                        name: "FK_SpecialCompetitionCategories_Competitions_CompetitionId",
                         column: x => x.CompetitionId,
                         principalTable: "Competitions",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -211,8 +212,8 @@ namespace Infrastructure.Persistence.Migrations
                     WeightKg = table.Column<decimal>(type: "numeric(7,3)", nullable: true),
                     PhotoUrl = table.Column<string>(type: "text", nullable: false),
                     CatchTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    FisheryId = table.Column<int>(type: "integer", nullable: true),
                     Notes = table.Column<string>(type: "text", nullable: true),
+                    FisheryId = table.Column<int>(type: "integer", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<int>(type: "integer", nullable: true),
                     LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -317,15 +318,15 @@ namespace Infrastructure.Persistence.Migrations
                 column: "MainScoringCategoryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Competitions_OrganizerId",
+                table: "Competitions",
+                column: "OrganizerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Competitions_ResultsToken",
                 table: "Competitions",
                 column: "ResultsToken",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Competitions_UserId",
-                table: "Competitions",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Fisheries_UserId",
@@ -354,8 +355,8 @@ namespace Infrastructure.Persistence.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SpecialCategoryOptions_CompetitionId",
-                table: "SpecialCategoryOptions",
+                name: "IX_SpecialCompetitionCategories_CompetitionId",
+                table: "SpecialCompetitionCategories",
                 column: "CompetitionId");
 
             migrationBuilder.CreateIndex(
@@ -385,7 +386,7 @@ namespace Infrastructure.Persistence.Migrations
                 name: "LogbookEntries");
 
             migrationBuilder.DropTable(
-                name: "SpecialCategoryOptions");
+                name: "SpecialCompetitionCategories");
 
             migrationBuilder.DropTable(
                 name: "CompetitionParticipants");

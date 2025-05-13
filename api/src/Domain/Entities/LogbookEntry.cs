@@ -3,16 +3,32 @@
 // Plik: LogbookEntry.cs
 public class LogbookEntry : BaseAuditableEntity
 {
-    public int UserId { get; set; } // Powinno być mapowane na CreatedBy
-    public string SpeciesName { get; set; } = string.Empty;
-    public decimal? LengthCm { get; set; }
-    public decimal? WeightKg { get; set; }
-    public string PhotoUrl { get; set; } = string.Empty;
-    public DateTimeOffset CatchTime { get; set; } // Zmieniono na DateTimeOffset
-    public int? FisheryId { get; set; }
-    public string? Notes { get; set; }
+    public int UserId { get; private set; }
+    public virtual User User { get; private set; } = null!;
 
-    // Właściwości nawigacyjne
-    public virtual User User { get; set; } = null!;
-    public virtual Fishery? Fishery { get; set; }
+    public string SpeciesName { get; private set; } = string.Empty; // Could link to FishSpecies if desired
+    public decimal? LengthCm { get; private set; }
+    public decimal? WeightKg { get; private set; }
+    public string PhotoUrl { get; private set; } = string.Empty; // Required
+    public DateTimeOffset CatchTime { get; private set; }
+    public string? Notes { get; private set; }
+
+    public int? FisheryId { get; private set; } // Optional link to a fishery
+    public virtual Fishery? Fishery { get; private set; }
+
+    // Private constructor for EF Core
+    private LogbookEntry() { }
+
+    public LogbookEntry(
+        User user,
+        string speciesName,
+        string photoUrl,
+        DateTimeOffset catchTime)
+    {
+        User = user;
+        UserId = user.Id;
+        SpeciesName = speciesName;
+        PhotoUrl = photoUrl;
+        CatchTime = catchTime;
+    }
 }

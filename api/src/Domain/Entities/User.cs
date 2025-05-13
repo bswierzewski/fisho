@@ -11,30 +11,23 @@ public class User : BaseAuditableEntity
     // Właściwości nawigacyjne
     public virtual ICollection<Competition> OrganizedCompetitions { get; private set; } = new List<Competition>();
     public virtual ICollection<CompetitionParticipant> CompetitionParticipations { get; private set; } = new List<CompetitionParticipant>();
-    public virtual ICollection<CompetitionFishCatch> JudgedCatches { get; private set; } = new List<CompetitionFishCatch>();
+    public virtual ICollection<CompetitionFishCatch> JudgedFishCatches { get; private set; } = new List<CompetitionFishCatch>();
     public virtual ICollection<LogbookEntry> LogbookEntries { get; private set; } = new List<LogbookEntry>();
     public virtual ICollection<Fishery> CreatedFisheries { get; private set; } = new List<Fishery>();
 
-    // Prywatny konstruktor dla EF Core i fabryki
+    // Private constructor for EF Core
     private User() { }
 
-    // Metoda fabryczna do tworzenia nowego użytkownika na podstawie danych z Clerk
-    public static User CreateFromClerk(string clerkUserId, string name, string? email)
+    public User(string clerkUserId, string name, string? email)
     {
         if (string.IsNullOrWhiteSpace(clerkUserId))
             throw new ArgumentNullException(nameof(clerkUserId));
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentNullException(nameof(name)); // Można ustawić domyślną, jeśli Clerk nie zawsze zwraca
 
-        var user = new User
-        {
-            ClerkUserId = clerkUserId,
-            Name = name,
-            Email = email
-            // Pola audytowe (Created, CreatedBy, etc.) zostaną ustawione przez AuditableEntityInterceptor
-        };
-        // Można tu dodać zdarzenie domenowe UserRegisteredEvent
-        return user;
+        ClerkUserId = clerkUserId;
+        Name = name;
+        Email = email;
     }
 
     // Metoda do aktualizacji danych użytkownika na podstawie danych z Clerk

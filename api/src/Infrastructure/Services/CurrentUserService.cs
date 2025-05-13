@@ -66,7 +66,7 @@ namespace Infrastructure.Services
             if (user == null)
             {
                 // Użytkownik nie istnieje, stwórz go używając metody fabrycznej z encji
-                user = User.CreateFromClerk(clerkId, nameFromToken, emailFromToken);
+                user = new User(clerkId, nameFromToken, emailFromToken);
                 _dbContext.Users.Add(user);
             }
             else            

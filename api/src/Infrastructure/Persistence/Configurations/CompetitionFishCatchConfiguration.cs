@@ -24,7 +24,7 @@ public class CompetitionFishCatchConfiguration : IEntityTypeConfiguration<Compet
               .OnDelete(DeleteBehavior.Cascade); // Jeśli usuniemy uczestnika z zawodów, usuwamy jego zgłoszenia
 
         entity.HasOne(d => d.Judge)
-              .WithMany(p => p.JudgedCatches)
+              .WithMany(p => p.JudgedFishCatches)
               .HasForeignKey(d => d.JudgeId)
               .OnDelete(DeleteBehavior.Restrict); // Nie usuwaj sędziego, jeśli ma zgłoszenia
     }
