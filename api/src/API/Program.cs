@@ -1,5 +1,5 @@
-﻿using API.Middlewares;
-using Application;
+﻿using Application;
+using Fishio.API.Middlewares;
 using Infrastructure.Persistence;
 using Web;
 

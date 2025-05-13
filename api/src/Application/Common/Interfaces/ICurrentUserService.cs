@@ -1,6 +1,4 @@
-﻿using Domain.Entities;
-
-namespace Application.Common.Interfaces;
+﻿namespace Fishio.Application.Common.Interfaces;
 
 /// <summary>
 /// Provides access to information about the currently authenticated user.

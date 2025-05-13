@@ -1,4 +1,4 @@
-﻿namespace Domain.Enums;
+﻿namespace Fishio.Domain.Enums;
 
 public enum CompetitionStatus
 {

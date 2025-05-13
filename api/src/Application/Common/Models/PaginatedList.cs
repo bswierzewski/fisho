@@ -1,4 +1,4 @@
-﻿namespace Application.Common.Models;
+﻿namespace Fishio.Application.Common.Models;
 
 public class PaginatedList<T>
 {

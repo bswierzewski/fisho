@@ -1,6 +1,4 @@
 ﻿// Fishio.Infrastructure/Services/CurrentUserService.cs
-using Application.Common.Interfaces;
-using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities;
+﻿namespace Fishio.Domain.Entities;
 
 // Plik: CompetitionParticipant.cs (Tabela łącząca dla uczestników i ich ról)
 public class CompetitionParticipant : BaseAuditableEntity // Uczestnictwo też może być audytowalne

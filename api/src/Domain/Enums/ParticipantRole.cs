@@ -1,9 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace Fishio.Domain.Enums;
 
-namespace Domain.Enums;
-
-    public enum ParticipantRole
-    {
-        Judge,
-        Competitor
-    }
+public enum ParticipantRole
+{
+    Judge,
+    Competitor
+}

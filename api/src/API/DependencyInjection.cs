@@ -1,12 +1,11 @@
-﻿// Web/DependencyInjection.cs
-using Fishio.Infrastructure.Services;      // Dla CurrentUserService
+﻿using Fishio.Infrastructure.Services;      // Dla CurrentUserService
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect; // Dla OpenIdConnectConfiguration
 using Microsoft.IdentityModel.Protocols;             // Dla ConfigurationManager
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models; // Dla OpenApiSecurityScheme etc.
-using Application.Common.Interfaces;
+using Microsoft.OpenApi.Models;
+using Fishio.API.Infrastructure; // Dla OpenApiSecurityScheme etc.
 
 namespace Web; // Zakładam, że namespace to 'Web' zgodnie z Twoim plikiem
 

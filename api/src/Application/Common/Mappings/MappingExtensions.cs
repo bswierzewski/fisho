@@ -1,7 +1,6 @@
-﻿using Application.Common.Models;
-using AutoMapper.QueryableExtensions;
+﻿using AutoMapper.QueryableExtensions;
 
-namespace Application.Common.Mappings;
+namespace Fishio.Application.Common.Mappings;
 
 public static class MappingExtensions
 {

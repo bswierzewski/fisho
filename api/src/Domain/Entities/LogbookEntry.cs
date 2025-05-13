@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities;
+﻿namespace Fishio.Domain.Entities;
 
 // Plik: LogbookEntry.cs
 public class LogbookEntry : BaseAuditableEntity

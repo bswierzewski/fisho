@@ -1,8 +1,8 @@
-﻿using Application.Common.Exceptions;
+﻿using Fishio.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Infrastructure;
+namespace Fishio.API.Infrastructure;
 
 public class CustomExceptionHandler : IExceptionHandler
 {

@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities;
+﻿namespace Fishio.Domain.Entities;
 
 // Plik: User.cs (Podstawowe dane, reszta w Clerk)
 public class User : BaseAuditableEntity

@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities;
+﻿namespace Fishio.Domain.Entities;
 
 public class FishSpecies : BaseEntity
 {

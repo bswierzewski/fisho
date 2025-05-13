@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Domain.Entities;
+﻿namespace Fishio.Domain.Entities;
 
 // Plik: CompetitionFishCatch.cs
 public class CompetitionFishCatch : BaseAuditableEntity // Zgłoszenie połowu też audytowalne

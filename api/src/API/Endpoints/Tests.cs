@@ -1,7 +1,6 @@
-﻿using System.Diagnostics.Contracts;
-using Web.Infrastructure;
+﻿using Web.Infrastructure;
 
-namespace API.Endpoints
+namespace Fishio.API.Endpoints
 {
     public class Tests : EndpointGroupBase
     {

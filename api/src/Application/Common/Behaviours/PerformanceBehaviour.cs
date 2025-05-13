@@ -1,8 +1,7 @@
 ﻿using System.Diagnostics;
-using Application.Common.Interfaces;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Common.Behaviours;
+namespace Fishio.Application.Common.Behaviours;
 
 public class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
 {

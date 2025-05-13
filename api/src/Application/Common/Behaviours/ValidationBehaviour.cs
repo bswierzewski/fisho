@@ -1,6 +1,6 @@
-﻿using ValidationException = Application.Common.Exceptions.ValidationException;
+﻿using ValidationException = Fishio.Application.Common.Exceptions.ValidationException;
 
-namespace Application.Common.Behaviours;
+namespace Fishio.Application.Common.Behaviours;
 
 public class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
      where TRequest : notnull

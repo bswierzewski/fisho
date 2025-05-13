@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities;
+﻿namespace Fishio.Domain.Entities;
 
 // Plik: Competition.cs
 public class Competition : BaseAuditableEntity

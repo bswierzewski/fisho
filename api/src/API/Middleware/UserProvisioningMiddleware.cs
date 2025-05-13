@@ -1,6 +1,4 @@
-﻿using Application.Common.Interfaces;
-
-namespace API.Middlewares;
+﻿namespace Fishio.API.Middlewares;
 
 /// <summary>
 /// Middleware to ensure that an authenticated user from Clerk
