@@ -1,0 +1,212 @@
+# Fishio Application Schema (Clean Architecture with .NET Minimal API)
+
+## 1. Główne Założenia Projektu
+
+- **Nazwa Aplikacji:** Fishio
+- **Cel:** Platforma webowa (zoptymalizowana mobilnie) do organizacji i uczestnictwa w zawodach wędkarskich oraz prowadzenia osobistego rejestru połowów.
+- **Architektura:** Clean Architecture
+- **Backend:** .NET 9 (Minimal API)
+- **Frontend:** Next.js (React, TypeScript, App Router) - *nieobjęty tym schematem backendu*
+- **Baza Danych:** PostgreSQL (produkcja), SQLite (dewelopment)
+- **Uwierzytelnianie:** Clerk
+- **Główne Funkcjonalności (MVP+):**
+    - Zarządzanie Zawodami (tworzenie, przeglądanie, szczegóły)
+    - Zarządzanie Uczestnikami i Rolami w Zawodach (dołączanie, dodawanie gości, role Organizator/Sędzia/Uczestnik)
+    - Rejestracja Połowów w Zawodach (przez Sędziego)
+    - Publiczna Strona Wyników Zawodów (dynamiczna w zależności od statusu)
+    - Osobisty Dziennik Połowów (rejestracja, przeglądanie)
+    - Zarządzanie Łowiskami (dodawanie, przeglądanie, przypisywanie gatunków ryb)
+    - Dashboard użytkownika
+    - Strona "O Aplikacji"
+
+## 2. Struktura Projektu (Foldery i Kluczowe Pliki)
+
+Fishio/
+├── Fishio.Domain/                  # Warstwa Domenowa: Encje, Wartości, Zdarzenia Domenowe, Interfejsy Repozytoriów
+│   ├── Common/
+│   │   ├── BaseEntity.cs           # Bazowa klasa dla encji z Id
+│   │   └── AuditableEntity.cs      # Bazowa klasa dla encji z polami audytu (Created, LastModified)
+│   ├── Entities/
+│   │   ├── Competition.cs          # Encja zawodów
+│   │   ├── CompetitionFishCatch.cs # Encja połowu w zawodach
+│   │   ├── CompetitionParticipant.cs # Encja uczestnika zawodów (z rolą)
+│   │   ├── FishSpecies.cs          # Encja predefiniowanego gatunku ryby
+│   │   ├── Fishery.cs              # Encja łowiska
+│   │   ├── LogbookEntry.cs         # Encja wpisu w dzienniku osobistym
+│   │   ├── ScoringCategoryOption.cs # Encja opcji głównej kategorii punktacji
+│   │   ├── SpecialCompetitionCategory.cs # Encja kategorii specjalnej w zawodach
+│   │   └── User.cs                 # Encja użytkownika (z ClerkUserId)
+│   ├── Enums/
+│   │   ├── CompetitionStatus.cs
+│   │   ├── CompetitionType.cs
+│   │   └── ParticipantRole.cs      # Rola uczestnika w zawodach (np. Competitor, Judge)
+│   ├── Events/                     # (Opcjonalnie) Zdarzenia domenowe (np. CompetitionCreatedEvent.cs)
+│   ├── Exceptions/                 # (Opcjonalnie) Niestandardowe wyjątki domenowe
+│   ├── Interfaces/                 # Interfejsy specyficzne dla domeny
+│   │   ├── IApplicationDbContext.cs # Interfejs kontekstu bazy danych (definiuje DbSet-y)
+│   │   ├── ICompetitionRepository.cs # Przykład interfejsu repozytorium
+│   │   └── ICompetitionTokenGenerator.cs # Interfejs serwisu do generowania tokenów wyników
+│   └── ValueObjects/               # (Opcjonalnie) Obiekty wartości (np. FishMeasurement.cs)
+│
+├── Fishio.Application/             # Warstwa Aplikacji: Logika Biznesowa, Komendy, Zapytania (CQRS z MediatR)
+│   ├── Common/
+│   │   ├── Behaviors/              # Zachowania pipeline'u MediatR (np. ValidationBehavior, LoggingBehavior)
+│   │   ├── Exceptions/             # Wyjątki specyficzne dla aplikacji (np. NotFoundException, ValidationException)
+│   │   ├── Interfaces/             # Interfejsy używane przez warstwę aplikacji
+│   │   │   └── ICurrentUserService.cs # Interfejs do pobierania informacji o bieżącym użytkowniku
+│   │   └── Mappings/               # (Opcjonalnie) Konfiguracja mapowania (np. AutoMapper Profiles)
+│   ├── Competitions/               # Funkcjonalność: Zawody
+│   │   ├── Commands/
+│   │   │   ├── CreateCompetition/
+│   │   │   │   ├── CreateCompetitionCommand.cs # Komenda (służy jako DTO wejściowe)
+│   │   │   │   └── CreateCompetitionCommandHandler.cs
+│   │   │   ├── AddParticipant/
+│   │   │   │   ├── AddParticipantCommand.cs
+│   │   │   │   └── AddParticipantCommandHandler.cs
+│   │   │   ├── AssignJudgeRole/
+│   │   │   ├── JoinCompetition/
+│   │   │   ├── RecordFishCatch/
+│   │   │   ├── RemoveParticipant/
+│   │   │   └── RevokeJudgeRole/
+│   │   └── Queries/
+│   │       ├── GetCompetitionDetails/
+│   │       │   ├── GetCompetitionDetailsQuery.cs
+│   │       │   ├── CompetitionDetailsDto.cs # DTO wynikowe
+│   │       │   └── GetCompetitionDetailsQueryHandler.cs
+│   │       ├── ListCompetitions/
+│   │       │   ├── ListCompetitionsQuery.cs
+│   │       │   ├── CompetitionDto.cs
+│   │       │   └── ListCompetitionsQueryHandler.cs
+│   │       ├── ListCompetitionParticipants/
+│   │       ├── ListMyCompetitions/
+│   │       └── ListCompetitionCatches/
+│   ├── Dashboard/
+│   │   └── Queries/
+│   │       └── GetDashboardData/
+│   │           ├── GetDashboardDataQuery.cs
+│   │           ├── DashboardDto.cs
+│   │           └── GetDashboardDataQueryHandler.cs
+│   ├── Fisheries/                  # Funkcjonalność: Łowiska (MVP+)
+│   │   ├── Commands/
+│   │   │   ├── CreateFishery/
+│   │   │   └── UpdateFishery/
+│   │   └── Queries/
+│   │       ├── GetFisheryDetails/
+│   │       └── ListFisheries/
+│   ├── Logbook/                    # Funkcjonalność: Dziennik Połowów (MVP+)
+│   │   ├── Commands/
+│   │   │   ├── CreateLogbookEntry/
+│   │   │   ├── DeleteLogbookEntry/
+│   │   │   └── UpdateLogbookEntry/
+│   │   └── Queries/
+│   │       ├── GetLogbookEntryDetails/
+│   │       └── ListLogbookEntries/
+│   ├── LookupData/                 # Funkcjonalność: Dane Słownikowe
+│   │   └── Queries/
+│   │       ├── ListFishSpecies/
+│   │       └── ListScoringCategories/
+│   ├── PublicResults/              # Funkcjonalność: Publiczne Wyniki
+│   │   └── Queries/
+│   │       └── GetPublicCompetitionResults/
+│   ├── Users/                      # Funkcjonalność: Użytkownicy
+│   │   └── Queries/
+│   │       └── SearchUsers/
+│   ├── About/                      # Funkcjonalność: O Aplikacji
+│   │   └── Queries/
+│   │       └── GetApplicationInfo/
+│   └── DependencyInjection.cs      # Metoda rozszerzająca do rejestracji usług tej warstwy (np. MediatR, AutoMapper, Validators)
+│
+├── Fishio.Infrastructure/          # Warstwa Infrastruktury: Implementacje Zewnętrznych Zależności
+│   ├── Persistence/
+│   │   ├── ApplicationDbContext.cs # Implementacja DbContext (EF Core)
+│   │   ├── Configurations/         # Konfiguracje encji dla EF Core (Fluent API)
+│   │   │   └── CompetitionConfiguration.cs
+│   │   ├── Migrations/             # Migracje bazy danych generowane przez EF Core
+│   │   └── Repositories/           # (Opcjonalnie) Implementacje repozytoriów, jeśli nie używamy generycznych
+│   │       └── CompetitionRepository.cs
+│   ├── Services/                   # Implementacje serwisów
+│   │   ├── DateTimeService.cs      # (Przykład) Implementacja IDateTime
+│   │   ├── CompetitionTokenGenerator.cs # Implementacja ICompetitionTokenGenerator
+│   │   └── CurrentUserService.cs   # Implementacja ICurrentUserService (pobieranie danych z HttpContext/Clerk)
+│   ├── Identity/                   # (Opcjonalnie) Jeśli potrzebna dodatkowa logika związana z Clerk
+│   └── DependencyInjection.cs      # Metoda rozszerzająca do rejestracji usług tej warstwy (np. DbContext, Repozytoria, Serwisy)
+│
+├── Fishio.Api/                     # Warstwa Prezentacji: Minimal API (lub MVC)
+│   ├── Endpoints/                  # Definicje endpointów Minimal API
+│   │   ├── AboutEndpoints.cs
+│   │   ├── CompetitionEndpoints.cs
+│   │   ├── DashboardEndpoints.cs
+│   │   ├── FisheryEndpoints.cs
+│   │   ├── LogbookEndpoints.cs
+│   │   ├── LookupDataEndpoints.cs
+│   │   ├── PublicResultsEndpoints.cs
+│   │   └── UserEndpoints.cs
+│   ├── Middleware/                 # (Opcjonalnie) Niestandardowe middleware
+│   │   └── ExceptionHandlingMiddleware.cs
+│   ├── Properties/
+│   │   └── launchSettings.json
+│   ├── appsettings.json
+│   ├── appsettings.Development.json
+│   ├── Fishio.Api.csproj
+│   └── Program.cs                  # Główny plik aplikacji: konfiguracja DI, pipeline, mapowanie endpointów
+│
+├── Tests/                          # Folder na projekty testowe
+│   ├── Fishio.Domain.UnitTests/
+│   ├── Fishio.Application.UnitTests/
+│   ├── Fishio.Infrastructure.IntegrationTests/
+│   └── Fishio.Api.IntegrationTests/
+│
+└── Fishio.sln                      # Plik solucji Visual Studio
+
+## 3. Przepływ Danych (Typowy Cykl Żądania/Odpowiedzi)
+
+1.  **Żądanie HTTP:** Klient (np. frontend Next.js, Postman) wysyła żądanie HTTP do endpointu zdefiniowanego w `Fishio.Api` (np. `POST /api/competitions`).
+2.  **Minimal API Endpoint (`Fishio.Api/Endpoints/`):**
+    *   Endpoint odbiera żądanie.
+    *   Dane z ciała żądania (JSON) są automatycznie bindowane do obiektu komendy MediatR (np. `CreateCompetitionCommand`), która jest zdefiniowana w `Fishio.Application`.
+    *   Endpoint wstrzykuje `ISender` (MediatR) i wysyła komendę/zapytanie: `await mediator.Send(command);`.
+3.  **MediatR Pipeline (`Fishio.Application/Common/Behaviors/`):**
+    *   Żądanie przechodzi przez zdefiniowane zachowania (behaviors), np.:
+        *   `LoggingBehavior`: Logowanie informacji o żądaniu.
+        *   `ValidationBehavior`: Walidacja komendy przy użyciu FluentValidation (jeśli zaimplementowano). Jeśli walidacja zawiedzie, rzucany jest `ValidationException`.
+        *   `PerformanceBehavior`: (Opcjonalnie) Mierzenie czasu wykonania.
+4.  **Handler Komendy/Zapytania (`Fishio.Application/Features/.../`):**
+    *   Odpowiedni handler (np. `CreateCompetitionCommandHandler`) odbiera żądanie.
+    *   Handler wykonuje logikę biznesową:
+        *   Może wchodzić w interakcję z encjami domenowymi (`Fishio.Domain/Entities/`).
+        *   Może korzystać z serwisów domenowych lub aplikacyjnych (np. `ICompetitionTokenGenerator`, `ICurrentUserService`).
+        *   Używa interfejsu `IApplicationDbContext` (z `Fishio.Domain`) do interakcji z bazą danych (operacje CRUD). Implementacja `IApplicationDbContext` znajduje się w `Fishio.Infrastructure`.
+        *   W przypadku zapytań, handler może mapować encje na DTOs (np. `CompetitionDetailsDto`) i je zwracać.
+5.  **Odpowiedź z Handlera:**
+    *   Handler komendy może zwrócić np. ID utworzonego zasobu lub nic (`Unit`).
+    *   Handler zapytania zwraca DTO z danymi.
+6.  **Minimal API Endpoint (`Fishio.Api/Endpoints/`):**
+    *   Endpoint otrzymuje wynik od MediatR.
+    *   Formatuje odpowiedź HTTP (np. `TypedResults.Ok(dto)`, `TypedResults.CreatedAtRoute(...)`, `TypedResults.NoContent()`).
+    *   Obsługuje wyjątki (np. `NotFoundException` mapowane na 404, `ValidationException` na 400 z listą błędów). Może to być realizowane przez globalny middleware (`ExceptionHandlingMiddleware.cs`).
+7.  **Odpowiedź HTTP:** API wysyła odpowiedź HTTP do klienta.
+
+## 4. Kluczowe Technologie i Koncepcje
+
+-   **.NET 9 Minimal API:** Lekka i wydajna platforma do budowy API.
+-   **Clean Architecture:** Podział na warstwy (Domain, Application, Infrastructure, Api) w celu separacji odpowiedzialności i testowalności.
+-   **CQRS (Command Query Responsibility Segregation):** Rozdzielenie operacji zapisu (Komendy) od operacji odczytu (Zapytania) przy użyciu biblioteki **MediatR**.
+-   **Entity Framework Core:** ORM do interakcji z bazą danych.
+-   **Dependency Injection (DI):** Wbudowany mechanizm .NET do zarządzania zależnościami. Konfiguracja w `Program.cs` oraz plikach `DependencyInjection.cs` w każdej warstwie.
+-   **DTOs (Data Transfer Objects):** Klasy komend/zapytań MediatR oraz klasy DTO zwracane przez zapytania służą jako kontrakt danych.
+-   **Walidacja:** (Zalecane) FluentValidation dla walidacji komend/zapytań, zintegrowane z pipeline'em MediatR.
+-   **Uwierzytelnianie i Autoryzacja:** Clerk dla uwierzytelniania. Autoryzacja oparta na rolach/politykach .NET.
+-   **Mapowanie:** (Opcjonalnie) AutoMapper do mapowania między obiektami, jeśli potrzebne (np. encja -> DTO, jeśli DTO nie jest bezpośrednio tworzone przez projekcję EF Core).
+-   **Testowanie:** Oddzielne projekty testowe dla każdej warstwy (jednostkowe, integracyjne).
+
+## 5. Ważne Uwagi
+
+-   **Niezmienniki Domenowe:** Logika walidacyjna i reguły biznesowe, które muszą być zawsze spełnione, powinny być egzekwowane w encjach domenowych (`Fishio.Domain`).
+-   **Cienkie Kontrolery/Endpointy:** Endpointy w `Fishio.Api` powinny być jak najprostsze, delegując większość pracy do warstwy `Application` poprzez MediatR.
+-   **Obsługa Błędów:** Spójna strategia obsługi błędów i zwracania odpowiednich kodów HTTP.
+-   **Konfiguracja:** Użycie `appsettings.json` i zmiennych środowiskowych do konfiguracji.
+-   **Logowanie:** Implementacja mechanizmu logowania (np. Serilog).
+
+---
+
+Ten schemat powinien dać Ci solidny przegląd struktury i działania aplikacji Fishio. Możesz go używać jako punktu odniesienia i rozwijać w miarę postępów prac. Powodzenia!
