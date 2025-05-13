@@ -61,7 +61,7 @@ ENV APP_VERSION_TAG=$BUILD_INFO_VERSION_TAG
 ENV ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_URLS=http://+:7000
 
-EXPOSE 7000 # Zmieniono port na 7000
+EXPOSE 7000
 
 # Nazwa DLLki będzie prawdopodobnie API.dll, jeśli Twój projekt API nazywa się API.csproj
 # Jeśli nazwa projektu to Fishio.Api.csproj, to DLLka będzie Fishio.Api.dll
