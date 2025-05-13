@@ -1,39 +1,40 @@
-# .github/workflows/docker-build-push-api.yml
-
 name: Build and Push API (.NET) Docker Image
 
 on:
   push:
     branches:
-      - main # Lub Twoja główna gałąź
-    paths: # Uruchom workflow tylko, gdy zmiany dotyczą folderów API lub tego pliku workflow
+      - main
+    paths:
       - "api/src/**"
-      - ".github/workflows/docker-build-push-api.yml"
-  pull_request: # Uruchom również dla Pull Requestów na gałąź main (bez wypychania obrazu)
+      - "api/Fishio.sln"
+      - "api/Dockerfile"
+      - ".github/workflows/docker-build-push-api.yaml"
+  pull_request:
     branches:
       - main
     paths:
       - "api/src/**"
-      - ".github/workflows/docker-build-push-api.yml"
-  workflow_dispatch: # Umożliwia ręczne uruchomienie
+      - "api/Fishio.sln"
+      - "api/Dockerfile"
+      - ".github/workflows/docker-build-push-api.yaml"
+  workflow_dispatch:
 
 env:
-  # Nazwa obrazu dla API w GitHub Container Registry
-  # Format: ghcr.io/TWOJ_USERNAME_LUB_ORGANIZACJA/NAZWA_REPOZYTORIUM-api
   IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}-api
+  # DOCKERFILE_PATH i BUILD_CONTEXT są używane bezpośrednio w kroku build-push-action
 
 jobs:
   build-and-push-api:
     runs-on: ubuntu-latest
     permissions:
-      contents: read # Potrzebne do checkoutu
-      packages: write # Potrzebne do wypychania obrazów do GHCR
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Potrzebne do pobrania pełnej historii Git dla tagów/SHA
+          fetch-depth: 0
 
       - name: Get current date and Git info
         id: build_info
@@ -43,10 +44,8 @@ jobs:
           GIT_TAG=$(git describe --tags --abbrev=0 --exact-match 2>/dev/null || echo "")
           if [ -n "$GIT_TAG" ]; then
             echo "APP_VERSION_TAG=$GIT_TAG" >> $GITHUB_OUTPUT
-            echo "Resolved version tag to Git tag: $GIT_TAG"
           else
-            echo "APP_VERSION_TAG=none" >> $GITHUB_OUTPUT # Lub pusty string, jeśli wolisz
-            echo "No exact Git tag found for versioning."
+            echo "APP_VERSION_TAG=none" >> $GITHUB_OUTPUT
           fi
 
       - name: Set up Docker Buildx
@@ -65,33 +64,21 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
-            type=sha # Taguje obraz krótkim SHA commita
-            type=raw,value=${{ steps.build_info.outputs.APP_VERSION_TAG }},enable=${{ steps.build_info.outputs.APP_VERSION_TAG != 'none' }} # Taguje obraz tagiem Git, jeśli istnieje
-            type=raw,value=latest,enable={{is_default_branch}} # Taguje 'latest' dla domyślnej gałęzi
+            type=sha
+            type=raw,value=${{ steps.build_info.outputs.APP_VERSION_TAG }},enable=${{ steps.build_info.outputs.APP_VERSION_TAG != 'none' }}
+            type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Docker image for API
         uses: docker/build-push-action@v5
         with:
           context: ./api
           file: ./api/Dockerfile
-          # Wypychaj tylko przy push na gałąź main (nie dla pull requestów)
           push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: | # Przekazujemy informacje o buildzie jako build-args
-            # Te build-args mogą być użyte w Dockerfile do ustawienia zmiennych środowiskowych
-            # za pomocą instrukcji ARG i ENV, jeśli chcesz je "wypalić" w obrazie.
-            # Jednak dla API .NET, częściej przekazuje się je jako zmienne środowiskowe
-            # w momencie uruchomienia kontenera.
-            # Jeśli Twój Dockerfile używa ARG do ustawienia ENV, możesz je tu przekazać.
-            # Na przykład, jeśli Dockerfile ma:
-            # ARG BUILD_INFO_GIT_SHA
-            # ENV APP_VERSION_SHA=$BUILD_INFO_GIT_SHA
+          build-args: |
             BUILD_INFO_GIT_SHA=${{ steps.build_info.outputs.GIT_SHA }}
             BUILD_INFO_TIMESTAMP=${{ steps.build_info.outputs.BUILD_TIMESTAMP }}
             BUILD_INFO_VERSION_TAG=${{ steps.build_info.outputs.APP_VERSION_TAG }}
-            # Dodaj inne build-args, jeśli są potrzebne, np. dla sekretów czasu budowania
-            # (chociaż dla API .NET sekrety są zwykle przekazywane w czasie uruchomienia)
-            # PRZYKŁAD_BUILD_ARG=${{ secrets.PRZYKLAD_SEKRET_BUILD }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
