@@ -14,10 +14,10 @@ COPY src/Domain/Domain.csproj ./src/Domain/
 COPY src/Application/Application.csproj ./src/Application/
 COPY src/Infrastructure/Infrastructure.csproj ./src/Infrastructure/
 COPY src/API/API.csproj ./src/API/
-COPY src/Fishio.sln ./src/
+COPY Fishio.sln ./
 
 # Przywróć zależności dla całej solucji
-RUN dotnet restore ./src/Fishio.sln
+RUN dotnet restore ./Fishio.sln
 
 # Kopiuj resztę kodu źródłowego aplikacji
 COPY src/ ./src/
