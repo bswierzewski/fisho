@@ -1,15 +1,7 @@
-﻿// Fishio.Api/Endpoints/FisheryEndpoints.cs
-using Fishio.Application.Fisheries.Commands.CreateFishery;
+﻿using Fishio.Application.Fisheries.Commands.CreateFishery;
 using Fishio.Application.Fisheries.Commands.UpdateFishery;
 using Fishio.Application.Fisheries.Queries.GetFisheryDetails;
 using Fishio.Application.Fisheries.Queries.ListFisheries;
-// DTOs z warstwy Application
-using Fishio.Application.Fisheries.Queries; // np. FisheryDto, FisheryDetailsDto
-using MediatR;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using System.Collections.Generic;
 
 namespace Fishio.API.Endpoints;
 

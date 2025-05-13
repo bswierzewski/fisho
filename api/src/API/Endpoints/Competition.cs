@@ -1,26 +1,17 @@
-﻿// Fishio.Api/Endpoints/CompetitionEndpoints.cs
-using Fishio.Application.Competitions.Commands.CreateCompetition;
-using Fishio.Application.Competitions.Commands.AddParticipant;
+﻿using Fishio.Application.Competitions.Commands.AddParticipant;
 using Fishio.Application.Competitions.Commands.AssignJudgeRole;
+using Fishio.Application.Competitions.Commands.CreateCompetition;
 using Fishio.Application.Competitions.Commands.JoinCompetition;
 using Fishio.Application.Competitions.Commands.RecordFishCatch;
 using Fishio.Application.Competitions.Commands.RemoveParticipant;
 using Fishio.Application.Competitions.Commands.RevokeJudgeRole;
-// using Fishio.Application.Competitions.Commands.UpdateCompetition; // Jeśli dodasz edycję
 using Fishio.Application.Competitions.Queries.GetCompetitionDetails;
-using Fishio.Application.Competitions.Queries.ListCompetitions;
-using Fishio.Application.Competitions.Queries.ListCompetitionParticipants;
-using Fishio.Application.Competitions.Queries.ListMyCompetitions;
 using Fishio.Application.Competitions.Queries.ListCompetitionCatches;
-// DTOs z warstwy Application
-using Fishio.Application.Competitions.Queries; // np. CompetitionDto, CompetitionDetailsDto, ParticipantDto, FishCatchDto
-using Fishio.Domain.Enums; // Dla CompetitionType
-using MediatR;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
+using Fishio.Application.Competitions.Queries.ListCompetitionParticipants;
+using Fishio.Application.Competitions.Queries.ListCompetitions;
+using Fishio.Application.Competitions.Queries.ListMyCompetitions;
+using Fishio.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
-using System.Collections.Generic;
 
 namespace Fishio.API.Endpoints;
 
@@ -55,7 +46,7 @@ public static class Competition
             ISender mediator,
             CancellationToken ct) =>
         {
-            var query = new ListCompetitionsQuery { TypeFilter = type };
+            var query = new ListCompetitionsQuery { Type = type };
             var result = await mediator.Send(query, ct);
             return TypedResults.Ok(result);
         })

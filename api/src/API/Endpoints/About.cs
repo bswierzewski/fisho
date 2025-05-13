@@ -1,9 +1,4 @@
-﻿// Fishio.Api/Endpoints/AboutEndpoints.cs
-using Fishio.Application.About.Queries; // Załóżmy, że masz takie zapytanie
-using MediatR;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+﻿using Fishio.Application.About.Queries.GetApplicationInfo;
 
 namespace Fishio.API.Endpoints;
 

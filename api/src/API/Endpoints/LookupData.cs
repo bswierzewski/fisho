@@ -1,13 +1,5 @@
-﻿// Fishio.Api/Endpoints/LookupDataEndpoints.cs
-using Fishio.Application.LookupData.Queries.ListFishSpecies;
+﻿using Fishio.Application.LookupData.Queries.ListFishSpecies;
 using Fishio.Application.LookupData.Queries.ListScoringCategories;
-// DTOs z warstwy Application
-using Fishio.Application.LookupData.Queries; // np. FishSpeciesDto, ScoringCategoryDto
-using MediatR;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using System.Collections.Generic;
 
 namespace Fishio.API.Endpoints;
 

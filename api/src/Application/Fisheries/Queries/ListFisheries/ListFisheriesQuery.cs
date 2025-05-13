@@ -1,0 +1,33 @@
+namespace Fishio.Application.Fisheries.Queries.ListFisheries;
+
+public record ListFisheriesQuery : IRequest<List<FisheryDto>>
+{
+    public string? SearchTerm { get; init; }
+    public Guid? FishSpeciesId { get; init; }
+    public int Page { get; init; } = 1;
+    public int PageSize { get; init; } = 10;
+}
+
+public class ListFisheriesQueryValidator : AbstractValidator<ListFisheriesQuery>
+{
+    public ListFisheriesQueryValidator()
+    {
+        RuleFor(x => x.Page)
+            .GreaterThan(0).WithMessage("Page must be greater than 0");
+
+        RuleFor(x => x.PageSize)
+            .GreaterThan(0).WithMessage("Page size must be greater than 0")
+            .LessThanOrEqualTo(100).WithMessage("Page size cannot exceed 100");
+    }
+}
+
+public record FisheryDto
+{
+    public Guid Id { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public string Description { get; init; } = string.Empty;
+    public string Location { get; init; } = string.Empty;
+    public int FishSpeciesCount { get; init; }
+    public int TotalCatchesCount { get; init; }
+    public DateTime? LastCatchDate { get; init; }
+} 

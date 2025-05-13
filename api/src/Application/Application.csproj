@@ -18,4 +18,32 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.4" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="About\Queries\GetApplicationInfo\" />
+	  <Folder Include="Competitions\Commands\AssignJudgeRole\" />
+	  <Folder Include="Competitions\Commands\JoinCompetition\" />
+	  <Folder Include="Competitions\Commands\RecordFishCatch\" />
+	  <Folder Include="Competitions\Commands\RevokeJudgeRole\" />
+	  <Folder Include="Competitions\Commands\RemoveParticipant\" />
+	  <Folder Include="Competitions\Commands\AddParticipant\" />
+	  <Folder Include="Competitions\Queries\ListCompetitions\" />
+	  <Folder Include="Competitions\Queries\ListCompetitionParticipants\" />
+	  <Folder Include="Competitions\Queries\ListMyCompetitions\" />
+	  <Folder Include="Competitions\Queries\ListCompetitionCatches\" />
+	  <Folder Include="Dashboard\Queries\GetDashboardData\" />
+	  <Folder Include="Fisheries\Commands\CreateFishery\" />
+	  <Folder Include="Fisheries\Commands\UpdateFishery\" />
+	  <Folder Include="Fisheries\Queries\GetFisheryDetails\" />
+	  <Folder Include="Fisheries\Queries\ListFisheries\" />
+	  <Folder Include="Logbook\Commands\CreateLogbookEntry\" />
+	  <Folder Include="Logbook\Commands\DeleteLogbookEntry\" />
+	  <Folder Include="Logbook\Commands\UpdateLogbookEntry\" />
+	  <Folder Include="Logbook\Queries\GetLogbookEntryDetails\" />
+	  <Folder Include="Logbook\Queries\ListLogbookEntries\" />
+	  <Folder Include="LookupData\Queries\ListFishSpecies\" />
+	  <Folder Include="LookupData\Queries\ListScoringCategories\" />
+	  <Folder Include="PublicResults\Queries\GetPublicCompetitionResults\" />
+	  <Folder Include="Users\Queries\SearchUsers\" />
+	</ItemGroup>
+
 </Project>

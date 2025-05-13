@@ -1,9 +1,4 @@
-﻿// Fishio.Api/Endpoints/PublicResultsEndpoints.cs
-using Fishio.Application.PublicResults.Queries; // Załóżmy, że masz takie zapytanie
-using MediatR;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+﻿using Fishio.Application.PublicResults.Queries.GetPublicCompetitionResults;
 
 namespace Fishio.API.Endpoints;
 

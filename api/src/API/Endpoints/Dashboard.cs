@@ -1,9 +1,4 @@
-﻿// Fishio.Api/Endpoints/DashboardEndpoints.cs
-using Fishio.Application.Dashboard.Queries; // Załóżmy, że masz takie zapytanie
-using MediatR;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+﻿using Fishio.Application.Dashboard.Queries.GetDashboardData;
 
 namespace Fishio.API.Endpoints;
 

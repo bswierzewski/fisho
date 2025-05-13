@@ -1,16 +1,8 @@
-﻿// Fishio.Api/Endpoints/LogbookEndpoints.cs
-using Fishio.Application.Logbook.Commands.CreateLogbookEntry;
+﻿using Fishio.Application.Logbook.Commands.CreateLogbookEntry;
 using Fishio.Application.Logbook.Commands.DeleteLogbookEntry;
 using Fishio.Application.Logbook.Commands.UpdateLogbookEntry;
 using Fishio.Application.Logbook.Queries.GetLogbookEntryDetails;
 using Fishio.Application.Logbook.Queries.ListLogbookEntries;
-// DTOs z warstwy Application
-using Fishio.Application.Logbook.Queries; // np. LogbookEntryDto, LogbookEntryDetailsDto
-using MediatR;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using System.Collections.Generic;
 
 namespace Fishio.API.Endpoints;
 
