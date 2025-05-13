@@ -2,6 +2,7 @@
 using Fishio.Infrastructure.Services;
 using Infrastructure.Data.Interceptors;
 using Infrastructure.Persistence;
+using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -29,6 +30,7 @@ public static class DependencyInjection
         builder.Services.AddScoped<ApplicationDbContextInitialiser>();
 
         builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+        builder.Services.AddScoped<ICompetitionTokenGenerator, CompetitionTokenGenerator>();
 
         builder.Services.AddSingleton(TimeProvider.System);
     }

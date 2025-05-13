@@ -2,9 +2,9 @@ namespace Fishio.Application.Logbook.Commands.UpdateLogbookEntry;
 
 public record UpdateLogbookEntryCommand : IRequest<Unit>
 {
-    public Guid LogbookEntryId { get; init; }
-    public Guid FisheryId { get; init; }
-    public Guid FishSpeciesId { get; init; }
+    public int LogbookEntryId { get; init; }
+    public int FisheryId { get; init; }
+    public int FishSpeciesId { get; init; }
     public decimal Length { get; init; }
     public decimal? Weight { get; init; }
     public string? Notes { get; init; }

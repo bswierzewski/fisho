@@ -1,9 +1,9 @@
 namespace Fishio.Application.Logbook.Commands.CreateLogbookEntry;
 
-public record CreateLogbookEntryCommand : IRequest<Unit>
+public record CreateLogbookEntryCommand : IRequest<int>
 {
-    public Guid FisheryId { get; init; }
-    public Guid FishSpeciesId { get; init; }
+    public int FisheryId { get; init; }
+    public int FishSpeciesId { get; init; }
     public decimal Length { get; init; }
     public decimal? Weight { get; init; }
     public string? Notes { get; init; }

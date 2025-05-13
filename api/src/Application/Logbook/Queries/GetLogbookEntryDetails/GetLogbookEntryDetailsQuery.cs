@@ -2,7 +2,7 @@ namespace Fishio.Application.Logbook.Queries.GetLogbookEntryDetails;
 
 public record GetLogbookEntryDetailsQuery : IRequest<LogbookEntryDetailsDto>
 {
-    public Guid LogbookEntryId { get; init; }
+    public int LogbookEntryId { get; init; }
 }
 
 public class GetLogbookEntryDetailsQueryValidator : AbstractValidator<GetLogbookEntryDetailsQuery>
@@ -16,10 +16,10 @@ public class GetLogbookEntryDetailsQueryValidator : AbstractValidator<GetLogbook
 
 public record LogbookEntryDetailsDto
 {
-    public Guid Id { get; init; }
-    public Guid FisheryId { get; init; }
+    public int Id { get; init; }
+    public int FisheryId { get; init; }
     public string FisheryName { get; init; } = string.Empty;
-    public Guid FishSpeciesId { get; init; }
+    public int FishSpeciesId { get; init; }
     public string FishSpeciesName { get; init; } = string.Empty;
     public decimal Length { get; init; }
     public decimal? Weight { get; init; }

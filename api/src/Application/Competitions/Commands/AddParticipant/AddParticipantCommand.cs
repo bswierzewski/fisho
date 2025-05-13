@@ -1,9 +1,9 @@
 namespace Fishio.Application.Competitions.Commands.AddParticipant;
 
-public record AddParticipantCommand : IRequest<Unit>
+public record AddParticipantCommand : IRequest<int>
 {
-    public Guid CompetitionId { get; init; }
-    public string ParticipantId { get; init; } = string.Empty;
+    public int CompetitionId { get; init; }
+    public int ParticipantId { get; init; }
     public bool IsGuest { get; init; }
 }
 

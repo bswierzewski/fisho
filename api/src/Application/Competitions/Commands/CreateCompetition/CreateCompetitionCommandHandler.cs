@@ -1,6 +1,6 @@
 ﻿namespace Fishio.Application.Competitions.Commands.CreateCompetition;
 
-public class CreateCompetitionCommandHandler : IRequestHandler<CreateCompetitionCommand, Unit>
+public class CreateCompetitionCommandHandler : IRequestHandler<CreateCompetitionCommand, int>
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUserService _currentUserService;
@@ -13,9 +13,9 @@ public class CreateCompetitionCommandHandler : IRequestHandler<CreateCompetition
         _currentUserService = currentUserService;
     }
 
-    public async Task<Unit> Handle(CreateCompetitionCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(CreateCompetitionCommand request, CancellationToken cancellationToken)
     {
         // TODO: Implement the logic for creating a competition
-        return Unit.Value;
+        return 0;
     }
 }

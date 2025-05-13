@@ -1,13 +1,13 @@
 ﻿namespace Fishio.Application.Competitions.Commands.CreateCompetition;
 
-public record CreateCompetitionCommand : IRequest<Unit>
+public record CreateCompetitionCommand : IRequest<int>
 {
     public string Name { get; init; } = string.Empty;
     public string Description { get; init; } = string.Empty;
     public DateTime StartDate { get; init; }
     public DateTime EndDate { get; init; }
     public string Type { get; init; } = string.Empty;
-    public List<Guid> FishSpeciesIds { get; init; } = new();
+    public List<int> FishSpeciesIds { get; init; } = new();
     public List<string> JudgeIds { get; init; } = new();
 }
 

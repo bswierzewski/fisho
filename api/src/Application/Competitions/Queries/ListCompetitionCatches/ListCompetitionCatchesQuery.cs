@@ -2,9 +2,9 @@ namespace Fishio.Application.Competitions.Queries.ListCompetitionCatches;
 
 public record ListCompetitionCatchesQuery : IRequest<List<CompetitionCatchDto>>
 {
-    public Guid CompetitionId { get; init; }
+    public int CompetitionId { get; init; }
     public string? ParticipantId { get; init; }
-    public Guid? FishSpeciesId { get; init; }
+    public int? FishSpeciesId { get; init; }
     public DateTime? FromDate { get; init; }
     public DateTime? ToDate { get; init; }
     public int Page { get; init; } = 1;
@@ -34,10 +34,10 @@ public class ListCompetitionCatchesQueryValidator : AbstractValidator<ListCompet
 
 public record CompetitionCatchDto
 {
-    public Guid Id { get; init; }
+    public int Id { get; init; }
     public string ParticipantId { get; init; } = string.Empty;
     public string ParticipantName { get; init; } = string.Empty;
-    public Guid FishSpeciesId { get; init; }
+    public int FishSpeciesId { get; init; }
     public string FishSpeciesName { get; init; } = string.Empty;
     public decimal Length { get; init; }
     public decimal? Weight { get; init; }

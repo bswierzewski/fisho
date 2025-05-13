@@ -1,6 +1,6 @@
 namespace Fishio.Application.Logbook.Commands.CreateLogbookEntry;
 
-public class CreateLogbookEntryCommandHandler : IRequestHandler<CreateLogbookEntryCommand, Unit>
+public class CreateLogbookEntryCommandHandler : IRequestHandler<CreateLogbookEntryCommand, int>
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUserService _currentUserService;
@@ -13,9 +13,9 @@ public class CreateLogbookEntryCommandHandler : IRequestHandler<CreateLogbookEnt
         _currentUserService = currentUserService;
     }
 
-    public async Task<Unit> Handle(CreateLogbookEntryCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(CreateLogbookEntryCommand request, CancellationToken cancellationToken)
     {
         // TODO: Implement the logic for creating a logbook entry
-        return Unit.Value;
+        return 0;
     }
 } 

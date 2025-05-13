@@ -2,9 +2,9 @@ namespace Fishio.Application.Competitions.Commands.RecordFishCatch;
 
 public record RecordFishCatchCommand : IRequest<Unit>
 {
-    public Guid CompetitionId { get; init; }
+    public int CompetitionId { get; init; }
     public string ParticipantId { get; init; } = string.Empty;
-    public Guid FishSpeciesId { get; init; }
+    public int FishSpeciesId { get; init; }
     public decimal Length { get; init; }
     public decimal? Weight { get; init; }
     public string? Notes { get; init; }

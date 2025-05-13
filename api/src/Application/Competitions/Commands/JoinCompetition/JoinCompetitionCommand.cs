@@ -2,7 +2,7 @@ namespace Fishio.Application.Competitions.Commands.JoinCompetition;
 
 public record JoinCompetitionCommand : IRequest<Unit>
 {
-    public Guid CompetitionId { get; init; }
+    public int CompetitionId { get; init; }
 }
 
 public class JoinCompetitionCommandValidator : AbstractValidator<JoinCompetitionCommand>

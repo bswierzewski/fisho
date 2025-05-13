@@ -2,11 +2,11 @@ namespace Fishio.Application.Fisheries.Commands.UpdateFishery;
 
 public record UpdateFisheryCommand : IRequest<Unit>
 {
-    public Guid FisheryId { get; init; }
+    public int FisheryId { get; init; }
     public string Name { get; init; } = string.Empty;
     public string Description { get; init; } = string.Empty;
     public string Location { get; init; } = string.Empty;
-    public List<Guid> FishSpeciesIds { get; init; } = new();
+    public List<int> FishSpeciesIds { get; init; } = new();
 }
 
 public class UpdateFisheryCommandValidator : AbstractValidator<UpdateFisheryCommand>

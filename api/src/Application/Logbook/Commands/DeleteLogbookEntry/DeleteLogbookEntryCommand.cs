@@ -2,7 +2,7 @@ namespace Fishio.Application.Logbook.Commands.DeleteLogbookEntry;
 
 public record DeleteLogbookEntryCommand : IRequest<Unit>
 {
-    public Guid LogbookEntryId { get; init; }
+    public int LogbookEntryId { get; init; }
 }
 
 public class DeleteLogbookEntryCommandValidator : AbstractValidator<DeleteLogbookEntryCommand>

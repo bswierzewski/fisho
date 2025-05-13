@@ -2,7 +2,7 @@ namespace Fishio.Application.Fisheries.Queries.GetFisheryDetails;
 
 public record GetFisheryDetailsQuery : IRequest<FisheryDetailsDto>
 {
-    public Guid FisheryId { get; init; }
+    public int FisheryId { get; init; }
 }
 
 public class GetFisheryDetailsQueryValidator : AbstractValidator<GetFisheryDetailsQuery>
@@ -16,7 +16,7 @@ public class GetFisheryDetailsQueryValidator : AbstractValidator<GetFisheryDetai
 
 public record FisheryDetailsDto
 {
-    public Guid Id { get; init; }
+    public int Id { get; init; }
     public string Name { get; init; } = string.Empty;
     public string Description { get; init; } = string.Empty;
     public string Location { get; init; } = string.Empty;
@@ -30,7 +30,7 @@ public record FisheryDetailsDto
 
 public record FisheryFishSpeciesDto
 {
-    public Guid Id { get; init; }
+    public int Id { get; init; }
     public string Name { get; init; } = string.Empty;
     public int CatchesCount { get; init; }
     public decimal? AverageLength { get; init; }

@@ -2,7 +2,7 @@ namespace Fishio.Application.Competitions.Queries.ListCompetitionParticipants;
 
 public record ListCompetitionParticipantsQuery : IRequest<List<CompetitionParticipantDto>>
 {
-    public Guid CompetitionId { get; init; }
+    public int CompetitionId { get; init; }
     public string? Role { get; init; }
     public string? SearchTerm { get; init; }
 }

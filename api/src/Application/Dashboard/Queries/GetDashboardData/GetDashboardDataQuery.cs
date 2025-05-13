@@ -16,7 +16,7 @@ public record DashboardDto
 
 public record RecentCompetitionDto
 {
-    public Guid Id { get; init; }
+    public int Id { get; init; }
     public string Name { get; init; } = string.Empty;
     public string Status { get; init; } = string.Empty;
     public DateTime StartDate { get; init; }
@@ -26,7 +26,7 @@ public record RecentCompetitionDto
 
 public record RecentCatchDto
 {
-    public Guid Id { get; init; }
+    public int Id { get; init; }
     public string CompetitionName { get; init; } = string.Empty;
     public string FishSpeciesName { get; init; } = string.Empty;
     public decimal Length { get; init; }

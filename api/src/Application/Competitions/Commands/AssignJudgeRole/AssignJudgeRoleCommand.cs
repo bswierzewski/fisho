@@ -1,9 +1,11 @@
+using FluentValidation;
+
 namespace Fishio.Application.Competitions.Commands.AssignJudgeRole;
 
 public record AssignJudgeRoleCommand : IRequest<Unit>
 {
-    public Guid CompetitionId { get; init; }
-    public string UserId { get; init; } = string.Empty;
+    public int CompetitionId { get; init; }
+    public int ParticipantId { get; init; }
 }
 
 public class AssignJudgeRoleCommandValidator : AbstractValidator<AssignJudgeRoleCommand>
@@ -11,9 +13,9 @@ public class AssignJudgeRoleCommandValidator : AbstractValidator<AssignJudgeRole
     public AssignJudgeRoleCommandValidator()
     {
         RuleFor(x => x.CompetitionId)
-            .NotEmpty().WithMessage("Competition ID is required");
+            .GreaterThan(0).WithMessage("Competition ID is required");
 
-        RuleFor(x => x.UserId)
-            .NotEmpty().WithMessage("User ID is required");
+        RuleFor(x => x.ParticipantId)
+            .GreaterThan(0).WithMessage("ParticipantId ID is required");
     }
 } 

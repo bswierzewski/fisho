@@ -2,7 +2,7 @@
 
 public record GetCompetitionDetailsQuery : IRequest<CompetitionDetailsDto>
 {
-    public Guid CompetitionId { get; init; }
+    public int CompetitionId { get; init; }
 }
 
 public class GetCompetitionDetailsQueryValidator : AbstractValidator<GetCompetitionDetailsQuery>
@@ -16,7 +16,7 @@ public class GetCompetitionDetailsQueryValidator : AbstractValidator<GetCompetit
 
 public record CompetitionDetailsDto
 {
-    public Guid Id { get; init; }
+    public int Id { get; init; }
     public string Name { get; init; } = string.Empty;
     public string Description { get; init; } = string.Empty;
     public DateTime StartDate { get; init; }
@@ -38,7 +38,7 @@ public record CompetitionDetailsDto
 
 public record CompetitionFishSpeciesDto
 {
-    public Guid Id { get; init; }
+    public int Id { get; init; }
     public string Name { get; init; } = string.Empty;
     public int CatchesCount { get; init; }
 }
@@ -55,10 +55,10 @@ public record CompetitionParticipantDto
 
 public record CompetitionCatchDto
 {
-    public Guid Id { get; init; }
+    public int Id { get; init; }
     public string ParticipantId { get; init; } = string.Empty;
     public string ParticipantName { get; init; } = string.Empty;
-    public Guid FishSpeciesId { get; init; }
+    public int FishSpeciesId { get; init; }
     public string FishSpeciesName { get; init; } = string.Empty;
     public decimal Length { get; init; }
     public decimal? Weight { get; init; }

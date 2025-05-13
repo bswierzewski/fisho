@@ -1,6 +1,6 @@
 namespace Fishio.Application.Competitions.Commands.AddParticipant;
 
-public class AddParticipantCommandHandler : IRequestHandler<AddParticipantCommand, Unit>
+public class AddParticipantCommandHandler : IRequestHandler<AddParticipantCommand, int>
 {
     private readonly IApplicationDbContext _context;
 
@@ -9,9 +9,9 @@ public class AddParticipantCommandHandler : IRequestHandler<AddParticipantComman
         _context = context;
     }
 
-    public async Task<Unit> Handle(AddParticipantCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(AddParticipantCommand request, CancellationToken cancellationToken)
     {
         // TODO: Implement the logic for adding a participant to a competition
-        return Unit.Value;
+        return 0;
     }
 } 

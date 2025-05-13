@@ -1,0 +1,909 @@
+{
+	"info": {
+		"_postman_id": "8c207a0f-ae1e-4ce4-8b8d-e79be99d16da",
+		"name": "Fishio API",
+		"description": "Kolekcja Postman dla API aplikacji Fishio - podejście z modularnymi endpointami.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6932673"
+	},
+	"item": [
+		{
+			"name": "About",
+			"item": [
+				{
+					"name": "Get Application Information",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/about/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"about",
+								""
+							]
+						},
+						"description": "Pobiera informacje o wersji i buildzie aplikacji."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Competitions",
+			"item": [
+				{
+					"name": "Participants",
+					"item": [
+						{
+							"name": "Join Competition As Participant",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/competitions/:competitionId/participants/join",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"competitions",
+										":competitionId",
+										"participants",
+										"join"
+									],
+									"variable": [
+										{
+											"key": "competitionId",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Użytkownik dołącza do zawodów."
+							},
+							"response": []
+						},
+						{
+							"name": "List Competition Participants For Competition",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/competitions/:competitionId/participants/",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"competitions",
+										":competitionId",
+										"participants",
+										""
+									],
+									"variable": [
+										{
+											"key": "competitionId",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Lista uczestników danych zawodów."
+							},
+							"response": []
+						},
+						{
+							"name": "Add Participant By Competition Organizer",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"userId\": 123, // Opcjonalne, jeśli dodajesz zarejestrowanego\n  \"guestName\": \"Jan Gość\", // Opcjonalne, jeśli dodajesz gościa\n  \"guestIdentifier\": \"GUEST001\", // Opcjonalne dla gościa\n  \"role\": \"Competitor\" // Competitor, Judge\n  // Dostosuj do AddParticipantByOrganizerRequestDto\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/competitions/:competitionId/participants/add-by-organizer",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"competitions",
+										":competitionId",
+										"participants",
+										"add-by-organizer"
+									],
+									"variable": [
+										{
+											"key": "competitionId",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Organizator dodaje uczestnika."
+							},
+							"response": []
+						},
+						{
+							"name": "Remove Participant By Competition Organizer",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/competitions/:competitionId/participants/:participantId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"competitions",
+										":competitionId",
+										"participants",
+										":participantId"
+									],
+									"variable": [
+										{
+											"key": "competitionId",
+											"value": "1"
+										},
+										{
+											"key": "participantId",
+											"value": "10"
+										}
+									]
+								},
+								"description": "Organizator usuwa uczestnika."
+							},
+							"response": []
+						},
+						{
+							"name": "Assign Judge Role To Participant",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/competitions/:competitionId/participants/:participantId/assign-judge",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"competitions",
+										":competitionId",
+										"participants",
+										":participantId",
+										"assign-judge"
+									],
+									"variable": [
+										{
+											"key": "competitionId",
+											"value": "1"
+										},
+										{
+											"key": "participantId",
+											"value": "10"
+										}
+									]
+								},
+								"description": "Organizator nadaje rolę sędziego."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Fish Catches",
+					"item": [
+						{
+							"name": "Record Fish Catch For Participant",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"participantId\": 10,\n  \"fishSpeciesId\": 5, // Lub \"fishSpeciesName\": \"Szczupak\"\n  \"weight\": 2.5,\n  \"length\": 65.0,\n  \"catchTime\": \"2025-07-20T10:30:00Z\",\n  \"photoUrl\": \"https://example.com/fish.jpg\"\n  // Dostosuj do RecordFishCatchCommand\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/competitions/:competitionId/catches/",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"competitions",
+										":competitionId",
+										"catches",
+										""
+									],
+									"variable": [
+										{
+											"key": "competitionId",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Sędzia rejestruje połów."
+							},
+							"response": []
+						},
+						{
+							"name": "List Fish Catches For Competition",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/competitions/:competitionId/catches/",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"competitions",
+										":competitionId",
+										"catches",
+										""
+									],
+									"variable": [
+										{
+											"key": "competitionId",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Lista połowów dla danych zawodów."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Create Competition",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Puchar Lata 2025\",\n  \"startTime\": \"2025-07-20T08:00:00Z\",\n  \"endTime\": \"2025-07-20T16:00:00Z\",\n  \"locationText\": \"Jezioro Tajemnic\",\n  \"rulesText\": \"Szczegółowy regulamin zawodów...\",\n  \"type\": \"Individual\", // Individual, Team, Mixed\n  \"mainScoringCategoryId\": 1,\n  \"specialCategories\": [\n    {\"name\": \"Najdłuższa Ryba\", \"description\": \"...\"}\n  ]\n  // Dostosuj do CreateCompetitionCommand\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/competitions/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"competitions",
+								""
+							]
+						},
+						"description": "Tworzy nowe zawody."
+					},
+					"response": []
+				},
+				{
+					"name": "List Available Competitions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/competitions/?statusFilter=Published&pageNumber=1&pageSize=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"competitions",
+								""
+							],
+							"query": [
+								{
+									"key": "statusFilter",
+									"value": "Published",
+									"description": "Draft, Published, InProgress, Finished, Cancelled"
+								},
+								{
+									"key": "dateFromFilter",
+									"value": "2025-01-01T00:00:00Z",
+									"disabled": true
+								},
+								{
+									"key": "pageNumber",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Pobiera listę dostępnych zawodów z opcjonalnymi filtrami."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Competition Details By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/competitions/:competitionId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"competitions",
+								":competitionId"
+							],
+							"variable": [
+								{
+									"key": "competitionId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Pobiera szczegóły konkretnych zawodów."
+					},
+					"response": []
+				},
+				{
+					"name": "List My Competitions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/competitions/mine",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"competitions",
+								"mine"
+							]
+						},
+						"description": "Pobiera listę zawodów użytkownika."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Logbook",
+			"item": [
+				{
+					"name": "Create Logbook Entry",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fishSpeciesId\": 3,\n  \"weight\": 1.2,\n  \"length\": 45.0,\n  \"notes\": \"Złowiony na spinning.\",\n  \"catchTime\": \"2025-07-21T18:00:00Z\",\n  \"fisheryId\": 2, // Opcjonalne\n  \"photoUrl\": \"https://example.com/logbook_fish.jpg\"\n  // Dostosuj do CreateLogbookEntryCommand\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/logbook/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"logbook",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List My Logbook Entries",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/logbook/?pageSize=5",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"logbook",
+								""
+							],
+							"query": [
+								{
+									"key": "dateFromFilter",
+									"value": "2025-01-01T00:00:00Z",
+									"disabled": true
+								},
+								{
+									"key": "speciesFilter",
+									"value": "Okoń",
+									"disabled": true
+								},
+								{
+									"key": "pageSize",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Logbook Entry Details By Id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/logbook/:entryId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"logbook",
+								":entryId"
+							],
+							"variable": [
+								{
+									"key": "entryId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Logbook Entry By Id",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"entryId\": 1, // Musi pasować do ID w URL\n  \"fishSpeciesId\": 3,\n  \"weight\": 1.3,\n  \"length\": 45.5,\n  \"notes\": \"Aktualizacja notatek.\",\n  \"catchTime\": \"2025-07-21T18:05:00Z\"\n  // Dostosuj do UpdateLogbookEntryCommand\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/logbook/:entryId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"logbook",
+								":entryId"
+							],
+							"variable": [
+								{
+									"key": "entryId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Logbook Entry By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/logbook/:entryId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"logbook",
+								":entryId"
+							],
+							"variable": [
+								{
+									"key": "entryId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Fisheries",
+			"item": [
+				{
+					"name": "Create Fishery",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Staw Komercyjny XYZ\",\n  \"locationText\": \"Miejscowość, ulica\",\n  \"description\": \"Opis łowiska\",\n  \"definedSpeciesIds\": [1, 2, 5]\n  // Dostosuj do CreateFisheryCommand\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/fisheries/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"fisheries",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Fisheries",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/fisheries/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"fisheries",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Fishery Details By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/fisheries/:fisheryId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"fisheries",
+								":fisheryId"
+							],
+							"variable": [
+								{
+									"key": "fisheryId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Fishery By Id",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fisheryId\": 1, // Musi pasować do ID w URL\n  \"name\": \"Nowa Nazwa Stawu\",\n  \"locationText\": \"Nowa Lokalizacja\",\n  \"definedSpeciesIds\": [1, 3]\n  // Dostosuj do UpdateFisheryCommand\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/fisheries/:fisheryId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"fisheries",
+								":fisheryId"
+							],
+							"variable": [
+								{
+									"key": "fisheryId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Get Dashboard Information",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/dashboard/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Search Available Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/search?searchTerm=Jan",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"search"
+							],
+							"query": [
+								{
+									"key": "searchTerm",
+									"value": "Jan"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "LookupData",
+			"item": [
+				{
+					"name": "Get All Fish Species",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/lookup/fishspecies",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"lookup",
+								"fishspecies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Scoring Categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/lookup/scoringcategories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"lookup",
+								"scoringcategories"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PublicResults",
+			"item": [
+				{
+					"name": "Get Results By Token",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/results/:token",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"results",
+								":token"
+							],
+							"variable": [
+								{
+									"key": "token",
+									"value": "UNIQUE_RESULTS_TOKEN"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:7000",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "TWOJ_TOKEN_JWT_OD_CLERK",
+			"type": "string"
+		}
+	]
+}

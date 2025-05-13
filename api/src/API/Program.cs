@@ -34,16 +34,11 @@ app.UseAuthorization();     // 3. Autoryzacja
 app.MapAboutEndpoints();
 app.MapCompetitionEndpoints();
 app.MapDashboardEndpoints();
-app.MapFisheryEndpoints();
+app.MapFisheriesEndpoints();
 app.MapLogbookEndpoints();
 app.MapLookupDataEndpoints();
 app.MapPublicResultsEndpoints();
 app.MapUserEndpoints();
-
-// Przykładowy endpoint testowy
-app.MapGet("/", () => Results.Ok(new { Message = "Witaj w Fishio API!" }))
-    .WithName("GetRoot")
-    .WithTags("Public");
 
 // 5. Uruchomienie Aplikacji
 app.Run();

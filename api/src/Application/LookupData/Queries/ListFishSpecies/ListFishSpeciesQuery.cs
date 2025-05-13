@@ -4,7 +4,7 @@ public record ListFishSpeciesQuery : IRequest<List<FishSpeciesDto>>;
 
 public record FishSpeciesDto
 {
-    public Guid Id { get; init; }
+    public int Id { get; init; }
     public string Name { get; init; } = string.Empty;
     public string? Description { get; init; }
     public decimal? MinLength { get; init; }

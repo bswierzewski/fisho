@@ -2,8 +2,8 @@ namespace Fishio.Application.Competitions.Commands.RevokeJudgeRole;
 
 public record RevokeJudgeRoleCommand : IRequest<Unit>
 {
-    public Guid CompetitionId { get; init; }
-    public string UserId { get; init; } = string.Empty;
+    public int CompetitionId { get; init; }
+    public int UserId { get; init; }
 }
 
 public class RevokeJudgeRoleCommandValidator : AbstractValidator<RevokeJudgeRoleCommand>

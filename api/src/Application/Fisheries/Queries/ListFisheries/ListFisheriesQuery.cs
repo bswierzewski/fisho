@@ -3,7 +3,7 @@ namespace Fishio.Application.Fisheries.Queries.ListFisheries;
 public record ListFisheriesQuery : IRequest<List<FisheryDto>>
 {
     public string? SearchTerm { get; init; }
-    public Guid? FishSpeciesId { get; init; }
+    public int? FishSpeciesId { get; init; }
     public int Page { get; init; } = 1;
     public int PageSize { get; init; } = 10;
 }
@@ -23,7 +23,7 @@ public class ListFisheriesQueryValidator : AbstractValidator<ListFisheriesQuery>
 
 public record FisheryDto
 {
-    public Guid Id { get; init; }
+    public int Id { get; init; }
     public string Name { get; init; } = string.Empty;
     public string Description { get; init; } = string.Empty;
     public string Location { get; init; } = string.Empty;
