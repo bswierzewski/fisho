@@ -1,4 +1,5 @@
 ﻿using Application;
+using Fishio.API.Endpoints;
 using Fishio.API.Middlewares;
 using Infrastructure.Persistence;
 using Web;
@@ -28,7 +29,16 @@ app.UseAuthorization();     // 3. Autoryzacja
 
 // Mapowanie endpointów - jeśli nie jest częścią AddWebServices
 // app.MapControllers(); // Jeśli używasz kontrolerów
-// app.MapFishioEndpoints(); // Przykładowa metoda grupująca mapowanie wszystkich endpointów Minimal API
+
+// Mapowanie endpointów
+app.MapAboutEndpoints();
+app.MapCompetitionEndpoints();
+app.MapDashboardEndpoints();
+app.MapFisheryEndpoints();
+app.MapLogbookEndpoints();
+app.MapLookupDataEndpoints();
+app.MapPublicResultsEndpoints();
+app.MapUserEndpoints();
 
 // Przykładowy endpoint testowy
 app.MapGet("/", () => Results.Ok(new { Message = "Witaj w Fishio API!" }))
