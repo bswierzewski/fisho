@@ -50,10 +50,10 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
                 {
                     if (entry.State == EntityState.Added)
                     {
-                        entry.Entity.CreatedBy = user?.Id;
+                        entry.Entity.CreatedBy = user?.DomainUserId;
                         entry.Entity.Created = utcNow;
                     }
-                    entry.Entity.LastModifiedBy = user?.Id;
+                    entry.Entity.LastModifiedBy = user?.DomainUserId;
                     entry.Entity.LastModified = utcNow;
                 }
             }
@@ -64,8 +64,8 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
 public static class Extensions
 {
     public static bool HasChangedOwnedEntities(this EntityEntry entry) =>
-        entry.References.Any(r => 
-            r.TargetEntry != null && 
-            r.TargetEntry.Metadata.IsOwned() && 
+        entry.References.Any(r =>
+            r.TargetEntry != null &&
+            r.TargetEntry.Metadata.IsOwned() &&
             (r.TargetEntry.State == EntityState.Added || r.TargetEntry.State == EntityState.Modified));
 }

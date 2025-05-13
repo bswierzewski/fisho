@@ -66,5 +66,6 @@ public class ApplicationDbContextInitialiser
 
     public async Task TrySeedAsync()
     {
+        await Task.CompletedTask;
     }
 }

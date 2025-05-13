@@ -1,79 +1,104 @@
-﻿using System.Security.Claims;
+﻿// Fishio.Infrastructure/Services/CurrentUserService.cs
 using Application.Common.Interfaces;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
-namespace Infrastructure.Services
+namespace Fishio.Infrastructure.Services;
+
+public class CurrentUserService : ICurrentUserService
 {
-    public class CurrentUserService : ICurrentUserService
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IApplicationDbContext _dbContext;
+    private readonly ILogger<CurrentUserService> _logger;
+    private int? _cachedDomainUserId;
+
+    public CurrentUserService(
+        IHttpContextAccessor httpContextAccessor,
+        IApplicationDbContext dbContext,
+        ILogger<CurrentUserService> logger)
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IApplicationDbContext _dbContext; // Potrzebne do operacji na bazie
+        _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+        _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        public CurrentUserService(IHttpContextAccessor httpContextAccessor, IApplicationDbContext dbContext)
+    public string? ClerkUserId
+    {
+        get
         {
-            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            var principal = _httpContextAccessor.HttpContext?.User;
+            // Clerk często używa claimu 'sub' jako głównego identyfikatora użytkownika.
+            // ClaimTypes.NameIdentifier jest również standardowym miejscem.
+            // Sprawdź dokumentację Clerk, który claim zawiera unikalne ID użytkownika.
+            return principal?.FindFirst("sub")?.Value // Preferowany dla OpenID Connect
+                   ?? principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        }
+    }
+
+    public bool IsAuthenticated => _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
+
+    public int? DomainUserId => _cachedDomainUserId;
+
+    public void SetDomainUserId(int domainUserId)
+    {
+        _cachedDomainUserId = domainUserId;
+    }
+
+    public async Task<User?> GetOrProvisionDomainUserAsync(CancellationToken cancellationToken = default)
+    {
+        if (!IsAuthenticated)
+        {
+            _logger.LogDebug("User is not authenticated (JWT validation likely failed or token not present). Cannot get or provision domain user.");
+            return null;
         }
 
-        public string? ClerkUserId =>
-            _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? // Standardowy claim dla ID
-            _httpContextAccessor.HttpContext?.User?.FindFirst("sub")?.Value; // 'sub' jest typowe dla Clerk ID
-
-        // Ta właściwość zwraca ID użytkownika z bazy, jeśli został już zmapowany w ramach bieżącego żądania.
-        // Dla pewności, że użytkownik istnieje i mamy jego ID, należy użyć EnsureUserExistsAndGetIdAsync.
-        public int? Id
+        var currentClerkUserId = ClerkUserId;
+        if (string.IsNullOrEmpty(currentClerkUserId))
         {
-            get
-            {
-                var clerkId = ClerkUserId;
-                if (string.IsNullOrEmpty(clerkId))
-                {
-                    return null;
-                }
-                // To jest synchroniczne i może być problematyczne.
-                // Lepszym wzorcem jest poleganie na EnsureUserExistsAndGetIdAsync.
-                // Można by tu dodać logikę cachowania per żądanie, jeśli to ID jest często odczytywane.
-                var user = _dbContext.Users.AsNoTracking().FirstOrDefault(u => u.ClerkUserId == clerkId);
-                return user?.Id;
-            }
+            _logger.LogWarning("User is authenticated via JWT, but ClerkUserId claim ('sub' or NameIdentifier) is missing or empty.");
+            return null;
         }
 
-        public string? Email =>
-            _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value;
+        var domainUser = await _dbContext.Users
+            .FirstOrDefaultAsync(u => u.ClerkUserId == currentClerkUserId, cancellationToken);
 
-        public string? NameFromToken =>
-            _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Name)?.Value ?? // Może być imię i nazwisko
-            _httpContextAccessor.HttpContext?.User?.FindFirst("name")?.Value ??
-            _httpContextAccessor.HttpContext?.User?.FindFirst("preferred_username")?.Value ??
-            _httpContextAccessor.HttpContext?.User?.FindFirst("given_name")?.Value; // Spróbuj różnych popularnych claimów
-
-        public async Task<int> EnsureUserExistsAndGetIdAsync(CancellationToken cancellationToken = default)
+        if (domainUser != null)
         {
-            var clerkId = ClerkUserId;
-            if (string.IsNullOrEmpty(clerkId))
-            {
-                throw new UnauthorizedAccessException("Brak identyfikatora użytkownika Clerk w tokenie. Użytkownik nie jest uwierzytelniony.");
-            }
+            SetDomainUserId(domainUser.Id);
+            _logger.LogDebug("Found existing domain user {DomainUserId} for ClerkUserId {ClerkUserId} (from JWT).", domainUser.Id, currentClerkUserId);
+            return domainUser;
+        }
 
-            var user = await _dbContext.Users
-                .FirstOrDefaultAsync(u => u.ClerkUserId == clerkId, cancellationToken);
+        _logger.LogInformation("Domain user not found for ClerkUserId {ClerkUserId} (from JWT). Attempting JIT provisioning.", currentClerkUserId);
 
-            var nameFromToken = NameFromToken ?? $"Użytkownik_{clerkId.Substring(0, Math.Min(clerkId.Length, 8))}"; // Fallback dla nazwy
-            var emailFromToken = Email;
+        var principal = _httpContextAccessor.HttpContext?.User;
+        // Przykładowe pobieranie imienia i emaila z claimów JWT.
+        // Nazwy claimów mogą się różnić w zależności od konfiguracji Clerk.
+        var userName = principal?.FindFirst(ClaimTypes.Name)?.Value
+                       ?? principal?.FindFirst("name")?.Value
+                       ?? principal?.FindFirst("preferred_username")?.Value
+                       ?? "Clerk User";
+        var userEmail = principal?.FindFirst(ClaimTypes.Email)?.Value
+                        ?? principal?.FindFirst("email")?.Value;
 
-            if (user == null)
-            {
-                // Użytkownik nie istnieje, stwórz go używając metody fabrycznej z encji
-                user = new User(clerkId, nameFromToken, emailFromToken);
-                _dbContext.Users.Add(user);
-            }
-            else            
-                user.UpdateDetailsFromClerk(nameFromToken, emailFromToken);            
+        var newDomainUser = new User(currentClerkUserId, userName, userEmail);
 
+        try
+        {
+            _dbContext.Users.Add(newDomainUser);
             await _dbContext.SaveChangesAsync(cancellationToken);
-            return user.Id;
+
+            SetDomainUserId(newDomainUser.Id);
+            _logger.LogInformation("Successfully provisioned new domain user {DomainUserId} for ClerkUserId {ClerkUserId} (from JWT).", newDomainUser.Id, currentClerkUserId);
+            return newDomainUser;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during JIT provisioning for ClerkUserId {ClerkUserId} (from JWT).", currentClerkUserId);
+            return null;
         }
     }
 }

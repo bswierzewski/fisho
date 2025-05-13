@@ -1,100 +1,168 @@
-﻿using System.Security.Claims;
+﻿// Web/DependencyInjection.cs
+using Fishio.Infrastructure.Services;      // Dla CurrentUserService
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect; // Dla OpenIdConnectConfiguration
+using Microsoft.IdentityModel.Protocols;             // Dla ConfigurationManager
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models; // Dla OpenApiSecurityScheme etc.
+using Application.Common.Interfaces;
 
-namespace Web;
+namespace Web; // Zakładam, że namespace to 'Web' zgodnie z Twoim plikiem
 
 public static class DependencyInjection
 {
     public static void AddWebServices(this IHostApplicationBuilder builder)
     {
-        builder.Services.AddControllers();
+        var services = builder.Services; // Dla czytelności
 
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        //builder.Services.AddFluentValidationRulesToSwagger();
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(c =>
+        // --- Konfiguracja Kontrolerów (jeśli używasz, choć projekt jest Minimal API) ---
+        // Jeśli projekt jest czysto Minimal API, ta linia może nie być potrzebna.
+        // Jeśli masz jakieś kontrolery (np. dla widoków błędów), zostaw.
+        //services.AddControllers();
+
+        // --- Konfiguracja Swagger/OpenAPI ---
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen(options =>
         {
-            // Konfiguracja Swaggera do obsługi JWT
-            c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Fishio API", Version = "v1" });
+
+            // Definicja schematu zabezpieczeń JWT dla Swaggera
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                In = ParameterLocation.Header,
+                Description = "Please enter a valid JWT token. Example: \"Bearer {token}\"",
                 Name = "Authorization",
-                In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-                Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
-                Scheme = "Bearer"
+                Type = SecuritySchemeType.Http, // Zmieniono z ApiKey na Http dla schematu Bearer
+                BearerFormat = "JWT",
+                Scheme = "Bearer" // Jawne określenie schematu
             });
-            c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement()
+
+            // Wymaganie schematu zabezpieczeń dla wszystkich endpointów (można to dostosować)
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
-                    new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                    new OpenApiSecurityScheme
                     {
-                        Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                        Reference = new OpenApiReference
                         {
-                            Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                            Id = "Bearer"
-                        },
-                        Scheme = "oauth2",
-                        Name = "Bearer",
-                        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer" // Musi pasować do Id z AddSecurityDefinition
+                        }
                     },
-                    new List<string>()
+                    Array.Empty<string>() // Pusta lista stringów
                 }
             });
         });
 
-        // Customise default API behaviour
-        builder.Services.Configure<ApiBehaviorOptions>(options =>
+        // --- Konfiguracja Zachowania API ---
+        // Wyłącza automatyczną walidację ModelState przez filtr [ApiController],
+        // co daje większą kontrolę, jeśli używasz np. FluentValidation z MediatR.
+        services.Configure<ApiBehaviorOptions>(options =>
             options.SuppressModelStateInvalidFilter = true);
-        builder.Services.AddExceptionHandler<CustomExceptionHandler>();
-        builder.Services.AddHttpContextAccessor();
 
-        var clerkIssuer = builder.Configuration["Clerk:Issuer"] ?? throw new ArgumentNullException("Clerk:Issuer");
-        var clerkAudience = builder.Configuration["Clerk:Audience"] ?? throw new ArgumentNullException("Clerk:Audience");
-        var clerkJwksUri = builder.Configuration["Clerk:JwksUri"];
+        // --- Konfiguracja Obsługi Wyjątków ---
+        services.AddExceptionHandler<CustomExceptionHandler>(); // Odkomentuj, jeśli masz zaimplementowany
 
-        // Authentication and Authorization
-        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        // --- Konfiguracja Dostępności HttpContext ---
+        services.AddHttpContextAccessor();
+
+        // Rejestracja ICurrentUserService
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+
+        // --- Konfiguracja Uwierzytelniania JWT (dla Clerk) ---
+        // Pobieranie konfiguracji Clerk z appsettings.json lub zmiennych środowiskowych
+        // Zmieniono nazwy kluczy konfiguracyjnych na bardziej spójne z moimi sugestiami
+        var clerkAuthority = builder.Configuration["Clerk:Authority"]
+            ?? throw new ArgumentNullException("Clerk:Authority", "Clerk Authority URL must be configured.");
+        var clerkAudience = builder.Configuration["Clerk:Audience"]
+            ?? throw new ArgumentNullException("Clerk:Audience", "Clerk Audience must be configured.");
+
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                options.Authority = clerkIssuer; // Issuer z Twojego dashboardu Clerk
-                options.Audience = clerkAudience;  // Często issuer i audience są takie same dla Clerk
-                options.RequireHttpsMetadata = builder.Environment.IsProduction(); // Wymagaj HTTPS na produkcji
+                options.Authority = clerkAuthority;
+                options.Audience = clerkAudience;
+                options.RequireHttpsMetadata = builder.Environment.IsProduction();
 
-                // Konfiguracja pobierania kluczy publicznych JWKS
-                options.ConfigurationManager = new Microsoft.IdentityModel.Protocols.ConfigurationManager<Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectConfiguration>(
-                    $"{clerkIssuer}/.well-known/openid-configuration",
-                    new Microsoft.IdentityModel.Protocols.OpenIdConnect.OpenIdConnectConfigurationRetriever(),
-                    new Microsoft.IdentityModel.Protocols.HttpDocumentRetriever());
+                // Automatyczne pobieranie konfiguracji OpenID Connect (w tym JWKS URI)
+                // To jest preferowane podejście, zamiast ręcznego ustawiania JwksUri.
+                options.ConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+                    $"{clerkAuthority.TrimEnd('/')}/.well-known/openid-configuration", // Upewnij się, że URL jest poprawny
+                    new OpenIdConnectConfigurationRetriever(),
+                    new HttpDocumentRetriever { RequireHttps = options.RequireHttpsMetadata }); // Użyj RequireHttps z opcji
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = clerkIssuer,
-                    ValidateAudience = true, // Zazwyczaj true, jeśli Audience jest ustawione
-                    ValidAudience = clerkAudience, // Lub specyficzna publiczna publiczna wartość Audience, jeśli ją masz
-                    ValidateIssuerSigningKey = true, // Kluczowe dla weryfikacji podpisu
-                                                     // NameClaimType i RoleClaimType mogą być potrzebne, jeśli używasz ról z JWT
-                    NameClaimType = ClaimTypes.NameIdentifier, // Mapuje 'sub' z JWT na User.Identity.Name
-                                                               // RoleClaimType = "rola_z_jwt", // Jeśli masz role w tokenie
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero // Brak tolerancji dla wygaśnięcia tokenu
-                };
-            });
-        builder.Services.AddAuthorization();
+                    ValidIssuer = clerkAuthority,
 
-        // Add CORS services only in development mode
+                    ValidateAudience = true,
+                    ValidAudience = clerkAudience,
+
+                    ValidateIssuerSigningKey = true, // Kluczowe, JWKS URI zostanie użyte do pobrania kluczy
+                    // Klucze publiczne zostaną pobrane z JWKS URI dostarczonego przez Authority.
+                    // Nie ma potrzeby ręcznego ustawiania IssuerSigningKey, jeśli JWKS jest dostępne.
+
+                    NameClaimType = "sub", // Standardowy claim dla ID użytkownika w OIDC (Clerk go używa)
+                                           // Możesz też użyć ClaimTypes.NameIdentifier, jeśli tak jest skonfigurowany Clerk.
+                    RoleClaimType = "permissions", // Jeśli Clerk używa claimu "permissions" dla ról/uprawnień.
+                                                   // Dostosuj, jeśli nazwa claimu jest inna.
+
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.FromSeconds(30) // Niewielka tolerancja dla różnic zegarów, standardowo 5 minut.
+                                                         // TimeSpan.Zero może być zbyt restrykcyjne.
+                };
+
+                // Opcjonalnie: Obsługa zdarzeń walidacji tokenu dla debugowania
+                // options.Events = new JwtBearerEvents
+                // {
+                //     OnAuthenticationFailed = context =>
+                //     {
+                //         // Logowanie błędów
+                //         Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+                //         return Task.CompletedTask;
+                //     },
+                //     OnTokenValidated = context =>
+                //     {
+                //         // Token pomyślnie zwalidowany
+                //         Console.WriteLine("Token validated for user: " + context.Principal?.Identity?.Name);
+                //         return Task.CompletedTask;
+                //     }
+                // };
+            });
+
+        // --- Konfiguracja Autoryzacji (Polityki) ---
+        services.AddAuthorization(options =>
+        {
+            // Przykładowe polityki - dostosuj do swoich potrzeb
+            options.AddPolicy("OrganizerPolicy", policy =>
+                policy.RequireAuthenticatedUser()); // Możesz dodać .RequireClaim("permissions", "manage:competitions")
+            options.AddPolicy("JudgePolicy", policy =>
+                policy.RequireAuthenticatedUser());
+            // ... inne polityki ...
+        });
+
+
+        // --- Konfiguracja CORS (tylko w trybie deweloperskim w tym przykładzie) ---
         if (builder.Environment.IsDevelopment())
         {
-            builder.Services.AddCors(options =>
+            services.AddCors(options =>
             {
-                options.AddDefaultPolicy(policy =>
+                options.AddDefaultPolicy(policyBuilder => // Zmieniono nazwę zmiennej dla jasności
                 {
-                    policy.AllowAnyOrigin()
-                          .AllowAnyMethod()
-                          .AllowAnyHeader();
+                    policyBuilder.AllowAnyOrigin()
+                                 .AllowAnyMethod()
+                                 .AllowAnyHeader();
                 });
+                // Możesz dodać bardziej restrykcyjne nazwane polityki CORS dla produkcji
+                // options.AddPolicy("AllowFishioFrontend", policy =>
+                // {
+                //     policy.WithOrigins("https://twoj-frontend.com")
+                //           .AllowAnyMethod()
+                //           .AllowAnyHeader();
+                // });
             });
         }
     }

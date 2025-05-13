@@ -1,0 +1,100 @@
+client/
+├─ app/
+│  ├─ (main)/
+│  │  ├─ about/
+│  │  │  └─ page.tsx
+│  │  ├─ competitions/
+│  │  │  ├─ [id]/
+│  │  │  │  ├─ edit/
+│  │  │  │  │  └─ page.tsx
+│  │  │  │  ├─ loading.tsx
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ add/
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ loading.tsx
+│  │  │  └─ page.tsx
+│  │  ├─ dashboard/
+│  │  │  └─ page.tsx
+│  │  ├─ fisheries/
+│  │  │  ├─ [id]/
+│  │  │  │  ├─ edit/
+│  │  │  │  │  └─ page.tsx
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ add/
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ loading.tsx
+│  │  │  └─ page.tsx
+│  │  ├─ logbook/
+│  │  │  ├─ [id]/
+│  │  │  │  ├─ edit/
+│  │  │  │  │  └─ page.tsx
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ add/
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ loading.tsx
+│  │  │  └─ page.tsx
+│  │  ├─ my-competitions/
+│  │  │  ├─ loading.tsx
+│  │  │  └─ page.tsx
+│  │  └─ layout.tsx
+│  ├─ results/
+│  │  └─ [token]/
+│  │     ├─ loading.tsx
+│  │     └─ page.tsx
+│  ├─ sign-in/
+│  │  └─ [[...sign-in]]/
+│  │     └─ page.tsx
+│  ├─ sign-up/
+│  │  └─ [[...sign-up]]/
+│  │     └─ page.tsx
+│  ├─ favicon.ico
+│  ├─ globals.css
+│  ├─ layout.tsx
+│  └─ page.tsx
+├─ components/
+│  ├─ layout/
+│  │  ├─ BottomNavbar.tsx
+│  │  └─ Navbar.tsx
+│  └─ ui/
+│     ├─ button.tsx
+│     ├─ checkbox.tsx
+│     ├─ input.tsx
+│     ├─ label.tsx
+│     ├─ select.tsx
+│     ├─ separator.tsx
+│     ├─ sheet.tsx
+│     └─ textarea.tsx
+├─ hooks/
+│  └─ use-media-query.tsx
+├─ lib/
+│  ├─ appVersion.ts
+│  ├─ config.ts
+│  ├─ definitions.ts
+│  ├─ static-data.ts
+│  └─ utils.ts
+├─ public/
+│  ├─ fisherman_blue_2.svg
+│  ├─ fisherman_blue.svg
+│  ├─ fisherman_boat.svg
+│  ├─ fisherman_green.svg
+│  ├─ fisherman_red_1.svg
+│  ├─ fisherman_red_2.svg
+│  ├─ fisherman_red.svg
+│  ├─ hand.svg
+│  ├─ koi.svg
+│  ├─ laurel_wreath_black.svg
+│  ├─ laurel_wreath_green.svg
+│  ├─ logo.svg
+│  ├─ not_found.svg
+│  └─ pond.svg
+├─ .gitignore
+├─ .prettierrc
+├─ components.json
+├─ Dockerfile
+├─ middleware.ts
+├─ next.config.ts
+├─ package-lock.json
+├─ package.json
+├─ postcss.config.mjs
+├─ README.md
+└─ tsconfig.json

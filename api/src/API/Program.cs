@@ -2,7 +2,6 @@
 using Application;
 using Infrastructure.Persistence;
 using Web;
-using Web.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,27 +13,27 @@ builder.AddWebServices();
 var app = builder.Build();
 
 await app.InitialiseDatabaseAsync();
+if (app.Environment.IsDevelopment()) { await app.SeedDatabaseAsync(); }
 
-// Configure the HTTP request pipeline.
+// Swagger tylko w Development
 if (app.Environment.IsDevelopment())
 {
-    app.UseCors(); // Applies the default policy
-
     app.UseSwagger();
-    app.UseSwaggerUI();
-
-    await app.SeedDatabaseAsync();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Fishio API V1"));
 }
 
-app.UseRouting(); // Ważne dla działania middleware
+app.UseAuthentication();    // 1. Uwierzytelnianie (np. Clerk JWT validation)
+app.UseMiddleware<UserProvisioningMiddleware>();  // 2. Nasze middleware do mapowania/provisioningu użytkownika domenowego
+app.UseAuthorization();     // 3. Autoryzacja
 
-app.UseAuthentication(); // Najpierw uwierzytelnianie
-app.UseAuthorization();  // Potem autoryzacja
+// Mapowanie endpointów - jeśli nie jest częścią AddWebServices
+// app.MapControllers(); // Jeśli używasz kontrolerów
+// app.MapFishioEndpoints(); // Przykładowa metoda grupująca mapowanie wszystkich endpointów Minimal API
 
-app.UseExceptionHandler(options => { });
+// Przykładowy endpoint testowy
+app.MapGet("/", () => Results.Ok(new { Message = "Witaj w Fishio API!" }))
+    .WithName("GetRoot")
+    .WithTags("Public");
 
-app.UseMiddleware<UserSyncMiddleware>();
-
-app.MapEndpoints();
-
+// 5. Uruchomienie Aplikacji
 app.Run();

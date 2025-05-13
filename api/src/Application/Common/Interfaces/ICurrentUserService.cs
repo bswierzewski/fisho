@@ -1,37 +1,50 @@
-﻿namespace Application.Common.Interfaces;
+﻿using Domain.Entities;
 
+namespace Application.Common.Interfaces;
+
+/// <summary>
+/// Provides access to information about the currently authenticated user.
+/// </summary>
 public interface ICurrentUserService
 {
     /// <summary>
-    /// Unikalny identyfikator użytkownika z systemu Clerk (zazwyczaj 'sub' z tokenu JWT).
-    /// Może być null, jeśli użytkownik nie jest uwierzytelniony.
+    /// Gets the unique identifier of the user from the external identity provider (Clerk).
+    /// Returns null if the user is not authenticated or the claim is not present.
     /// </summary>
     string? ClerkUserId { get; }
 
     /// <summary>
-    /// Wewnętrzny, numeryczny identyfikator użytkownika z bazy danych aplikacji Fisho.
-    /// Może być null, jeśli użytkownik nie jest uwierzytelniony lub nie został jeszcze zsynchronizowany.
-    /// Aby zagwarantować jego istnienie dla uwierzytelnionego użytkownika, użyj EnsureUserExistsAndGetIdAsync.
+    /// Gets the unique identifier of the corresponding domain user.
+    /// This ID is typically populated after the UserProvisioningMiddleware has run.
+    /// Returns null if the user is not authenticated or not yet provisioned in the domain.
     /// </summary>
-    int? Id { get; }
+    int? DomainUserId { get; }
 
     /// <summary>
-    /// Adres email użytkownika pobrany z tokenu Clerk.
-    /// Może być null.
+    /// Gets a value indicating whether the current user is authenticated.
     /// </summary>
-    string? Email { get; }
+    bool IsAuthenticated { get; }
 
     /// <summary>
-    /// Nazwa wyświetlana użytkownika pobrana z tokenu Clerk.
-    /// Może być null.
+    /// Asynchronously retrieves the domain <see cref="User"/> entity for the currently authenticated user.
+    /// This method may also handle Just-In-Time (JIT) provisioning of the user in the domain database
+    /// if they exist in Clerk but not locally.
     /// </summary>
-    string? NameFromToken { get; }
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains the domain <see cref="User"/>
+    /// entity, or null if the user is not authenticated or could not be provisioned.
+    /// </returns>
+    /// <remarks>
+    /// It's recommended that the UserProvisioningMiddleware calls this method early in the request pipeline
+    /// to ensure the user is available for subsequent operations.
+    /// </remarks>
+    Task<User?> GetOrProvisionDomainUserAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Sprawdza, czy użytkownik istnieje w lokalnej bazie danych na podstawie ClerkUserId.
-    /// Jeśli nie istnieje, tworzy go. Jeśli istnieje, opcjonalnie aktualizuje jego dane (imię, email).
-    /// Zwraca wewnętrzne, numeryczne ID użytkownika aplikacji Fisho.
-    /// Rzuca UnauthorizedAccessException, jeśli ClerkUserId nie jest dostępny (użytkownik nie jest uwierzytelniony).
+    /// Sets the domain user ID after successful provisioning or retrieval.
+    /// This is typically called by the UserProvisioningMiddleware or internally.
     /// </summary>
-    Task<int> EnsureUserExistsAndGetIdAsync(CancellationToken cancellationToken = default);
+    /// <param name="domainUserId">The domain user ID.</param>
+    void SetDomainUserId(int domainUserId);
 }

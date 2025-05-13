@@ -1,8 +1,8 @@
 ﻿using Application.Common.Interfaces;
 using Ardalis.GuardClauses;
+using Fishio.Infrastructure.Services;
 using Infrastructure.Data.Interceptors;
 using Infrastructure.Persistence;
-using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
