@@ -65,4 +65,4 @@ EXPOSE 7000 # Zmieniono port na 7000
 
 # Nazwa DLLki będzie prawdopodobnie API.dll, jeśli Twój projekt API nazywa się API.csproj
 # Jeśli nazwa projektu to Fishio.Api.csproj, to DLLka będzie Fishio.Api.dll
-ENTRYPOINT ["dotnet", "API.dll"] # DOSTOSUJ NAZWĘ DLL, JEŚLI JEST INNA
+ENTRYPOINT ["dotnet", "API.dll"]
