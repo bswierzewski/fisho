@@ -1,6 +1,6 @@
 namespace Fishio.Application.LookupData.Queries.ListScoringCategories;
 
-public class ListScoringCategoriesQueryHandler : IRequestHandler<ListScoringCategoriesQuery, List<ScoringCategoryDto>>
+public class ListScoringCategoriesQueryHandler : IRequestHandler<ListScoringCategoriesQuery, List<ScoringCategoryOptionDto>>
 {
     private readonly IApplicationDbContext _context;
 
@@ -9,9 +9,13 @@ public class ListScoringCategoriesQueryHandler : IRequestHandler<ListScoringCate
         _context = context;
     }
 
-    public async Task<List<ScoringCategoryDto>> Handle(ListScoringCategoriesQuery request, CancellationToken cancellationToken)
+    public async Task<List<ScoringCategoryOptionDto>> Handle(ListScoringCategoriesQuery request, CancellationToken cancellationToken)
     {
-        // TODO: Implement the logic for listing scoring categories
-        return new List<ScoringCategoryDto>();
+        var scoringCategories = await _context.ScoringCategoryOptions
+                    .OrderBy(sco => sco.Name)
+                    .Select(sco => new ScoringCategoryOptionDto(sco.Id, sco.Name, sco.Description))
+                    .ToListAsync(cancellationToken);
+
+        return scoringCategories;
     }
 } 
