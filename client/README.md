@@ -1,9 +1,9 @@
-# Fishio - Aplikacja Frontendowa
+# 🎣 Fishio - Aplikacja Frontendowa
 
-## Przegląd
+## 📋 Przegląd
 Jest to aplikacja frontendowa dla systemu Fishio - kompleksowego systemu zarządzania zawodami wędkarskimi i dziennika połowów. Zbudowana przy użyciu Next.js 14, aplikacja zapewnia nowoczesny i responsywny interfejs użytkownika do zarządzania zawodami wędkarskimi, osobistymi dziennikami połowów i informacjami o łowiskach.
 
-## Główne Funkcje
+## ⭐ Główne Funkcje
 - Uwierzytelnianie i autoryzacja użytkowników (przy użyciu Clerk)
 - System zarządzania zawodami
 - Osobisty dziennik połowów
@@ -11,7 +11,7 @@ Jest to aplikacja frontendowa dla systemu Fishio - kompleksowego systemu zarząd
 - Publiczne udostępnianie wyników
 - Aktualizacje i powiadomienia w czasie rzeczywistym
 
-## Stos Technologiczny
+## 🛠️ Stos Technologiczny
 - **Framework**: Next.js 14 z App Router
 - **Język**: TypeScript
 - **Style**: Tailwind CSS
@@ -22,7 +22,7 @@ Jest to aplikacja frontendowa dla systemu Fishio - kompleksowego systemu zarząd
 - **Walidacja**: Zod
 - **Przesyłanie Zdjęć**: Cloudinary
 
-## Struktura Projektu
+## 📁 Struktura Projektu
 ```
 fishio-frontend/
 ├── app/                    # Główny katalog App Router
@@ -41,13 +41,13 @@ fishio-frontend/
 └── public/              # Zasoby statyczne
 ```
 
-## Rozpoczęcie Pracy
+## 🚀 Rozpoczęcie Pracy
 
-### Wymagania Wstępne
+### 📋 Wymagania Wstępne
 - Node.js 18.x lub nowszy
 - Menedżer pakietów npm lub yarn
 
-### Instalacja
+### 💻 Instalacja
 1. Sklonuj repozytorium
 2. Zainstaluj zależności:
 \`\`\`bash
@@ -78,7 +78,7 @@ npm run dev
 yarn dev
 \`\`\`
 
-## Wytyczne Rozwoju
+## 📝 Wytyczne Rozwoju
 - Przestrzegaj ustalonej struktury folderów
 - Używaj TypeScript dla wszystkich nowych plików
 - Implementuj odpowiednią obsługę błędów
@@ -87,19 +87,19 @@ yarn dev
 - Używaj Server Actions do mutacji danych
 - Implementuj odpowiednie stany ładowania i błędów
 
-## Dostępne Skrypty
+## ⚡ Dostępne Skrypty
 - \`npm run dev\`: Uruchom serwer deweloperski
 - \`npm run build\`: Zbuduj wersję produkcyjną
 - \`npm run start\`: Uruchom serwer produkcyjny
 - \`npm run lint\`: Uruchom ESLint
 - \`npm run format\`: Formatuj kod z Prettier
 
-## Współpraca
+## 👥 Współpraca
 1. Utwórz nową gałąź dla swojej funkcji
 2. Wprowadź zmiany
 3. Wyślij pull request
 
-## Dodatkowe Zasoby
+## 📚 Dodatkowe Zasoby
 - [Dokumentacja Next.js](https://nextjs.org/docs)
 - [Dokumentacja Clerk](https://clerk.com/docs)
 - [Dokumentacja Tailwind CSS](https://tailwindcss.com/docs)
