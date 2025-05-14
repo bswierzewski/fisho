@@ -50,15 +50,15 @@ fishio-frontend/
 ### 💻 Instalacja
 1. Sklonuj repozytorium
 2. Zainstaluj zależności:
-\`\`\`bash
+```bash
 npm install
 # lub
 yarn install
-\`\`\`
+```
 
 3. Skonfiguruj zmienne środowiskowe:
-Utwórz plik \`.env.local\` z następującymi zmiennymi:
-\`\`\`
+Utwórz plik `.env.local` z następującymi zmiennymi:
+```
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=
@@ -69,14 +69,14 @@ NEXT_PUBLIC_API_URL=
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
-\`\`\`
+```
 
 4. Uruchom serwer deweloperski:
-\`\`\`bash
+```bash
 npm run dev
 # lub
 yarn dev
-\`\`\`
+```
 
 ## 📝 Wytyczne Rozwoju
 - Przestrzegaj ustalonej struktury folderów
@@ -88,11 +88,11 @@ yarn dev
 - Implementuj odpowiednie stany ładowania i błędów
 
 ## ⚡ Dostępne Skrypty
-- \`npm run dev\`: Uruchom serwer deweloperski
-- \`npm run build\`: Zbuduj wersję produkcyjną
-- \`npm run start\`: Uruchom serwer produkcyjny
-- \`npm run lint\`: Uruchom ESLint
-- \`npm run format\`: Formatuj kod z Prettier
+- `npm run dev`: Uruchom serwer deweloperski
+- `npm run build`: Zbuduj wersję produkcyjną
+- `npm run start`: Uruchom serwer produkcyjny
+- `npm run lint`: Uruchom ESLint
+- `npm run format`: Formatuj kod z Prettier
 
 ## 👥 Współpraca
 1. Utwórz nową gałąź dla swojej funkcji
