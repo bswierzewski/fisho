@@ -22,7 +22,7 @@ public class SearchUsersQueryValidator : AbstractValidator<SearchUsersQuery>
 
 public record UserDto
 {
-    public string Id { get; init; } = string.Empty;
+    public int Id { get; init; }
     public string Name { get; init; } = string.Empty;
     public string Email { get; init; } = string.Empty;
     public string? ImageUrl { get; init; }
