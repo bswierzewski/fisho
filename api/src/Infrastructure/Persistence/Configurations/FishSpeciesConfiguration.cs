@@ -5,9 +5,9 @@ namespace Infrastructure.Persistence.Configurations;
 
 public class FishSpeciesConfiguration : IEntityTypeConfiguration<FishSpecies>
 {
-    public void Configure(EntityTypeBuilder<FishSpecies> entity)
+    public void Configure(EntityTypeBuilder<FishSpecies> builder)
     {
-        entity.Property(e => e.Name).IsRequired().HasMaxLength(255);
-        entity.HasIndex(e => e.Name).IsUnique();
+        builder.Property(e => e.Name).IsRequired().HasMaxLength(255);
+        builder.HasIndex(e => e.Name).IsUnique();
     }
 }

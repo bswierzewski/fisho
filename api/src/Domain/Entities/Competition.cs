@@ -16,13 +16,10 @@ public class Competition : BaseAuditableEntity
     public int OrganizerId { get; private set; }
     public virtual User Organizer { get; private set; } = null!;
 
-    public int? MainScoringCategoryId { get; private set; }
-    public virtual ScoringCategoryOption? MainScoringCategory { get; private set; }
-
     // Navigation properties
+    public ICollection<CompetitionCategory> CompetitionCategories { get; private set; } = new List<CompetitionCategory>();
     public virtual ICollection<CompetitionParticipant> Participants { get; private set; } = new List<CompetitionParticipant>();
     public virtual ICollection<CompetitionFishCatch> FishCatches { get; private set; } = new List<CompetitionFishCatch>();
-    public virtual ICollection<SpecialCompetitionCategory> SpecialCategories { get; private set; } = new List<SpecialCompetitionCategory>();
 
     // Private constructor for EF Core
     private Competition() { }
@@ -69,11 +66,5 @@ public class Competition : BaseAuditableEntity
         return DateTimeOffset.UtcNow < startTime ? CompetitionStatus.Upcoming : CompetitionStatus.Ongoing;
         // Note: Logic for 'Finished' status update might be handled by a background job or when results are finalized.
         // For simplicity, initial status is Upcoming or Ongoing. EndTime check will transition to Finished.
-    }
-
-    public void AddSpecialCategory(string name, string? description)
-    {
-        var category = new SpecialCompetitionCategory(this, name, description);
-        SpecialCategories.Add(category);
     }
 }

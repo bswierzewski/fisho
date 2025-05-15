@@ -14,8 +14,8 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Fishery> Fisheries => Set<Fishery>();
     public DbSet<FishSpecies> FishSpecies => Set<FishSpecies>();
     public DbSet<LogbookEntry> LogbookEntries => Set<LogbookEntry>();
-    public DbSet<ScoringCategoryOption> ScoringCategoryOptions => Set<ScoringCategoryOption>();
-    public DbSet<SpecialCompetitionCategory> SpecialCompetitionCategories => Set<SpecialCompetitionCategory>();
+    public DbSet<CategoryDefinition> CategoryDefinitions => Set<CategoryDefinition>();
+    public DbSet<CompetitionCategory> CompetitionCategories => Set<CompetitionCategory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

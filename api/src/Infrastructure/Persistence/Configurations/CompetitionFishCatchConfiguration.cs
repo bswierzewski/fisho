@@ -5,24 +5,24 @@ namespace Infrastructure.Persistence.Configurations;
 
 public class CompetitionFishCatchConfiguration : IEntityTypeConfiguration<CompetitionFishCatch>
 {
-    public void Configure(EntityTypeBuilder<CompetitionFishCatch> entity)
+    public void Configure(EntityTypeBuilder<CompetitionFishCatch> builder)
     {
-        entity.Property(e => e.SpeciesName).IsRequired().HasMaxLength(255);
-        entity.Property(e => e.PhotoUrl).IsRequired();
-        entity.Property(e => e.LengthCm).HasColumnType("decimal(6, 2)");
-        entity.Property(e => e.WeightKg).HasColumnType("decimal(7, 3)");
+        builder.Property(e => e.SpeciesName).IsRequired().HasMaxLength(255);
+        builder.Property(e => e.PhotoUrl).IsRequired();
+        builder.Property(e => e.LengthCm).HasColumnType("decimal(6, 2)");
+        builder.Property(e => e.WeightKg).HasColumnType("decimal(7, 3)");
 
-        entity.HasOne(d => d.Competition)
+        builder.HasOne(d => d.Competition)
               .WithMany(p => p.FishCatches)
               .HasForeignKey(d => d.CompetitionId)
               .OnDelete(DeleteBehavior.Cascade); // Jeśli usuniemy zawody, usuwamy zgłoszenia
 
-        entity.HasOne(d => d.Participant)
+        builder.HasOne(d => d.Participant)
               .WithMany(p => p.FishCatches)
               .HasForeignKey(d => d.ParticipantId)
               .OnDelete(DeleteBehavior.Cascade); // Jeśli usuniemy uczestnika z zawodów, usuwamy jego zgłoszenia
 
-        entity.HasOne(d => d.Judge)
+        builder.HasOne(d => d.Judge)
               .WithMany(p => p.JudgedFishCatches)
               .HasForeignKey(d => d.JudgeId)
               .OnDelete(DeleteBehavior.Restrict); // Nie usuwaj sędziego, jeśli ma zgłoszenia

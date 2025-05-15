@@ -5,8 +5,8 @@ namespace Infrastructure.Persistence.Configurations;
 
 public class FisheryConfiguration : IEntityTypeConfiguration<Fishery>
 {
-    public void Configure(EntityTypeBuilder<Fishery> entity)
+    public void Configure(EntityTypeBuilder<Fishery> builder)
     {
-        entity.Property(e => e.Name).IsRequired().HasMaxLength(255);
+        builder.Property(e => e.Name).IsRequired().HasMaxLength(255);
     }
 }
