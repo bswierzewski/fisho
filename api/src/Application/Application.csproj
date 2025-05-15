@@ -41,7 +41,6 @@
 	  <Folder Include="Logbook\Queries\GetLogbookEntryDetails\" />
 	  <Folder Include="Logbook\Queries\ListLogbookEntries\" />
 	  <Folder Include="LookupData\Queries\ListFishSpecies\" />
-	  <Folder Include="LookupData\Queries\ListScoringCategories\" />
 	  <Folder Include="PublicResults\Queries\GetPublicCompetitionResults\" />
 	  <Folder Include="Users\Queries\SearchUsers\" />
 	</ItemGroup>

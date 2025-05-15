@@ -7,16 +7,16 @@ public class FishSpeciesConfiguration : IEntityTypeConfiguration<FishSpecies>
 {
     public void Configure(EntityTypeBuilder<FishSpecies> builder)
     {
-        entity.HasKey(fs => fs.Id); // Upewnij się, że klucz główny jest zdefiniowany
+        builder.HasKey(fs => fs.Id); // Upewnij się, że klucz główny jest zdefiniowany
 
-        entity.Property(e => e.Name)
+        builder.Property(e => e.Name)
             .IsRequired()
             .HasMaxLength(255);
 
-        entity.HasIndex(e => e.Name)
+        builder.HasIndex(e => e.Name)
             .IsUnique();
 
-        entity.HasData(
+        builder.HasData(
             new FishSpecies("Szczupak") { Id = 1 },
             new FishSpecies("Okoń") { Id = 2 },
             new FishSpecies("Sandacz") { Id = 3 },
