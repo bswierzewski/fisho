@@ -1,7 +1,4 @@
-﻿using Fishio.Domain.Common;
-using Fishio.Domain.Enums;
-
-namespace Fishio.Domain.Entities;
+﻿namespace Fishio.Domain.Entities;
 
 public class CategoryDefinition : BaseAuditableEntity
 {
@@ -16,6 +13,5 @@ public class CategoryDefinition : BaseAuditableEntity
     public bool AllowManualWinnerAssignment { get; set; } = true;
 
     // Relacja zwrotna do kategorii w zawodach
-    public ICollection<CompetitionCategory> CompetitionCategories { get; private set; } =
-        new List<CompetitionCategory>();
+    public ICollection<CompetitionCategory> CompetitionCategories { get; private set; } = new List<CompetitionCategory>();
 }

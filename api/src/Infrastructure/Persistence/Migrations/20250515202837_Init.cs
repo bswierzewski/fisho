@@ -1,7 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
+
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
 namespace Infrastructure.Persistence.Migrations
 {
@@ -11,6 +14,31 @@ namespace Infrastructure.Persistence.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "CategoryDefinitions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    IsGlobal = table.Column<bool>(type: "boolean", nullable: false),
+                    Type = table.Column<string>(type: "text", nullable: false),
+                    Metric = table.Column<string>(type: "text", nullable: false),
+                    CalculationLogic = table.Column<string>(type: "text", nullable: false),
+                    EntityType = table.Column<string>(type: "text", nullable: false),
+                    RequiresSpecificFishSpecies = table.Column<bool>(type: "boolean", nullable: false),
+                    AllowManualWinnerAssignment = table.Column<bool>(type: "boolean", nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<int>(type: "integer", nullable: true),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CategoryDefinitions", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "FishSpecies",
                 columns: table => new
@@ -22,20 +50,6 @@ namespace Infrastructure.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_FishSpecies", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ScoringCategoryOptions",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ScoringCategoryOptions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -68,12 +82,12 @@ namespace Infrastructure.Persistence.Migrations
                     EndTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     LocationText = table.Column<string>(type: "text", nullable: true),
                     RulesText = table.Column<string>(type: "text", nullable: true),
-                    Type = table.Column<int>(type: "integer", maxLength: 50, nullable: false),
-                    Status = table.Column<int>(type: "integer", maxLength: 50, nullable: false),
+                    Type = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
                     ImageUrl = table.Column<string>(type: "text", nullable: true),
                     ResultsToken = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     OrganizerId = table.Column<int>(type: "integer", nullable: false),
-                    MainScoringCategoryId = table.Column<int>(type: "integer", nullable: true),
+                    UserId = table.Column<int>(type: "integer", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<int>(type: "integer", nullable: true),
                     LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -83,16 +97,16 @@ namespace Infrastructure.Persistence.Migrations
                 {
                     table.PrimaryKey("PK_Competitions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Competitions_ScoringCategoryOptions_MainScoringCategoryId",
-                        column: x => x.MainScoringCategoryId,
-                        principalTable: "ScoringCategoryOptions",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_Competitions_Users_OrganizerId",
                         column: x => x.OrganizerId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Competitions_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -118,6 +132,49 @@ namespace Infrastructure.Persistence.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CompetitionCategories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CompetitionId = table.Column<int>(type: "integer", nullable: false),
+                    CategoryDefinitionId = table.Column<int>(type: "integer", nullable: false),
+                    SpecificFishSpeciesId = table.Column<int>(type: "integer", nullable: true),
+                    CustomNameOverride = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    CustomDescriptionOverride = table.Column<string>(type: "text", nullable: true),
+                    SortOrder = table.Column<int>(type: "integer", nullable: false),
+                    IsPrimaryScoring = table.Column<bool>(type: "boolean", nullable: false),
+                    MaxWinnersToDisplay = table.Column<int>(type: "integer", nullable: false),
+                    IsEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<int>(type: "integer", nullable: true),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModifiedBy = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CompetitionCategories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CompetitionCategories_CategoryDefinitions_CategoryDefinitio~",
+                        column: x => x.CategoryDefinitionId,
+                        principalTable: "CategoryDefinitions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CompetitionCategories_Competitions_CompetitionId",
+                        column: x => x.CompetitionId,
+                        principalTable: "Competitions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CompetitionCategories_FishSpecies_SpecificFishSpeciesId",
+                        column: x => x.SpecificFishSpeciesId,
+                        principalTable: "FishSpecies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -152,27 +209,6 @@ namespace Infrastructure.Persistence.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SpecialCompetitionCategories",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    CompetitionId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SpecialCompetitionCategories", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SpecialCompetitionCategories_Competitions_CompetitionId",
-                        column: x => x.CompetitionId,
-                        principalTable: "Competitions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -277,6 +313,64 @@ namespace Infrastructure.Persistence.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.InsertData(
+                table: "CategoryDefinitions",
+                columns: new[] { "Id", "AllowManualWinnerAssignment", "CalculationLogic", "Created", "CreatedBy", "Description", "EntityType", "IsGlobal", "LastModified", "LastModifiedBy", "Metric", "Name", "RequiresSpecificFishSpecies", "Type" },
+                values: new object[,]
+                {
+                    { 1, false, "MaxValue", new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Zwycięzcą zostaje uczestnik, który złowił rybę o największej długości.", "FishCatch", true, new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "LengthCm", "Najdłuższa Ryba (Indywidualnie)", false, "MainScoring" },
+                    { 2, false, "MaxValue", new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Zwycięzcą zostaje uczestnik, który złowił rybę o największej wadze.", "FishCatch", true, new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "WeightKg", "Najcięższa Ryba (Indywidualnie)", false, "MainScoring" },
+                    { 3, false, "SumValue", new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Zwycięzcą zostaje uczestnik z największą sumą długości wszystkich swoich złowionych ryb.", "ParticipantAggregateCatches", true, new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "LengthCm", "Suma Długości Złowionych Ryb", false, "MainScoring" },
+                    { 4, false, "SumValue", new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Zwycięzcą zostaje uczestnik z największą sumą wag wszystkich swoich złowionych ryb.", "ParticipantAggregateCatches", true, new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "WeightKg", "Suma Wag Złowionych Ryb", false, "MainScoring" },
+                    { 5, false, "SumValue", new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Zwycięzcą zostaje uczestnik, który złowił najwięcej ryb (sztuk).", "ParticipantAggregateCatches", true, new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "FishCount", "Liczba Złowionych Ryb", false, "MainScoring" },
+                    { 10, true, "ManualAssignment", new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Nagroda za największą (najdłuższą lub najcięższą - do ustalenia przez organizatora) rybę zawodów, niezależnie od gatunku.", "FishCatch", true, new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "NotApplicable", "Największa Ryba Zawodów (Gatunek Dowolny)", false, "SpecialAchievement" },
+                    { 11, true, "ManualAssignment", new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Nagroda za największą rybę wybranego gatunku (np. Największy Szczupak). Gatunek wybierany przy dodawaniu kategorii do zawodów.", "FishCatch", true, new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "NotApplicable", "Największa Ryba Określonego Gatunku", true, "SpecialAchievement" },
+                    { 12, false, "FirstOccurrence", new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Nagroda dla uczestnika, który jako pierwszy zarejestruje połów.", "FishCatch", true, new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "TimeOfCatch", "Pierwsza Złowiona Ryba Zawodów", false, "SpecialAchievement" },
+                    { 13, true, "ManualAssignment", new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Nagroda dla najmłodszego uczestnika, który złowił jakąkolwiek rybę.", "ParticipantProfile", true, new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "NotApplicable", "Najmłodszy Uczestnik z Rybą", false, "FunChallenge" },
+                    { 14, false, "MaxValue", new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Nagroda dla uczestnika, który złowił najwięcej różnych gatunków ryb.", "ParticipantAggregateCatches", true, new DateTimeOffset(new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "SpeciesVariety", "Największa Różnorodność Gatunków", false, "SpecialAchievement" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "FishSpecies",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Szczupak" },
+                    { 2, "Okoń" },
+                    { 3, "Sandacz" },
+                    { 4, "Karp" },
+                    { 5, "Leszcz" },
+                    { 6, "Płoć" },
+                    { 7, "Lin" },
+                    { 8, "Sum" },
+                    { 9, "Węgorz" },
+                    { 10, "Pstrąg potokowy" }
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CompetitionCategories_CategoryDefinitionId",
+                table: "CompetitionCategories",
+                column: "CategoryDefinitionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CompetitionCategories_CompetitionId_CategoryDefinitionId",
+                table: "CompetitionCategories",
+                columns: new[] { "CompetitionId", "CategoryDefinitionId" },
+                unique: true,
+                filter: "\"SpecificFishSpeciesId\" IS NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CompetitionCategories_CompetitionId_CategoryDefinitionId_Sp~",
+                table: "CompetitionCategories",
+                columns: new[] { "CompetitionId", "CategoryDefinitionId", "SpecificFishSpeciesId" },
+                unique: true,
+                filter: "\"SpecificFishSpeciesId\" IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CompetitionCategories_SpecificFishSpeciesId",
+                table: "CompetitionCategories",
+                column: "SpecificFishSpeciesId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_CompetitionFishCatches_CompetitionId",
                 table: "CompetitionFishCatches",
@@ -312,11 +406,6 @@ namespace Infrastructure.Persistence.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Competitions_MainScoringCategoryId",
-                table: "Competitions",
-                column: "MainScoringCategoryId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Competitions_OrganizerId",
                 table: "Competitions",
                 column: "OrganizerId");
@@ -326,6 +415,11 @@ namespace Infrastructure.Persistence.Migrations
                 table: "Competitions",
                 column: "ResultsToken",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Competitions_UserId",
+                table: "Competitions",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Fisheries_UserId",
@@ -354,11 +448,6 @@ namespace Infrastructure.Persistence.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SpecialCompetitionCategories_CompetitionId",
-                table: "SpecialCompetitionCategories",
-                column: "CompetitionId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Users_ClerkUserId",
                 table: "Users",
                 column: "ClerkUserId",
@@ -376,6 +465,9 @@ namespace Infrastructure.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "CompetitionCategories");
+
+            migrationBuilder.DropTable(
                 name: "CompetitionFishCatches");
 
             migrationBuilder.DropTable(
@@ -385,7 +477,7 @@ namespace Infrastructure.Persistence.Migrations
                 name: "LogbookEntries");
 
             migrationBuilder.DropTable(
-                name: "SpecialCompetitionCategories");
+                name: "CategoryDefinitions");
 
             migrationBuilder.DropTable(
                 name: "CompetitionParticipants");
@@ -398,9 +490,6 @@ namespace Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Competitions");
-
-            migrationBuilder.DropTable(
-                name: "ScoringCategoryOptions");
 
             migrationBuilder.DropTable(
                 name: "Users");

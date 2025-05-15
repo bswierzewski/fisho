@@ -1,5 +1,4 @@
-﻿using Fishio.Domain.Entities;
-using Fishio.Domain.Enums;
+﻿using Fishio.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;

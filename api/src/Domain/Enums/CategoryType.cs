@@ -1,9 +1,18 @@
-﻿namespace Fishio.Domain.Enums;
+﻿using System.ComponentModel;
+
+namespace Fishio.Domain.Enums;
 
 public enum CategoryType
 {
-    MainScoring = 1,        // Główna kategoria punktacyjna
-    SpecialAchievement = 2, // Specjalne osiągnięcie
-    FunChallenge = 3,       // Kategoria rozrywkowa/dodatkowa
-    Custom = 4              // Kategoria zdefiniowana przez użytkownika (na przyszłość)
+    [Description("Główna kategoria punktacyjna")]
+    MainScoring = 1,
+
+    [Description("Specjalne osiągnięcie")]
+    SpecialAchievement = 2,
+
+    [Description("Kategoria rozrywkowa/dodatkowa")]
+    FunChallenge = 3,
+
+    [Description("Kategoria zdefiniowana przez użytkownika")]
+    Custom = 4
 }

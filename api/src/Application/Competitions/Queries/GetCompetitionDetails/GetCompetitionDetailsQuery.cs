@@ -31,6 +31,7 @@ public record CompetitionDetailsDto
     public bool IsCurrentUserParticipant { get; init; }
     public bool IsCurrentUserJudge { get; init; }
     public bool IsCurrentUserOrganizer { get; init; }
+    public List<CompetitionCategoryDetailsDto> ConfiguredCategories { get; set; } = new();
     public List<CompetitionFishSpeciesDto> FishSpecies { get; init; } = new();
     public List<CompetitionParticipantDto> Participants { get; init; } = new();
     public List<CompetitionCatchDto> RecentCatches { get; init; } = new();
@@ -66,4 +67,30 @@ public record CompetitionCatchDto
     public DateTime CaughtAt { get; init; }
     public string RecordedByUserId { get; init; } = string.Empty;
     public string RecordedByUserName { get; init; } = string.Empty;
+}
+
+public class CompetitionCategoryDetailsDto
+{
+    public int Id { get; set; } // Id encji CompetitionCategory
+    public int CategoryDefinitionId { get; set; }
+    public required string CategoryDefinitionName { get; set; } // Nazwa z CategoryDefinition
+    public string? CustomNameOverride { get; set; }
+    public string DisplayName => !string.IsNullOrEmpty(CustomNameOverride) ? CustomNameOverride : CategoryDefinitionName;
+
+    public string? CategoryDefinitionDescription { get; set; }
+    public string? CustomDescriptionOverride { get; set; }
+    public string? DisplayDescription => !string.IsNullOrEmpty(CustomDescriptionOverride) ? CustomDescriptionOverride : CategoryDefinitionDescription;
+
+    public CategoryType CategoryType { get; set; }
+    public CategoryMetric CategoryMetric { get; set; }
+    public CategoryCalculationLogic CategoryCalculationLogic { get; set; }
+    public bool RequiresSpecificFishSpecies { get; set; }
+
+    public int? SpecificFishSpeciesId { get; set; }
+    public string? SpecificFishSpeciesName { get; set; }
+
+    public int SortOrder { get; set; }
+    public bool IsPrimaryScoring { get; set; }
+    public int MaxWinnersToDisplay { get; set; }
+    public bool IsEnabled { get; set; }
 }

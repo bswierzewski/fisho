@@ -1,8 +1,21 @@
-﻿namespace Fishio.Domain.Enums;
+﻿using System.ComponentModel;
+
+namespace Fishio.Domain.Enums;
 
 public enum CompetitionStatus
 {
-    Upcoming,  // Zaplanowane
-    Ongoing,   // Trwające
-    Finished   // Zakończone
+    [Description("Wersja robocza")]
+    Draft,
+
+    [Description("W trakcie zatwierdzania")]
+    PendingApproval,
+
+    [Description("Zaplanowane")]
+    Upcoming,
+
+    [Description("Trwające")]
+    Ongoing,
+
+    [Description("Zakończone")]
+    Finished
 }
