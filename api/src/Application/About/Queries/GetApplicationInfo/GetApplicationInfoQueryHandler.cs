@@ -1,5 +1,3 @@
-using Fishio.Application.Common.Interfaces;
-
 namespace Fishio.Application.About.Queries.GetApplicationInfo;
 
 public class GetApplicationInfoQueryHandler : IRequestHandler<GetApplicationInfoQuery, ApplicationInfoDto>

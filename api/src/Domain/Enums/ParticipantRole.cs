@@ -3,5 +3,6 @@
 public enum ParticipantRole
 {
     Judge,
-    Competitor
+    Competitor,
+    Guest
 }

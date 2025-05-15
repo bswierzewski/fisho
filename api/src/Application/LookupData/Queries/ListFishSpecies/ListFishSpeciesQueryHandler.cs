@@ -11,7 +11,11 @@ public class ListFishSpeciesQueryHandler : IRequestHandler<ListFishSpeciesQuery,
 
     public async Task<List<FishSpeciesDto>> Handle(ListFishSpeciesQuery request, CancellationToken cancellationToken)
     {
-        // TODO: Implement the logic for listing fish species
-        return new List<FishSpeciesDto>();
+        var fishSpeciesList = await _context.FishSpecies
+                    .OrderBy(fs => fs.Name)
+                    .Select(fs => new FishSpeciesDto(fs.Id, fs.Name))
+                    .ToListAsync(cancellationToken);
+
+        return fishSpeciesList;
     }
 } 
