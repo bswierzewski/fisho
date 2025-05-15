@@ -1,35 +1,49 @@
 namespace Fishio.Application.Dashboard.Queries.GetDashboardData;
 
-public record GetDashboardDataQuery : IRequest<DashboardDto>;
+public record GetDashboardDataQuery : IRequest<DashboardDataDto>;
 
-public record DashboardDto
+public class DashboardDataDto
 {
-    public int TotalCompetitionsCount { get; init; }
-    public int ActiveCompetitionsCount { get; init; }
-    public int UpcomingCompetitionsCount { get; init; }
-    public int MyCompetitionsCount { get; init; }
-    public int MyJudgedCompetitionsCount { get; init; }
-    public int MyTotalCatchesCount { get; init; }
-    public List<RecentCompetitionDto> RecentCompetitions { get; init; } = new();
-    public List<RecentCatchDto> RecentCatches { get; init; } = new();
+    public UserSummaryDto UserSummary { get; set; } = new();
+    public CompetitionSummaryDto CompetitionSummary { get; set; } = new();
+    public LogbookSummaryDto LogbookSummary { get; set; } = new();
+    public List<UpcomingEventDto> UpcomingEvents { get; set; } = new();
 }
 
-public record RecentCompetitionDto
+public class UserSummaryDto
 {
-    public int Id { get; init; }
-    public string Name { get; init; } = string.Empty;
-    public string Status { get; init; } = string.Empty;
-    public DateTime StartDate { get; init; }
-    public DateTime EndDate { get; init; }
-    public int ParticipantsCount { get; init; }
+    public string UserName { get; set; } = string.Empty;
+    // Można dodać więcej informacji o użytkowniku, jeśli potrzebne
 }
 
-public record RecentCatchDto
+public class CompetitionSummaryDto
 {
-    public int Id { get; init; }
-    public string CompetitionName { get; init; } = string.Empty;
-    public string FishSpeciesName { get; init; } = string.Empty;
-    public decimal Length { get; init; }
-    public decimal? Weight { get; init; }
-    public DateTime CaughtAt { get; init; }
-} 
+    public int ParticipatingCount { get; set; }
+    public int OrganizingCount { get; set; }
+}
+
+public class LogbookSummaryDto
+{
+    public int TotalLogbookEntries { get; set; }
+    public int TotalFishCaughtInLogbook { get; set; } // Przykładowa statystyka
+    public List<RecentLogbookEntryDto> RecentEntries { get; set; } = new();
+}
+
+public class RecentLogbookEntryDto
+{
+    public int Id { get; set; }
+    public required string SpeciesName { get; set; }
+    public DateTimeOffset CatchTime { get; set; }
+    public decimal? LengthCm { get; set; }
+    public decimal? WeightKg { get; set; }
+    public string? FisheryName { get; set; } // Opcjonalnie
+}
+
+public class UpcomingEventDto // Może to być zarówno zawody, w których uczestniczy, jak i te, które organizuje
+{
+    public int CompetitionId { get; set; }
+    public required string CompetitionName { get; set; }
+    public DateTimeOffset StartTime { get; set; }
+    public string RoleInCompetition { get; set; } = string.Empty; // Np. "Organizator", "Uczestnik"
+    public Domain.Enums.CompetitionStatus Status { get; set; }
+}

@@ -10,6 +10,12 @@ public enum CompetitionStatus
     [Description("W trakcie zatwierdzania")]
     PendingApproval,
 
+    [Description("Akceptacja zgłoszeń")]
+    AcceptingRegistrations,
+
+    [Description("Zgłoszenia zamknięte")]
+    Scheduled,
+
     [Description("Zaplanowane")]
     Upcoming,
 
@@ -17,5 +23,8 @@ public enum CompetitionStatus
     Ongoing,
 
     [Description("Zakończone")]
-    Finished
+    Finished,
+
+    [Description("Anulowane")]
+    Cancelled
 }
