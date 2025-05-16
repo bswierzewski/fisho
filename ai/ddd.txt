@@ -1,0 +1,244 @@
+==================================================
+Przegląd Encji Domenowych i Ich Metod (DDD)
+==================================================
+
+Legenda:
+(KR) - Korzeń Agregatu
+(E)  - Encja (część agregatu lub referencyjna)
+internal - Metoda przeznaczona do wywołania przez korzeń agregatu lub w ramach domeny.
+
+---
+1. User (KR)
+---
+   Cel: Reprezentuje użytkownika systemu.
+   Kluczowe Właściwości: Id, ClerkUserId, Name, Email.
+
+   Metody Domenowe (MVP):
+     - Konstruktor User(clerkUserId, name, email):
+       - Waliduje clerkUserId (wymagany, format), name (wymagany).
+       - Zapewnia unikalność ClerkUserId (mechanizm sprawdzany przy tworzeniu przez serwis aplikacyjny/repozytorium).
+       - Podnosi zdarzenie UserCreatedEvent.
+     - UpdateProfile(name, email):
+       - Waliduje name (wymagany).
+       - Podnosi zdarzenie UserProfileUpdatedEvent, jeśli dane uległy zmianie.
+
+   Potencjalne Rozszerzenia (MVP+ lub później):
+     - CanOrganizeCompetition(): bool - Sprawdza, czy użytkownik ma uprawnienia do organizowania zawodów.
+     - CanBeJudge(): bool - Sprawdza, czy użytkownik może pełnić rolę sędziego.
+     - Metody związane z zarządzaniem preferencjami użytkownika specyficznymi dla aplikacji.
+
+---
+2. FishSpecies (E)
+---
+   Cel: Predefiniowany gatunek ryby (dane słownikowe).
+   Kluczowe Właściwości: Id, Name.
+
+   Metody Domenowe (MVP - zakładając, że dane są predefiniowane i zarządzane poza standardowym CRUD użytkownika):
+     - Konstruktor FishSpecies(name):
+       - Waliduje name (wymagany, niepusty).
+       - Zapewnia unikalność nazwy (mechanizm sprawdzany przy zarządzaniu słownikiem przez administratora/system).
+
+   Potencjalne Rozszerzenia (Później - jeśli zarządzanie słownikiem przez admina):
+     - UpdateName(newName):
+       - Waliduje newName.
+
+   Logika Domenowa: Minimalna, głównie walidacja integralności danych przy inicjalizacji.
+
+---
+3. CategoryDefinition (E)
+---
+   Cel: Predefiniowana definicja kategorii (dane słownikowe).
+   Kluczowe Właściwości: Id, Name, Description, IsGlobal, Type, Metric, CalculationLogic, EntityType, RequiresSpecificFishSpecies, AllowManualWinnerAssignment.
+
+   Metody Domenowe (MVP - zakładając, że dane są predefiniowane i zarządzane poza standardowym CRUD użytkownika):
+     - Konstruktor CategoryDefinition(name, type, metric, calculationLogic, entityType, isGlobal, requiresSpecificFishSpecies, allowManualWinnerAssignment, description?):
+       - Waliduje wszystkie parametry wejściowe (wymagalność, zakresy).
+       - Egzekwuje reguły spójności kombinacji wartości enum (Type, Metric, CalculationLogic, EntityType).
+
+   Potencjalne Rozszerzenia (Później - jeśli zarządzanie słownikiem przez admina):
+     - Update(name, type, metric, ...):
+       - Waliduje parametry i spójność kombinacji enumów.
+
+   Logika Domenowa: Minimalna dla MVP (poza walidacją w konstruktorze dla danych `HasData`). Rozbudowana, jeśli definicje będą dynamicznie zarządzane.
+
+---
+4. Fishery (KR)
+---
+   Cel: Reprezentuje łowisko.
+   Kluczowe Właściwości: Id, Name, LocationText, ImageUrl, UserId (właściciel/twórca), DefinedFishSpecies (kolekcja FishSpecies).
+
+   Metody Domenowe (MVP+):
+     - Konstruktor Fishery(name, creatorUserId, locationText?, imageUrl?):
+       - Waliduje name (wymagany, długość), creatorUserId (wymagany).
+       - Podnosi zdarzenie FisheryCreatedEvent.
+     - UpdateDetails(name, locationText?, imageUrl?):
+       - Waliduje name (wymagany, długość).
+       - Podnosi zdarzenie FisheryUpdatedEvent, jeśli dane uległy zmianie.
+     - AddFishSpecies(FishSpecies species):
+       - Sprawdza, czy dany gatunek nie został już przypisany do tego łowiska.
+       - Dodaje gatunek do wewnętrznej kolekcji _definedFishSpecies.
+       - Podnosi zdarzenie FishSpeciesAssociatedToFisheryEvent.
+     - RemoveFishSpecies(FishSpecies species) / RemoveFishSpeciesById(speciesId):
+       - Usuwa gatunek z wewnętrznej kolekcji _definedFishSpecies.
+       - Podnosi zdarzenie FishSpeciesDisassociatedFromFisheryEvent.
+     - SetFishSpecies(IEnumerable<FishSpecies> newSpeciesList):
+       - Czyści istniejącą listę gatunków i dodaje nowe, zapewniając unikalność.
+       - Podnosi zdarzenie FisheryFishSpeciesUpdatedEvent.
+
+   Potencjalne Rozszerzenia (Później):
+     - ChangeOwner(newUserId):
+       - Waliduje newUserId.
+       - Podnosi zdarzenie FisheryOwnerChangedEvent.
+
+---
+5. LogbookEntry (KR)
+---
+   Cel: Osobisty wpis połowu użytkownika.
+   Kluczowe Właściwości: Id, UserId, SpeciesName, LengthCm?, WeightKg?, PhotoUrl, CatchTime, Notes?, FisheryId?.
+
+   Metody Domenowe (MVP+):
+     - Konstruktor LogbookEntry(userId, speciesName, catchTime, photoUrl, lengthCm?, weightKg?, notes?, fisheryId?):
+       - Waliduje wszystkie wymagane pola (userId, speciesName, catchTime, photoUrl).
+       - Waliduje formaty i zakresy wartości (długość, waga, data połowu nie w przyszłości).
+       - Podnosi zdarzenie LogbookEntryCreatedEvent.
+     - UpdateDetails(speciesName, catchTime, photoUrl, lengthCm?, weightKg?, notes?, fisheryId?):
+       - Przeprowadza walidację analogiczną do konstruktora.
+       - Podnosi zdarzenie LogbookEntryUpdatedEvent, jeśli dane uległy zmianie.
+     - ChangeFishery(newFisheryId?):
+       - Waliduje newFisheryId (jeśli podane).
+       - Podnosi zdarzenie LogbookEntryFisheryChangedEvent (lub ogólne LogbookEntryUpdatedEvent).
+
+---
+6. Competition (KR)
+---
+   Cel: Reprezentuje zawody wędkarskie.
+   Kluczowe Właściwości: Id, Name, StartTime, EndTime, LocationText?, RulesText?, Type, Status, ImageUrl?, ResultsToken, OrganizerId.
+   Kolekcje Wewnętrzne: _participants (CompetitionParticipant), _categories (CompetitionCategory), _fishCatches (CompetitionFishCatch).
+
+   Metody Domenowe (MVP i MVP+):
+     - Konstruktor Competition(name, startTime, endTime, type, organizerId, locationText?, rulesText?, imageUrl?):
+       - Waliduje name (wymagany), startTime < endTime, organizerId (wymagany).
+       - Ustawia Status na Draft.
+       - Generuje unikalny ResultsToken.
+       - Podnosi zdarzenie CompetitionCreatedEvent.
+     - UpdateDetails(name, startTime, endTime, type, locationText?, rulesText?, imageUrl?):
+       - Egzekwuje regułę: dozwolone tylko w statusach Draft lub Scheduled.
+       - Waliduje parametry (name, startTime < endTime).
+       - Podnosi zdarzenie CompetitionDetailsUpdatedEvent.
+     - ScheduleCompetition():
+       - Zmienia Status z Draft na Scheduled (lub AcceptingRegistrations).
+       - Podnosi zdarzenie CompetitionStatusChangedEvent.
+     - StartCompetition():
+       - Egzekwuje regułę: StartTime musi nadejść.
+       - Zmienia Status na Ongoing.
+       - Podnosi zdarzenie CompetitionStatusChangedEvent.
+     - EndCompetition():
+       - Egzekwuje regułę: EndTime musi nadejść (lub manualne zakończenie przez organizatora).
+       - Zmienia Status na Finished.
+       - Podnosi zdarzenie CompetitionStatusChangedEvent.
+     - CancelCompetition(reason?):
+       - Zmienia Status na Cancelled.
+       - Podnosi zdarzenie CompetitionStatusChangedEvent.
+     - AddParticipant(User user, ParticipantRole role, User addedBy):
+       - Egzekwuje regułę: dozwolone tylko w statusach AcceptingRegistrations lub Scheduled.
+       - Sprawdza, czy użytkownik już nie jest uczestnikiem.
+       - (Opcjonalnie) Sprawdza limit uczestników.
+       - Tworzy instancję CompetitionParticipant.
+       - Dodaje uczestnika do wewnętrznej kolekcji _participants.
+       - Podnosi zdarzenie ParticipantAddedToCompetitionEvent.
+     - AddGuestParticipant(guestName, guestIdentifier, User addedBy):
+       - Analogicznie do AddParticipant, ale dla gości.
+       - Podnosi zdarzenie ParticipantAddedToCompetitionEvent.
+     - RemoveParticipant(participantId, User removedBy):
+       - Egzekwuje regułę: dozwolone tylko w określonych statusach.
+       - Rozważa konsekwencje, jeśli uczestnik ma już zarejestrowane połowy.
+       - Usuwa CompetitionParticipant z kolekcji _participants.
+       - Podnosi zdarzenie ParticipantRemovedFromCompetitionEvent.
+     - AssignRoleToParticipant(participantId, newRole, User assignedBy):
+       - Waliduje możliwość przypisania roli (np. ograniczenia liczby sędziów).
+       - Aktualizuje rolę w odpowiedniej instancji CompetitionParticipant.
+       - Podnosi zdarzenie ParticipantRoleChangedEvent.
+     - AddCategoryToCompetition(CategoryDefinition definition, int? specificFishSpeciesId, User addedBy, customName?, customDescription?, sortOrder?, isPrimaryScoring?, maxWinnersToDisplay?):
+       - Egzekwuje regułę: dozwolone tylko w statusach Draft lub Scheduled.
+       - Waliduje, czy kategoria (z danym gatunkiem) nie istnieje już w zawodach.
+       - Waliduje, czy podano gatunek, jeśli definicja kategorii tego wymaga.
+       - Tworzy instancję CompetitionCategory.
+       - Dodaje kategorię do wewnętrznej kolekcji _categories.
+       - Podnosi zdarzenie CategoryAddedToCompetitionEvent.
+     - UpdateCompetitionCategory(competitionCategoryId, User updatedBy, customName?, customDescription?, sortOrder?, isPrimaryScoring?, maxWinnersToDisplay?, isEnabled?):
+       - Egzekwuje regułę: dozwolone tylko w statusach Draft lub Scheduled.
+       - Znajduje CompetitionCategory w kolekcji _categories.
+       - Wywołuje metodę Update na znalezionej instancji CompetitionCategory.
+       - Podnosi zdarzenie CompetitionCategoryUpdatedEvent.
+     - RemoveCompetitionCategory(competitionCategoryId, User removedBy):
+       - Egzekwuje regułę: dozwolone tylko w statusach Draft lub Scheduled.
+       - Rozważa konsekwencje, jeśli kategoria ma już zarejestrowane wyniki/połowy.
+       - Usuwa CompetitionCategory z kolekcji _categories.
+       - Podnosi zdarzenie CategoryRemovedFromCompetitionEvent.
+     - RecordFishCatch(participantId, judgeId, speciesName, catchTime, photoUrl, lengthCm?, weightKg?):
+       - Egzekwuje regułę: dozwolone tylko gdy zawody są w statusie Ongoing.
+       - Sprawdza, czy participantId jest prawidłowym uczestnikiem.
+       - Sprawdza, czy judgeId jest sędzią w tych zawodach.
+       - Waliduje dane połowu (wymagane pola, zakresy).
+       - Tworzy instancję CompetitionFishCatch.
+       - Dodaje połów do wewnętrznej kolekcji _fishCatches.
+       - Podnosi zdarzenie FishCatchRecordedEvent.
+     - GenerateNewResultsToken():
+       - Generuje nowy, unikalny token i go ustawia.
+       - Podnosi zdarzenie CompetitionResultsTokenChangedEvent.
+     - CanBeJoinedBy(userId): bool - Sprawdza, czy użytkownik może dołączyć do zawodów (status, limity, czy już nie jest uczestnikiem).
+
+   Potencjalne Rozszerzenia (MVP+ lub później):
+     - UpdateRecordedFishCatch(fishCatchId, judgeId, newSpeciesName, ...): Logika edycji połowu, uprawnienia sędziego.
+     - DeleteRecordedFishCatch(fishCatchId, judgeId): Logika usuwania połowu, uprawnienia sędziego.
+     - Metody związane z zaawansowanym zarządzaniem wynikami, klasyfikacjami.
+     - Obsługa drużyn.
+
+---
+7. CompetitionParticipant (E - część agregatu Competition)
+---
+   Cel: Reprezentuje uczestnika (lub gościa) w konkretnych zawodach.
+   Kluczowe Właściwości: Id, CompetitionId, UserId?, GuestName?, GuestIdentifier?, Role, AddedByOrganizer.
+
+   Metody Domenowe (MVP):
+     - Konstruktor internal CompetitionParticipant(competitionId, userId?, guestName?, guestIdentifier?, role, addedByOrganizer):
+       - Wywoływany przez Competition.
+       - Waliduje, że podano albo UserId albo GuestName.
+     - internal UpdateRole(newRole):
+       - Wywoływana przez Competition.
+       - Waliduje nową rolę.
+     - IsUser(userId): bool - Sprawdza, czy uczestnik jest danym zarejestrowanym użytkownikiem.
+     - IsGuest(): bool - Sprawdza, czy uczestnik jest gościem.
+     - HasRole(role): bool - Sprawdza, czy uczestnik ma daną rolę.
+
+---
+8. CompetitionCategory (E - część agregatu Competition)
+---
+   Cel: Reprezentuje konkretną kategorię skonfigurowaną dla danych zawodów.
+   Kluczowe Właściwości: Id, CompetitionId, CategoryDefinitionId, SpecificFishSpeciesId?, CustomNameOverride?, CustomDescriptionOverride?, SortOrder, IsPrimaryScoring, MaxWinnersToDisplay, IsEnabled.
+
+   Metody Domenowe (MVP):
+     - Konstruktor internal CompetitionCategory(competitionId, categoryDefinitionId, specificFishSpeciesId?, customNameOverride?, customDescriptionOverride?, sortOrder, isPrimaryScoring, maxWinnersToDisplay, isEnabled):
+       - Wywoływany przez Competition.
+       - Waliduje podstawowe parametry (np. maxWinnersToDisplay > 0).
+     - internal Update(customNameOverride?, customDescriptionOverride?, sortOrder, isPrimaryScoring, maxWinnersToDisplay, isEnabled):
+       - Wywoływana przez Competition.
+       - Waliduje parametry.
+     - internal Enable(): Zmienia IsEnabled na true.
+     - internal Disable(): Zmienia IsEnabled na false.
+
+---
+9. CompetitionFishCatch (E - część agregatu Competition)
+---
+   Cel: Reprezentuje połów zarejestrowany w ramach zawodów.
+   Kluczowe Właściwości: Id, CompetitionId, ParticipantId, JudgeId, SpeciesName, LengthCm?, WeightKg?, PhotoUrl, CatchTime.
+
+   Metody Domenowe (MVP):
+     - Konstruktor internal CompetitionFishCatch(competitionId, participantId, judgeId, speciesName, catchTime, photoUrl, lengthCm?, weightKg?):
+       - Wywoływany przez Competition.
+       - Waliduje wszystkie wymagane pola i ich formaty/zakresy.
+
+   Potencjalne Rozszerzenia (MVP+ lub później):
+     - internal UpdateDetails(newSpeciesName, newLength?, ...): Logika edycji, jeśli dozwolona.
+
+==================================================

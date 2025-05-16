@@ -4,7 +4,7 @@ public class CategoryDefinition : BaseAuditableEntity
 {
     public required string Name { get; set; }
     public string? Description { get; set; }
-    public bool IsGlobal { get; set; } = true; // Domyślnie globalna
+    public bool IsGlobal { get; set; } = true;
     public CategoryType Type { get; set; }
     public CategoryMetric Metric { get; set; }
     public CategoryCalculationLogic CalculationLogic { get; set; }
@@ -12,6 +12,8 @@ public class CategoryDefinition : BaseAuditableEntity
     public bool RequiresSpecificFishSpecies { get; set; } = false;
     public bool AllowManualWinnerAssignment { get; set; } = true;
 
-    // Relacja zwrotna do kategorii w zawodach
-    public ICollection<CompetitionCategory> CompetitionCategories { get; private set; } = new List<CompetitionCategory>();
+    // Prywatny konstruktor dla EF Core i dla HasData
+    // HasData będzie musiało przypisać wartości do wszystkich właściwości.
+    private CategoryDefinition() { }
+
 }

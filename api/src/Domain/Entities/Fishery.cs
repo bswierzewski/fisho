@@ -18,6 +18,7 @@ public class Fishery : BaseAuditableEntity
 
     public Fishery(string name)
     {
+        Guard.Against.NullOrWhiteSpace(name, nameof(name), "Nazwa łowiska jest wymagana.");
         Name = name;
     }
 

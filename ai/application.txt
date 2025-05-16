@@ -1,0 +1,410 @@
+======================================================================
+Przegląd Komend i Zapytań Warstwy Aplikacji (CQRS & Clean Architecture)
+======================================================================
+
+---
+Moduł: Users
+---
+
+  [Q] SearchUsersQuery (MVP+)
+      DTO_IN: SearchTerm (string), PageNumber, PageSize
+      DTO_OUT: PaginatedList<UserSearchResultDto>
+      Logika:
+        - Walidacja.
+        - Wyszukiwanie użytkowników: Repo.Users.Where(u => u.Name.Contains(request.SearchTerm) || u.Email.Contains(request.SearchTerm))
+        - Paginacja i mapowanie na DTO.
+      Auth: Zalogowany użytkownik (np. do dodawania uczestników).
+
+---
+Moduł: Fisheries (MVP+)
+---
+
+  [C] CreateFisheryCommand
+      DTO_IN: Name, LocationText?, ImageUrl?, InitialFishSpeciesIds? (lista Id gatunków)
+      DTO_OUT: FisheryId (int)
+      Logika:
+        - Walidacja: Wymagane pola (Name).
+        - Pobranie CreatorUserId z ICurrentUserService.
+        - Tworzenie instancji: new Fishery(request.Name, creatorUserId, request.LocationText, request.ImageUrl) -> Fishery.Konstruktor()
+        - (Jeśli InitialFishSpeciesIds podane):
+          - Pobranie encji FishSpecies: Repo.FishSpecies.Where(fs => request.InitialFishSpeciesIds.Contains(fs.Id)).ToListAsync()
+          - Wywołanie metody domenowej: fishery.SetFishSpecies(retrievedFishSpecies)
+        - Zapis: Repo.Fisheries.Add(fishery), Repo.SaveChangesAsync()
+      Auth: Zalogowany użytkownik.
+
+  [C] UpdateFisheryCommand
+      DTO_IN: FisheryId, Name, LocationText?, ImageUrl?
+      DTO_OUT: Unit
+      Logika:
+        - Walidacja.
+        - Pobranie łowiska: Repo.Fisheries.FindAsync(request.FisheryId)
+        - Sprawdzenie uprawnień: Czy zalogowany użytkownik jest właścicielem łowiska lub adminem.
+        - Wywołanie metody domenowej: fishery.UpdateDetails(request.Name, request.LocationText, request.ImageUrl)
+        - Zapis: Repo.SaveChangesAsync()
+      Auth: Właściciel łowiska lub Administrator.
+
+  [C] UpdateFisheryFishSpeciesCommand
+      DTO_IN: FisheryId, List<FishSpeciesId>
+      DTO_OUT: Unit
+      Logika:
+        - Walidacja.
+        - Pobranie łowiska: Repo.Fisheries.GetByIdWithSpeciesAsync(request.FisheryId) (repozytorium powinno załadować gatunki)
+        - Sprawdzenie uprawnień.
+        - Pobranie encji FishSpecies: Repo.FishSpecies.Where(fs => request.FishSpeciesIds.Contains(fs.Id)).ToListAsync()
+        - Wywołanie metody domenowej: fishery.SetFishSpecies(retrievedFishSpecies)
+        - Zapis: Repo.SaveChangesAsync()
+      Auth: Właściciel łowiska lub Administrator.
+
+  [C] DeleteFisheryCommand
+      DTO_IN: FisheryId
+      DTO_OUT: Unit
+      Logika:
+        - Walidacja.
+        - Pobranie łowiska: Repo.Fisheries.FindAsync(request.FisheryId)
+        - Sprawdzenie uprawnień.
+        - (Opcjonalnie) Sprawdzenie, czy łowisko nie jest używane w LogbookEntries (Repo.LogbookEntries.AnyAsync(...)).
+        - Usunięcie: Repo.Fisheries.Remove(fishery), Repo.SaveChangesAsync()
+      Auth: Właściciel łowiska lub Administrator.
+
+  [Q] GetFisheryDetailsQuery
+      DTO_IN: FisheryId
+      DTO_OUT: FisheryDetailsDto (Id, Name, LocationText, ImageUrl, OwnerName, List<FishSpeciesDto>)
+      Logika:
+        - Walidacja.
+        - Pobranie łowiska z danymi: Repo.Fisheries.Include(f => f.User).Include(f => f.DefinedFishSpecies).FirstOrDefaultAsync(f => f.Id == request.FisheryId)
+        - Mapowanie na DTO.
+      Auth: Zalogowany użytkownik.
+
+  [Q] ListFisheriesQuery
+      DTO_IN: PageNumber, PageSize, UserId? (do filtrowania po właścicielu), SearchTerm?
+      DTO_OUT: PaginatedList<FisherySummaryDto>
+      Logika:
+        - Walidacja.
+        - Budowanie zapytania: Repo.Fisheries.Where(...) filtrowanie, wyszukiwanie.
+        - Paginacja i mapowanie na DTO.
+      Auth: Zalogowany użytkownik.
+
+---
+Moduł: Logbook (MVP+)
+---
+
+  [C] CreateLogbookEntryCommand
+      DTO_IN: SpeciesName, CatchTime, PhotoUrl, LengthCm?, WeightKg?, Notes?, FisheryId?
+      DTO_OUT: LogbookEntryId (int)
+      Logika:
+        - Walidacja: Wymagane pola, formaty, zakresy.
+        - Pobranie UserId z ICurrentUserService.
+        - (Opcjonalnie) Walidacja istnienia FisheryId, jeśli podane.
+        - Tworzenie instancji: new LogbookEntry(userId, request.SpeciesName, ...) -> LogbookEntry.Konstruktor()
+        - Zapis: Repo.LogbookEntries.Add(entry), Repo.SaveChangesAsync()
+      Auth: Zalogowany użytkownik.
+
+  [C] UpdateLogbookEntryCommand
+      DTO_IN: LogbookEntryId, SpeciesName, CatchTime, PhotoUrl, LengthCm?, WeightKg?, Notes?, FisheryId?
+      DTO_OUT: Unit
+      Logika:
+        - Walidacja.
+        - Pobranie wpisu: Repo.LogbookEntries.FindAsync(request.LogbookEntryId)
+        - Sprawdzenie uprawnień: Czy zalogowany użytkownik jest autorem wpisu.
+        - (Opcjonalnie) Walidacja istnienia FisheryId, jeśli podane i zmienione.
+        - Wywołanie metody domenowej: entry.UpdateDetails(request.SpeciesName, ...)
+        - Zapis: Repo.SaveChangesAsync()
+      Auth: Autor wpisu.
+
+  [C] DeleteLogbookEntryCommand
+      DTO_IN: LogbookEntryId
+      DTO_OUT: Unit
+      Logika:
+        - Walidacja.
+        - Pobranie wpisu: Repo.LogbookEntries.FindAsync(request.LogbookEntryId)
+        - Sprawdzenie uprawnień.
+        - Usunięcie: Repo.LogbookEntries.Remove(entry), Repo.SaveChangesAsync()
+      Auth: Autor wpisu.
+
+  [Q] GetLogbookEntryDetailsQuery
+      DTO_IN: LogbookEntryId
+      DTO_OUT: LogbookEntryDetailsDto (wszystkie pola + nazwa łowiska)
+      Logika:
+        - Walidacja.
+        - Pobranie wpisu: Repo.LogbookEntries.Include(le => le.Fishery).FirstOrDefaultAsync(le => le.Id == request.LogbookEntryId)
+        - Sprawdzenie uprawnień (czy użytkownik jest autorem).
+        - Mapowanie na DTO.
+      Auth: Autor wpisu.
+
+  [Q] ListLogbookEntriesQuery
+      DTO_IN: PageNumber, PageSize, FilterBySpecies?, FilterByDateRange?
+      DTO_OUT: PaginatedList<LogbookEntrySummaryDto>
+      Logika:
+        - Walidacja.
+        - Pobranie UserId z ICurrentUserService.
+        - Budowanie zapytania: Repo.LogbookEntries.Where(le => le.UserId == userId)... filtrowanie.
+        - Paginacja i mapowanie na DTO.
+      Auth: Zalogowany użytkownik (dla swoich wpisów).
+
+---
+Moduł: Competitions (MVP i MVP+)
+---
+
+  [C] CreateCompetitionCommand
+      DTO_IN: Name, StartTime, EndTime, CompetitionType, LocationText?, RulesText?, ImageUrl?
+      DTO_OUT: CompetitionId (int)
+      Logika:
+        - Walidacja: Wymagane pola, StartTime < EndTime.
+        - Pobranie OrganizerId z ICurrentUserService.
+        - Tworzenie instancji: new Competition(request.Name, ..., organizerId, ...) -> Competition.Konstruktor()
+        - Zapis: Repo.Competitions.Add(competition), Repo.SaveChangesAsync()
+      Auth: Zalogowany użytkownik (z uprawnieniami do organizowania).
+
+  [C] UpdateCompetitionDetailsCommand
+      DTO_IN: CompetitionId, Name, StartTime, EndTime, CompetitionType, LocationText?, RulesText?, ImageUrl?
+      DTO_OUT: Unit
+      Logika:
+        - Walidacja.
+        - Pobranie zawodów: Repo.Competitions.FindAsync(request.CompetitionId)
+        - Sprawdzenie uprawnień: Czy zalogowany użytkownik jest organizatorem.
+        - Wywołanie metody domenowej: competition.UpdateDetails(request.Name, ...)
+        - Zapis: Repo.SaveChangesAsync()
+      Auth: Organizator zawodów.
+
+  [C] ScheduleCompetitionCommand
+      DTO_IN: CompetitionId
+      DTO_OUT: Unit
+      Logika:
+        - Pobranie zawodów: Repo.Competitions.FindAsync(request.CompetitionId)
+        - Sprawdzenie uprawnień.
+        - Wywołanie metody domenowej: competition.ScheduleCompetition()
+        - Zapis: Repo.SaveChangesAsync()
+      Auth: Organizator zawodów.
+
+  [C] StartCompetitionCommand
+      DTO_IN: CompetitionId
+      DTO_OUT: Unit
+      Logika:
+        - Pobranie zawodów: Repo.Competitions.FindAsync(request.CompetitionId)
+        - Sprawdzenie uprawnień.
+        - Wywołanie metody domenowej: competition.StartCompetition()
+        - Zapis: Repo.SaveChangesAsync()
+      Auth: Organizator zawodów.
+
+  [C] EndCompetitionCommand
+      DTO_IN: CompetitionId
+      DTO_OUT: Unit
+      Logika:
+        - Pobranie zawodów: Repo.Competitions.FindAsync(request.CompetitionId)
+        - Sprawdzenie uprawnień.
+        - Wywołanie metody domenowej: competition.EndCompetition()
+        - Zapis: Repo.SaveChangesAsync()
+      Auth: Organizator zawodów.
+
+  [C] CancelCompetitionCommand
+      DTO_IN: CompetitionId, Reason?
+      DTO_OUT: Unit
+      Logika:
+        - Pobranie zawodów: Repo.Competitions.FindAsync(request.CompetitionId)
+        - Sprawdzenie uprawnień.
+        - Wywołanie metody domenowej: competition.CancelCompetition(request.Reason)
+        - Zapis: Repo.SaveChangesAsync()
+      Auth: Organizator zawodów.
+
+  [C] AddParticipantToCompetitionCommand
+      DTO_IN: CompetitionId, UserId (dla zarejestrowanego) LUB GuestName, GuestIdentifier (dla gościa), Role
+      DTO_OUT: ParticipantId (int)
+      Logika:
+        - Walidacja.
+        - Pobranie zawodów: Repo.Competitions.Include(c => c.Participants).FirstOrDefaultAsync(c => c.Id == request.CompetitionId)
+        - Sprawdzenie uprawnień (organizator dodaje lub użytkownik sam dołącza).
+        - Pobranie User (jeśli UserId podane) lub CurrentUser (jeśli sam dołącza).
+        - Pobranie User (addedBy) z ICurrentUserService.
+        - Jeśli UserId podane: Wywołanie metody domenowej: competition.AddParticipant(user, request.Role, addedByUser)
+        - Jeśli GuestName podane: Wywołanie metody domenowej: competition.AddGuestParticipant(request.GuestName, request.GuestIdentifier, addedByUser)
+        - Zapis: Repo.SaveChangesAsync()
+      Auth: Organizator lub zalogowany użytkownik (dla dołączenia do otwartych zawodów).
+
+  [C] RemoveParticipantFromCompetitionCommand
+      DTO_IN: CompetitionId, ParticipantId (CompetitionParticipant.Id)
+      DTO_OUT: Unit
+      Logika:
+        - Walidacja.
+        - Pobranie zawodów: Repo.Competitions.Include(c => c.Participants).FirstOrDefaultAsync(c => c.Id == request.CompetitionId)
+        - Sprawdzenie uprawnień (organizator).
+        - Pobranie User (removedBy) z ICurrentUserService.
+        - Wywołanie metody domenowej: competition.RemoveParticipant(request.ParticipantId, removedByUser)
+        - Zapis: Repo.SaveChangesAsync()
+      Auth: Organizator zawodów.
+
+  [C] AssignRoleToParticipantCommand
+      DTO_IN: CompetitionId, ParticipantId, NewRole
+      DTO_OUT: Unit
+      Logika:
+        - Walidacja.
+        - Pobranie zawodów: Repo.Competitions.Include(c => c.Participants).FirstOrDefaultAsync(c => c.Id == request.CompetitionId)
+        - Sprawdzenie uprawnień (organizator).
+        - Pobranie User (assignedBy) z ICurrentUserService.
+        - Wywołanie metody domenowej: competition.AssignRoleToParticipant(request.ParticipantId, request.NewRole, assignedByUser)
+        - Zapis: Repo.SaveChangesAsync()
+      Auth: Organizator zawodów.
+
+  [C] AddCategoryToCompetitionCommand
+      DTO_IN: CompetitionId, CategoryDefinitionId, SpecificFishSpeciesId?, CustomNameOverride?, CustomDescriptionOverride?, SortOrder?, IsPrimaryScoring?, MaxWinnersToDisplay?
+      DTO_OUT: CompetitionCategoryId (int)
+      Logika:
+        - Walidacja.
+        - Pobranie zawodów: Repo.Competitions.Include(c => c.CompetitionCategories).FirstOrDefaultAsync(c => c.Id == request.CompetitionId)
+        - Sprawdzenie uprawnień (organizator).
+        - Pobranie CategoryDefinition: Repo.CategoryDefinitions.FindAsync(request.CategoryDefinitionId)
+        - Pobranie User (addedBy) z ICurrentUserService.
+        - Wywołanie metody domenowej: competition.AddCategoryToCompetition(categoryDefinition, request.SpecificFishSpeciesId, addedByUser, ...)
+        - Zapis: Repo.SaveChangesAsync()
+      Auth: Organizator zawodów.
+
+  [C] UpdateCompetitionCategoryCommand
+      DTO_IN: CompetitionId, CompetitionCategoryId, CustomNameOverride?, CustomDescriptionOverride?, SortOrder?, IsPrimaryScoring?, MaxWinnersToDisplay?, IsEnabled?
+      DTO_OUT: Unit
+      Logika:
+        - Walidacja.
+        - Pobranie zawodów: Repo.Competitions.Include(c => c.CompetitionCategories).FirstOrDefaultAsync(c => c.Id == request.CompetitionId)
+        - Sprawdzenie uprawnień (organizator).
+        - Pobranie User (updatedBy) z ICurrentUserService.
+        - Wywołanie metody domenowej: competition.UpdateCompetitionCategory(request.CompetitionCategoryId, updatedByUser, ...)
+        - Zapis: Repo.SaveChangesAsync()
+      Auth: Organizator zawodów.
+
+  [C] RemoveCompetitionCategoryCommand
+      DTO_IN: CompetitionId, CompetitionCategoryId
+      DTO_OUT: Unit
+      Logika:
+        - Walidacja.
+        - Pobranie zawodów: Repo.Competitions.Include(c => c.CompetitionCategories).FirstOrDefaultAsync(c => c.Id == request.CompetitionId)
+        - Sprawdzenie uprawnień (organizator).
+        - Pobranie User (removedBy) z ICurrentUserService.
+        - Wywołanie metody domenowej: competition.RemoveCompetitionCategory(request.CompetitionCategoryId, removedByUser)
+        - Zapis: Repo.SaveChangesAsync()
+      Auth: Organizator zawodów.
+
+  [C] RecordFishCatchCommand
+      DTO_IN: CompetitionId, ParticipantId (CompetitionParticipant.Id), SpeciesName, CatchTime, PhotoUrl, LengthCm?, WeightKg?
+      DTO_OUT: FishCatchId (int)
+      Logika:
+        - Walidacja.
+        - Pobranie zawodów: Repo.Competitions.Include(c => c.Participants).Include(c => c.FishCatches).FirstOrDefaultAsync(c => c.Id == request.CompetitionId)
+        - Pobranie JudgeId z ICurrentUserService (zakładając, że sędzia jest zalogowany).
+        - Wywołanie metody domenowej: competition.RecordFishCatch(request.ParticipantId, judgeId, request.SpeciesName, ...)
+        - Zapis: Repo.SaveChangesAsync()
+      Auth: Sędzia zawodów.
+
+  [Q] GetCompetitionDetailsQuery
+      DTO_IN: CompetitionId
+      DTO_OUT: CompetitionDetailsDto (szczegóły zawodów, lista uczestników, lista skonfigurowanych kategorii)
+      Logika:
+        - Walidacja.
+        - Pobranie zawodów z danymi: Repo.Competitions
+            .Include(c => c.Organizer)
+            .Include(c => c.Participants).ThenInclude(p => p.User)
+            .Include(c => c.CompetitionCategories).ThenInclude(cc => cc.CategoryDefinition)
+            .Include(c => c.CompetitionCategories).ThenInclude(cc => cc.SpecificFishSpecies)
+            .FirstOrDefaultAsync(c => c.Id == request.CompetitionId)
+        - Mapowanie na DTO.
+      Auth: Zalogowany użytkownik.
+
+  [Q] ListCompetitionsQuery
+      DTO_IN: PageNumber, PageSize, FilterByStatus?, FilterByType?, SearchTerm?
+      DTO_OUT: PaginatedList<CompetitionSummaryDto>
+      Logika:
+        - Walidacja.
+        - Budowanie zapytania: Repo.Competitions.Where(...).OrderByDescending(c => c.StartTime)
+        - Paginacja i mapowanie na DTO.
+      Auth: Zalogowany użytkownik (publiczna lista) lub Wszyscy.
+
+  [Q] ListMyCompetitionsQuery (MVP+)
+      DTO_IN: PageNumber, PageSize, RoleFilter? (Organized, Participating)
+      DTO_OUT: PaginatedList<MyCompetitionDto>
+      Logika:
+        - Pobranie UserId z ICurrentUserService.
+        - Budowanie zapytania:
+          - Jeśli Organized: Repo.Competitions.Where(c => c.OrganizerId == userId)
+          - Jeśli Participating: Repo.CompetitionParticipants.Where(cp => cp.UserId == userId).Select(cp => cp.Competition)
+        - Paginacja i mapowanie na DTO.
+      Auth: Zalogowany użytkownik.
+
+  [Q] ListCompetitionParticipantsQuery
+      DTO_IN: CompetitionId, PageNumber, PageSize
+      DTO_OUT: PaginatedList<CompetitionParticipantDto>
+      Logika:
+        - Walidacja.
+        - Pobranie uczestników: Repo.CompetitionParticipants.Where(cp => cp.CompetitionId == request.CompetitionId).Include(cp => cp.User)
+        - Paginacja i mapowanie na DTO.
+      Auth: Zalogowany użytkownik.
+
+  [Q] ListCompetitionCatchesQuery (MVP+)
+      DTO_IN: CompetitionId, ParticipantId?, PageNumber, PageSize
+      DTO_OUT: PaginatedList<CompetitionFishCatchDto>
+      Logika:
+        - Walidacja.
+        - Pobranie połowów: Repo.CompetitionFishCatches.Where(cfc => cfc.CompetitionId == request.CompetitionId && (request.ParticipantId == null || cfc.ParticipantId == request.ParticipantId))
+        - Paginacja i mapowanie na DTO.
+      Auth: Zalogowany użytkownik (np. sędzia, organizator, lub uczestnik dla swoich połowów).
+
+---
+Moduł: PublicResults (MVP)
+---
+
+  [Q] GetPublicCompetitionResultsQuery
+      DTO_IN: ResultToken
+      DTO_OUT: PublicCompetitionResultsDto (szczegóły zawodów, wyniki dla każdej kategorii)
+      Logika:
+        - Walidacja ResultToken.
+        - Pobranie zawodów z wszystkimi potrzebnymi danymi (uczestnicy, połowy, kategorie) na podstawie ResultToken.
+        - Sprawdzenie statusu zawodów (czy wyniki są publiczne).
+        - Przetworzenie połowów i obliczenie wyników dla każdej aktywnej kategorii zgodnie z jej CategoryDefinition.CalculationLogic i CategoryDefinition.Metric.
+        - Mapowanie na DTO.
+      Auth: Wszyscy (publiczny endpoint).
+
+---
+Moduł: Dashboard (MVP+)
+---
+
+  [Q] GetDashboardDataQuery
+      DTO_IN: Brak
+      DTO_OUT: DashboardDataDto (agregacja różnych informacji dla użytkownika)
+      Logika:
+        - Pobranie UserId z ICurrentUserService.
+        - Pobranie danych:
+          - Liczba zawodów organizowanych i w których uczestniczy.
+          - Nadchodzące zawody.
+          - Ostatnie wpisy z dziennika.
+          - Inne statystyki.
+        - Mapowanie na DTO.
+      Auth: Zalogowany użytkownik.
+
+---
+Moduł: LookupData (MVP i MVP+)
+---
+
+  [Q] ListCategoryDefinitionsQuery
+      DTO_IN: FilterByType? (CategoryType)
+      DTO_OUT: IEnumerable<CategoryDefinitionDto>
+      Logika:
+        - Pobranie globalnych definicji kategorii: Repo.CategoryDefinitions.Where(cd => cd.IsGlobal)
+        - Filtrowanie (jeśli podano FilterByType).
+        - Mapowanie na DTO.
+      Auth: Zalogowany użytkownik (do wyboru przy tworzeniu/edycji zawodów).
+
+  [Q] ListFishSpeciesQuery
+      DTO_IN: Brak
+      DTO_OUT: IEnumerable<FishSpeciesDto>
+      Logika:
+        - Pobranie wszystkich gatunków: Repo.FishSpecies.All()
+        - Mapowanie na DTO.
+      Auth: Zalogowany użytkownik.
+
+  [Q] ListEnumValuesQuery
+      DTO_IN: EnumName (string)
+      DTO_OUT: IEnumerable<EnumValueDto>
+      Logika:
+        - Walidacja EnumName (czy jest na liście dozwolonych).
+        - Użycie refleksji do pobrania wartości i opisów dla danego enuma.
+        - Mapowanie na DTO.
+      Auth: Zalogowany użytkownik.
+      Alternatywa: Dedykowane endpointy dla każdego enuma (lepsze dla Swaggera).
+
+======================================================================

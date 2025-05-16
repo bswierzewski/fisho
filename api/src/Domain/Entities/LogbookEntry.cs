@@ -1,6 +1,5 @@
 ﻿namespace Fishio.Domain.Entities;
 
-// Plik: LogbookEntry.cs
 public class LogbookEntry : BaseAuditableEntity
 {
     public int UserId { get; private set; }
@@ -19,16 +18,50 @@ public class LogbookEntry : BaseAuditableEntity
     // Private constructor for EF Core
     private LogbookEntry() { }
 
+    // Konstruktor do tworzenia nowego wpisu w dzienniku
     public LogbookEntry(
-        User user,
+        int userId,
         string speciesName,
+        DateTimeOffset catchTime,
         string photoUrl,
-        DateTimeOffset catchTime)
+        decimal? lengthCm = null,
+        decimal? weightKg = null,
+        string? notes = null,
+        int? fisheryId = null)
     {
-        User = user;
-        UserId = user.Id;
+        Guard.Against.NegativeOrZero(userId, nameof(userId), "Id użytkownika jest wymagane.");
+        Guard.Against.NullOrWhiteSpace(speciesName, nameof(speciesName), "Nazwa gatunku jest wymagana.");
+        Guard.Against.LengthOutOfRange(speciesName, 1, 255, "Nazwa gatunku musi mieć od 1 do 255 znaków.");
+        Guard.Against.NullOrWhiteSpace(photoUrl, nameof(photoUrl), "URL zdjęcia jest wymagany.");
+        Guard.Against.Default(catchTime, nameof(catchTime), "Czas połowu jest wymagany.");
+
+        if (catchTime > DateTimeOffset.UtcNow.AddHours(1))
+            throw new ArgumentOutOfRangeException(nameof(catchTime), "Czas połowu nie może być znacznie w przyszłości.");
+
+        if (lengthCm.HasValue)
+        {
+            Guard.Against.NegativeOrZero(lengthCm.Value, nameof(lengthCm), "Długość musi być wartością dodatnią.");
+            Guard.Against.OutOfRange(lengthCm.Value, nameof(lengthCm), 0.1m, 9999.99m, "Długość poza dopuszczalnym zakresem."); // Przykładowy zakres
+        }
+
+        if (weightKg.HasValue)
+        {
+            Guard.Against.NegativeOrZero(weightKg.Value, nameof(weightKg), "Waga musi być wartością dodatnią.");
+            Guard.Against.OutOfRange(weightKg.Value, nameof(weightKg), 0.001m, 9999.999m, "Waga poza dopuszczalnym zakresem."); // Przykładowy zakres
+        }
+
+        if (fisheryId.HasValue)
+            Guard.Against.NegativeOrZero(fisheryId.Value, nameof(fisheryId), "Id łowiska musi być wartością dodatnią.");
+
+        UserId = userId;
         SpeciesName = speciesName;
-        PhotoUrl = photoUrl;
         CatchTime = catchTime;
+        PhotoUrl = photoUrl;
+        LengthCm = lengthCm;
+        WeightKg = weightKg;
+        Notes = notes;
+        FisheryId = fisheryId;
+
+        AddDomainEvent(new LogbookEntryCreatedEvent(this));
     }
 }

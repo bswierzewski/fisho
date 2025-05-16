@@ -33,8 +33,8 @@ Fishio/
 │   │   ├── FishSpecies.cs          # Encja predefiniowanego gatunku ryby
 │   │   ├── Fishery.cs              # Encja łowiska
 │   │   ├── LogbookEntry.cs         # Encja wpisu w dzienniku osobistym
-│   │   ├── ScoringCategoryOption.cs # Encja opcji głównej kategorii punktacji
-│   │   ├── SpecialCompetitionCategory.cs # Encja kategorii specjalnej w zawodach
+│   │   ├── CategoryDefinition.cs   # Encja 
+│   │   ├── CompetitionCategory.cs  # Encja 
 │   │   └── User.cs                 # Encja użytkownika (z ClerkUserId)
 │   ├── Enums/
 │   │   ├── CompetitionStatus.cs
