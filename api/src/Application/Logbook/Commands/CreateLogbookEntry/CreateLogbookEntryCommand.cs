@@ -1,38 +1,25 @@
-namespace Fishio.Application.Logbook.Commands.CreateLogbookEntry;
+﻿namespace Fishio.Application.Logbook.Commands.CreateLogbookEntry;
 
 public record CreateLogbookEntryCommand : IRequest<int>
 {
-    public int FisheryId { get; init; }
-    public int FishSpeciesId { get; init; }
-    public decimal Length { get; init; }
+    public string? PhotoUrl { get; init; }
+    public int? FisheryId { get; init; }
+    public int? FishSpeciesId { get; init; }
+    public decimal? Length { get; init; }
     public decimal? Weight { get; init; }
     public string? Notes { get; init; }
-    public DateTime CaughtAt { get; init; }
+    public DateTimeOffset? CaughtAt { get; init; }
 }
 
 public class CreateLogbookEntryCommandValidator : AbstractValidator<CreateLogbookEntryCommand>
 {
-    public CreateLogbookEntryCommandValidator()
+    private readonly IApplicationDbContext _context;
+
+    public CreateLogbookEntryCommandValidator(IApplicationDbContext context)
     {
-        RuleFor(x => x.FisheryId)
-            .NotEmpty().WithMessage("Fishery ID is required");
+        _context = context;
 
-        RuleFor(x => x.FishSpeciesId)
-            .NotEmpty().WithMessage("Fish species ID is required");
-
-        RuleFor(x => x.Length)
-            .GreaterThan(0).WithMessage("Length must be greater than 0");
-
-        RuleFor(x => x.Weight)
-            .GreaterThan(0).When(x => x.Weight.HasValue)
-            .WithMessage("Weight must be greater than 0 when provided");
-
-        RuleFor(x => x.Notes)
-            .MaximumLength(500).When(x => x.Notes != null)
-            .WithMessage("Notes cannot exceed 500 characters");
-
-        RuleFor(x => x.CaughtAt)
-            .NotEmpty().WithMessage("Caught at date is required")
-            .LessThanOrEqualTo(DateTime.UtcNow).WithMessage("Caught at date cannot be in the future");
+        RuleFor(v => v.Notes)
+            .MaximumLength(2000).WithMessage("Notatki nie mogą przekraczać 2000 znaków.");
     }
-} 
+}

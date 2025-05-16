@@ -3,7 +3,7 @@
 public class Fishery : BaseAuditableEntity
 {
     public string Name { get; private set; } = string.Empty;
-    public string? LocationText { get; private set; }
+    public string? Location { get; private set; }
     public string? ImageUrl { get; private set; }
 
     public int? UserId { get; private set; } // Creator/Maintainer of this fishery entry, nullable
@@ -16,10 +16,28 @@ public class Fishery : BaseAuditableEntity
     // Private constructor for EF Core
     private Fishery() { }
 
-    public Fishery(string name)
+    public Fishery(string name, int userId, string location, string? imageUrl)
     {
         Guard.Against.NullOrWhiteSpace(name, nameof(name), "Nazwa łowiska jest wymagana.");
         Name = name;
+
+        UserId = userId;
+
+        Location = location;
+
+        ImageUrl = imageUrl;
+    }
+
+    public void UpdateDetails(string? name, string? location, string? imageUrl)
+    {
+        Guard.Against.NullOrWhiteSpace(name, nameof(name));
+        Name = name!;
+
+        Guard.Against.NullOrWhiteSpace(location, nameof(location));
+        Location = location;
+
+        Guard.Against.NullOrWhiteSpace(imageUrl, nameof(imageUrl));
+        ImageUrl = imageUrl;
     }
 
     public void AddSpecies(FishSpecies species)

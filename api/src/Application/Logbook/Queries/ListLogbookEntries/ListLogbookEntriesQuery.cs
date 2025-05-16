@@ -1,6 +1,6 @@
 namespace Fishio.Application.Logbook.Queries.ListLogbookEntries;
 
-public record ListLogbookEntriesQuery : IRequest<List<LogbookEntryDto>>
+public record ListLogbookEntriesQuery : IRequest<PaginatedList<LogbookEntryDto>>
 {
     public int? FisheryId { get; init; }
     public int? FishSpeciesId { get; init; }
@@ -31,12 +31,13 @@ public class ListLogbookEntriesQueryValidator : AbstractValidator<ListLogbookEnt
 public record LogbookEntryDto
 {
     public int Id { get; init; }
+    public string PhotoUrl { get; set; } = string.Empty;
     public int FisheryId { get; init; }
-    public string FisheryName { get; init; } = string.Empty;
+    public string? FisheryName { get; init; } = string.Empty;
     public int FishSpeciesId { get; init; }
-    public string FishSpeciesName { get; init; } = string.Empty;
-    public decimal Length { get; init; }
+    public string? FishSpeciesName { get; init; } = string.Empty;
+    public decimal? Length { get; init; }
     public decimal? Weight { get; init; }
     public string? Notes { get; init; }
-    public DateTime CaughtAt { get; init; }
+    public DateTimeOffset CaughtAt { get; init; }
 } 

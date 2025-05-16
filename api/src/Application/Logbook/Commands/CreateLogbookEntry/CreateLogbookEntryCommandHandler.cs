@@ -1,4 +1,4 @@
-namespace Fishio.Application.Logbook.Commands.CreateLogbookEntry;
+﻿namespace Fishio.Application.Logbook.Commands.CreateLogbookEntry;
 
 public class CreateLogbookEntryCommandHandler : IRequestHandler<CreateLogbookEntryCommand, int>
 {
@@ -15,7 +15,30 @@ public class CreateLogbookEntryCommandHandler : IRequestHandler<CreateLogbookEnt
 
     public async Task<int> Handle(CreateLogbookEntryCommand request, CancellationToken cancellationToken)
     {
-        // TODO: Implement the logic for creating a logbook entry
-        return 0;
+        var userId = _currentUserService.DomainUserId;
+        if (!userId.HasValue)
+        {
+            throw new UnauthorizedAccessException("Użytkownik musi być zalogowany, aby dodać wpis do dziennika.");
+        }
+
+        var logbookEntry = new LogbookEntry(
+            userId.Value,
+            request.PhotoUrl,
+            request.CaughtAt,
+            request.Length,
+            request.Weight,
+            request.Notes,
+            request.FishSpeciesId,
+            request.FisheryId
+        );
+        // Pola audytu (Created, CreatedBy etc.) zostaną ustawione przez BaseAuditableEntity
+        // lub można je ustawić tutaj, jeśli ICurrentUserService dostarcza CreatedBy
+
+        _context.LogbookEntries.Add(logbookEntry);
+        // await _logbookRepository.AddAsync(logbookEntry, cancellationToken);
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return logbookEntry.Id;
     }
 } 

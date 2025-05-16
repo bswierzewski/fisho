@@ -1,36 +1,43 @@
-namespace Fishio.Application.Fisheries.Commands.UpdateFishery;
+﻿namespace Fishio.Application.Fisheries.Commands.UpdateFishery;
 
 public record UpdateFisheryCommand : IRequest<Unit>
 {
-    public int FisheryId { get; init; }
+    public int Id { get; init; }
     public string Name { get; init; } = string.Empty;
     public string Description { get; init; } = string.Empty;
-    public string Location { get; init; } = string.Empty;
+    public string Location { get; init; } = string.Empty; 
+    public string? ImageUrl { get; init; }
     public List<int> FishSpeciesIds { get; init; } = new();
 }
 
 public class UpdateFisheryCommandValidator : AbstractValidator<UpdateFisheryCommand>
 {
-    public UpdateFisheryCommandValidator()
+    private readonly IApplicationDbContext _context;
+
+    public UpdateFisheryCommandValidator(IApplicationDbContext context)
     {
-        RuleFor(x => x.FisheryId)
-            .NotEmpty().WithMessage("Fishery ID is required");
+        _context = context;
 
-        RuleFor(x => x.Name)
-            .NotEmpty().WithMessage("Name is required")
-            .MaximumLength(100).WithMessage("Name cannot exceed 100 characters");
+        RuleFor(v => v.Id).GreaterThan(0);
 
-        RuleFor(x => x.Description)
-            .MaximumLength(1000).WithMessage("Description cannot exceed 1000 characters");
+        RuleFor(v => v.Name)
+            .NotEmpty().WithMessage("Nazwa łowiska jest wymagana.")
+            .MaximumLength(255).WithMessage("Nazwa łowiska nie może przekraczać 255 znaków.");
 
-        RuleFor(x => x.Location)
-            .NotEmpty().WithMessage("Location is required")
-            .MaximumLength(200).WithMessage("Location cannot exceed 200 characters");
+        // Sprawdzenie unikalności nazwy, ignorując aktualnie edytowane łowisko
+        RuleFor(v => v)
+            .MustAsync(async (command, cancellation) =>
+            {
+                return !await _context.Fisheries
+                    .AnyAsync(f => f.Name == command.Name && f.Id != command.Id, cancellation);
+            })
+            .WithMessage("Łowisko o tej nazwie już istnieje.")
+            .WithName("Name"); // Aby błąd był przypisany do pola Name
 
-        RuleFor(x => x.FishSpeciesIds)
-            .NotEmpty().WithMessage("At least one fish species must be selected");
+        RuleFor(v => v.Location)
+            .MaximumLength(1000).WithMessage("Lokalizacja nie może przekraczać 1000 znaków.");
 
-        RuleForEach(x => x.FishSpeciesIds)
-            .NotEmpty().WithMessage("Fish species ID cannot be empty");
+        RuleFor(v => v.ImageUrl)
+            .MaximumLength(2048).WithMessage("URL obrazka nie może przekraczać 2048 znaków.");
     }
 } 

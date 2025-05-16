@@ -1,32 +1,47 @@
-namespace Fishio.Application.Fisheries.Commands.CreateFishery;
+﻿namespace Fishio.Application.Fisheries.Commands.CreateFishery;
 
 public record CreateFisheryCommand : IRequest<int>
 {
     public string Name { get; init; } = string.Empty;
     public string Description { get; init; } = string.Empty;
-    public string Location { get; init; } = string.Empty;
+    public string Location { get; init; } = string.Empty; 
+    public string? ImageUrl { get; init; }
     public List<int> FishSpeciesIds { get; init; } = new();
 }
 
 public class CreateFisheryCommandValidator : AbstractValidator<CreateFisheryCommand>
 {
-    public CreateFisheryCommandValidator()
+    private readonly IApplicationDbContext _context;
+
+    public CreateFisheryCommandValidator(IApplicationDbContext context)
     {
-        RuleFor(x => x.Name)
-            .NotEmpty().WithMessage("Name is required")
-            .MaximumLength(100).WithMessage("Name cannot exceed 100 characters");
+        _context = context;
 
-        RuleFor(x => x.Description)
-            .MaximumLength(1000).WithMessage("Description cannot exceed 1000 characters");
+        RuleFor(v => v.Name)
+            .NotEmpty().WithMessage("Nazwa łowiska jest wymagana.")
+            .MaximumLength(255).WithMessage("Nazwa łowiska nie może przekraczać 255 znaków.")
+            .MustAsync(BeUniqueName).WithMessage("Łowisko o tej nazwie już istnieje.");
 
-        RuleFor(x => x.Location)
-            .NotEmpty().WithMessage("Location is required")
-            .MaximumLength(200).WithMessage("Location cannot exceed 200 characters");
+        RuleFor(v => v.Location)
+            .MaximumLength(1000).WithMessage("Lokalizacja nie może przekraczać 1000 znaków.");
 
-        RuleFor(x => x.FishSpeciesIds)
-            .NotEmpty().WithMessage("At least one fish species must be selected");
+        RuleFor(v => v.ImageUrl)
+            .MaximumLength(2048).WithMessage("URL obrazka nie może przekraczać 2048 znaków.");
+        // Można dodać walidację formatu URL
 
-        RuleForEach(x => x.FishSpeciesIds)
-            .NotEmpty().WithMessage("Fish species ID cannot be empty");
+        RuleForEach(v => v.FishSpeciesIds)
+            .GreaterThan(0).WithMessage("Id gatunku ryby musi być dodatnie.")
+            .MustAsync(FishSpeciesExists).WithMessage("Jeden z podanych gatunków ryb nie istnieje.")
+            .When(v => v.FishSpeciesIds != null && v.FishSpeciesIds.Any());
     }
-} 
+
+    private async Task<bool> BeUniqueName(string name, CancellationToken cancellationToken)
+    {
+        return !await _context.Fisheries.AnyAsync(f => f.Name == name, cancellationToken);
+    }
+
+    private async Task<bool> FishSpeciesExists(int fishSpeciesId, CancellationToken cancellationToken)
+    {
+        return await _context.FishSpecies.AnyAsync(fs => fs.Id == fishSpeciesId, cancellationToken);
+    }
+}

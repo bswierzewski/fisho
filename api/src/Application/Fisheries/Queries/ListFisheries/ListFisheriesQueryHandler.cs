@@ -1,6 +1,8 @@
+﻿using Fishio.Application.Common.Mappings;
+
 namespace Fishio.Application.Fisheries.Queries.ListFisheries;
 
-public class ListFisheriesQueryHandler : IRequestHandler<ListFisheriesQuery, List<FisheryDto>>
+public class ListFisheriesQueryHandler : IRequestHandler<ListFisheriesQuery, PaginatedList<FisheryDto>>
 {
     private readonly IApplicationDbContext _context;
 
@@ -9,9 +11,35 @@ public class ListFisheriesQueryHandler : IRequestHandler<ListFisheriesQuery, Lis
         _context = context;
     }
 
-    public async Task<List<FisheryDto>> Handle(ListFisheriesQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<FisheryDto>> Handle(ListFisheriesQuery request, CancellationToken cancellationToken)
     {
-        // TODO: Implement the logic for listing fisheries
-        return new List<FisheryDto>();
+        var query = _context.Fisheries.AsNoTracking();
+
+        if (request.UserId.HasValue)
+        {
+            query = query.Where(f => f.UserId == request.UserId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+        {
+            query = query.Where(f => f.Name.Contains(request.SearchTerm) ||
+                                     (f.Location != null && f.Location.Contains(request.SearchTerm)));
+        }
+
+        // Ręczne mapowanie i paginacja
+        var fisheriesQuery = query
+            .Include(f => f.User) // Dla OwnerName
+            .Include(f => f.DefinedSpecies) // Dla FishSpeciesCount
+            .OrderBy(f => f.Name)
+            .Select(f => new FisheryDto
+            {
+                Id = f.Id,
+                Name = f.Name,
+                Location = f.Location,
+                ImageUrl = f.ImageUrl,
+                FishSpeciesCount = f.DefinedSpecies.Count,
+            });
+
+        return await fisheriesQuery.ToPaginatedListAsync(request.Page, request.PageSize);
     }
 } 

@@ -1,15 +1,15 @@
-namespace Fishio.Application.Fisheries.Queries.GetFisheryDetails;
+﻿namespace Fishio.Application.Fisheries.Queries.GetFisheryDetails;
 
 public record GetFisheryDetailsQuery : IRequest<FisheryDetailsDto>
 {
-    public int FisheryId { get; init; }
+    public int Id { get; init; }
 }
 
 public class GetFisheryDetailsQueryValidator : AbstractValidator<GetFisheryDetailsQuery>
 {
     public GetFisheryDetailsQueryValidator()
     {
-        RuleFor(x => x.FisheryId)
+        RuleFor(x => x.Id)
             .NotEmpty().WithMessage("Fishery ID is required");
     }
 }
@@ -18,10 +18,11 @@ public record FisheryDetailsDto
 {
     public int Id { get; init; }
     public string Name { get; init; } = string.Empty;
+    public string? Location { get; init; }
     public string Description { get; init; } = string.Empty;
-    public string Location { get; init; } = string.Empty;
-    public string CreatedByUserId { get; init; } = string.Empty;
-    public string CreatedByUserName { get; init; } = string.Empty;
+    public string? OwnerName { get; set; } // Nazwa użytkownika, który dodał
+    public int? OwnerId { get; set; }
+    public string? ImageUrl { get; set; }
     public DateTime CreatedAt { get; init; }
     public DateTime? LastModifiedAt { get; init; }
     public List<FisheryFishSpeciesDto> FishSpecies { get; init; } = new();

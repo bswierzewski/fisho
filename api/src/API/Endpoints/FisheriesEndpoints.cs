@@ -43,7 +43,7 @@ public static class FisheriesEndpoints
 
     private static async Task<IResult> GetFisheryDetailsById(ISender sender, [FromRoute] int fisheryId, CancellationToken ct)
     {
-        var query = new GetFisheryDetailsQuery { FisheryId = fisheryId };
+        var query = new GetFisheryDetailsQuery { Id = fisheryId };
         var fishery = await sender.Send(query, ct);
         return fishery != null ? TypedResults.Ok(fishery) : TypedResults.NotFound();
     }
@@ -51,8 +51,8 @@ public static class FisheriesEndpoints
     private static async Task<IResult> UpdateFisheryById(ISender sender, [FromRoute] int fisheryId, [FromBody] UpdateFisheryCommand command, CancellationToken ct)
     {
         var updateCommand = command;
-        if (updateCommand.FisheryId == 0) return TypedResults.BadRequest("Empty FisheryId.");
-        else if (updateCommand.FisheryId != fisheryId) return TypedResults.BadRequest("Mismatched ID.");
+        if (updateCommand.Id == 0) return TypedResults.BadRequest("Empty FisheryId.");
+        else if (updateCommand.Id != fisheryId) return TypedResults.BadRequest("Mismatched ID.");
         await sender.Send(updateCommand, ct);
         return TypedResults.Ok();
     }

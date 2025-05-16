@@ -101,10 +101,10 @@ public async Task<DashboardDataDto> Handle(GetDashboardDataQuery request, Cancel
             .Select(le => new RecentLogbookEntryDto
             {
                 Id = le.Id,
-                SpeciesName = le.SpeciesName,
+                SpeciesName = le.FishSpecies?.Name ?? "",
                 CatchTime = le.CatchTime,
-                LengthCm = le.LengthCm,
-                WeightKg = le.WeightKg,
+                LengthCm = le.Length,
+                WeightKg = le.Weight,
                 FisheryName = le.Fishery?.Name
             }).ToList();
 

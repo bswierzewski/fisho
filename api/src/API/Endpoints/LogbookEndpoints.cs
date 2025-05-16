@@ -46,7 +46,7 @@ public static class LogbookEndpoints
 
     private static async Task<IResult> GetLogbookEntryDetailsById(ISender sender, [FromRoute] int entryId, CancellationToken ct)
     {
-         var query = new GetLogbookEntryDetailsQuery { LogbookEntryId = entryId };
+         var query = new GetLogbookEntryDetailsQuery { Id = entryId };
          var entry = await sender.Send(query, ct);
          return entry != null ? TypedResults.Ok(entry) : TypedResults.NotFound();        
     }
@@ -61,7 +61,7 @@ public static class LogbookEndpoints
 
     private static async Task<IResult> DeleteLogbookEntryById(ISender sender, [FromRoute] int entryId, CancellationToken ct)
     {
-        var command = new DeleteLogbookEntryCommand { LogbookEntryId = entryId };
+        var command = new DeleteLogbookEntryCommand { Id = entryId };
         await sender.Send(command, ct);
         return TypedResults.NoContent();
     }

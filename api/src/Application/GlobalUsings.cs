@@ -1,4 +1,5 @@
-﻿global using AutoMapper;
+﻿global using Ardalis.GuardClauses;
+global using AutoMapper;
 global using Fishio.Application.Common.Behaviours;
 global using Fishio.Application.Common.Interfaces;
 global using Fishio.Application.Common.Models;
