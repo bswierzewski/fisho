@@ -14,10 +14,12 @@ public class CompetitionCategoryConfiguration : IEntityTypeConfiguration<Competi
             .HasForeignKey(cc => cc.CompetitionId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(cc => cc.CategoryDefinition)
-            .WithMany(cd => cd.CompetitionCategories)
-            .HasForeignKey(cc => cc.CategoryDefinitionId)
-            .OnDelete(DeleteBehavior.Restrict); // Nie usuwaj globalnej definicji
+        // Relacja do CategoryDefinition
+        builder.HasOne(cc => cc.CategoryDefinition) // Strona "jeden"
+            .WithMany() // Strona "wiele" - nie ma właściwości nawigacyjnej w CategoryDefinition, więc używamy .WithMany() bez argumentu
+            .HasForeignKey(cc => cc.CategoryDefinitionId) // Definiujemy klucz obcy
+            .IsRequired() // CategoryDefinitionId jest NOT NULL
+            .OnDelete(DeleteBehavior.Restrict); // WAŻNE: Zachowujemy to, aby nie można było usunąć używanej definicji
 
         builder.HasOne(cc => cc.SpecificFishSpecies)
             .WithMany() // FishSpecies nie potrzebuje kolekcji CompetitionCategories

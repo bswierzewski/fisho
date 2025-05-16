@@ -29,166 +29,139 @@ public class CategoryDefinitionConfiguration : IEntityTypeConfiguration<Category
         builder.Property(cd => cd.EntityType)
             .HasConversion(new EnumToStringConverter<CategoryEntityType>());
 
-        // Relacja zwrotna (opcjonalna, EF Core często wykrywa ją automatycznie)
-        builder.HasMany(cd => cd.CompetitionCategories)
-            .WithOne(cc => cc.CategoryDefinition)
-            .HasForeignKey(cc => cc.CategoryDefinitionId);
-
         // --- HasData ---
         builder.HasData(
             // --- GŁÓWNE KATEGORIE PUNKTACYJNE ---
-            new CategoryDefinition
-            {
-                Id = 1,
-                Name = "Najdłuższa Ryba (Indywidualnie)",
-                Description = "Zwycięzcą zostaje uczestnik, który złowił rybę o największej długości.",
-                IsGlobal = true,
-                Type = CategoryType.MainScoring,
-                Metric = CategoryMetric.LengthCm,
-                CalculationLogic = CategoryCalculationLogic.MaxValue,
-                EntityType = CategoryEntityType.FishCatch, // Dotyczy pojedynczego połowu, ale wynik dla uczestnika
-                RequiresSpecificFishSpecies = false,
-                AllowManualWinnerAssignment = false, // System powinien to obliczyć
-                Created = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                LastModified = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            },
-            new CategoryDefinition
-            {
-                Id = 2,
-                Name = "Najcięższa Ryba (Indywidualnie)",
-                Description = "Zwycięzcą zostaje uczestnik, który złowił rybę o największej wadze.",
-                IsGlobal = true,
-                Type = CategoryType.MainScoring,
-                Metric = CategoryMetric.WeightKg,
-                CalculationLogic = CategoryCalculationLogic.MaxValue,
-                EntityType = CategoryEntityType.FishCatch,
-                RequiresSpecificFishSpecies = false,
-                AllowManualWinnerAssignment = false,
-                Created = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                LastModified = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            },
-            new CategoryDefinition
-            {
-                Id = 3,
-                Name = "Suma Długości Złowionych Ryb",
-                Description = "Zwycięzcą zostaje uczestnik z największą sumą długości wszystkich swoich złowionych ryb.",
-                IsGlobal = true,
-                Type = CategoryType.MainScoring,
-                Metric = CategoryMetric.LengthCm,
-                CalculationLogic = CategoryCalculationLogic.SumValue,
-                EntityType = CategoryEntityType.ParticipantAggregateCatches,
-                RequiresSpecificFishSpecies = false,
-                AllowManualWinnerAssignment = false,
-                Created = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                LastModified = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            },
-            new CategoryDefinition
-            {
-                Id = 4,
-                Name = "Suma Wag Złowionych Ryb",
-                Description = "Zwycięzcą zostaje uczestnik z największą sumą wag wszystkich swoich złowionych ryb.",
-                IsGlobal = true,
-                Type = CategoryType.MainScoring,
-                Metric = CategoryMetric.WeightKg,
-                CalculationLogic = CategoryCalculationLogic.SumValue,
-                EntityType = CategoryEntityType.ParticipantAggregateCatches,
-                RequiresSpecificFishSpecies = false,
-                AllowManualWinnerAssignment = false,
-                Created = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                LastModified = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            },
-            new CategoryDefinition
-            {
-                Id = 5,
-                Name = "Liczba Złowionych Ryb",
-                Description = "Zwycięzcą zostaje uczestnik, który złowił najwięcej ryb (sztuk).",
-                IsGlobal = true,
-                Type = CategoryType.MainScoring,
-                Metric = CategoryMetric.FishCount,
-                CalculationLogic = CategoryCalculationLogic.SumValue, // Suma "1" za każdą rybę
-                EntityType = CategoryEntityType.ParticipantAggregateCatches,
-                RequiresSpecificFishSpecies = false,
-                AllowManualWinnerAssignment = false,
-                Created = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                LastModified = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            },
+            new CategoryDefinition(
+                name: "Najdłuższa Ryba (Indywidualnie)",
+                description: "Zwycięzcą zostaje uczestnik, który złowił rybę o największej długości.",
+                isGlobal: true,
+                type: CategoryType.MainScoring,
+                metric: CategoryMetric.LengthCm,
+                calculationLogic: CategoryCalculationLogic.MaxValue,
+                entityType: CategoryEntityType.FishCatch,
+                requiresSpecificFishSpecies: false,
+                allowManualWinnerAssignment: false
+            )
+            { Id = 1 },
+
+            new CategoryDefinition(
+                name: "Najcięższa Ryba (Indywidualnie)",
+                description: "Zwycięzcą zostaje uczestnik, który złowił rybę o największej wadze.",
+                isGlobal: true,
+                type: CategoryType.MainScoring,
+                metric: CategoryMetric.WeightKg,
+                calculationLogic: CategoryCalculationLogic.MaxValue,
+                entityType: CategoryEntityType.FishCatch,
+                requiresSpecificFishSpecies: false,
+                allowManualWinnerAssignment: false
+            )
+            { Id = 2 },
+
+            new CategoryDefinition(
+                name: "Suma Długości Złowionych Ryb",
+                description: "Zwycięzcą zostaje uczestnik z największą sumą długości wszystkich swoich złowionych ryb.",
+                isGlobal: true,
+                type: CategoryType.MainScoring,
+                metric: CategoryMetric.LengthCm,
+                calculationLogic: CategoryCalculationLogic.SumValue,
+                entityType: CategoryEntityType.ParticipantAggregateCatches,
+                requiresSpecificFishSpecies: false,
+                allowManualWinnerAssignment: false
+            )
+            { Id = 3 },
+
+            new CategoryDefinition(
+                name: "Suma Wag Złowionych Ryb",
+                description: "Zwycięzcą zostaje uczestnik z największą sumą wag wszystkich swoich złowionych ryb.",
+                isGlobal: true,
+                type: CategoryType.MainScoring,
+                metric: CategoryMetric.WeightKg,
+                calculationLogic: CategoryCalculationLogic.SumValue,
+                entityType: CategoryEntityType.ParticipantAggregateCatches,
+                requiresSpecificFishSpecies: false,
+                allowManualWinnerAssignment: false
+            )
+            { Id = 4 },
+
+            new CategoryDefinition(
+                name: "Liczba Złowionych Ryb",
+                description: "Zwycięzcą zostaje uczestnik, który złowił najwięcej ryb (sztuk).",
+                isGlobal: true,
+                type: CategoryType.MainScoring,
+                metric: CategoryMetric.FishCount,
+                calculationLogic: CategoryCalculationLogic.SumValue, // Suma "1" za każdą rybę
+                entityType: CategoryEntityType.ParticipantAggregateCatches,
+                requiresSpecificFishSpecies: false,
+                allowManualWinnerAssignment: false
+            )
+            { Id = 5 },
 
             // --- KATEGORIE SPECJALNE / OSIĄGNIĘCIA ---
-            new CategoryDefinition
-            {
-                Id = 10,
-                Name = "Największa Ryba Zawodów (Gatunek Dowolny)",
-                Description = "Nagroda za największą (najdłuższą lub najcięższą - do ustalenia przez organizatora) rybę zawodów, niezależnie od gatunku.",
-                IsGlobal = true,
-                Type = CategoryType.SpecialAchievement,
-                Metric = CategoryMetric.NotApplicable, // Organizator wybierze czy długość czy waga
-                CalculationLogic = CategoryCalculationLogic.ManualAssignment, // Na MVP, potem można zautomatyzować
-                EntityType = CategoryEntityType.FishCatch,
-                RequiresSpecificFishSpecies = false,
-                AllowManualWinnerAssignment = true,
-                Created = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                LastModified = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            },
-            new CategoryDefinition
-            {
-                Id = 11,
-                Name = "Największa Ryba Określonego Gatunku",
-                Description = "Nagroda za największą rybę wybranego gatunku (np. Największy Szczupak). Gatunek wybierany przy dodawaniu kategorii do zawodów.",
-                IsGlobal = true,
-                Type = CategoryType.SpecialAchievement,
-                Metric = CategoryMetric.NotApplicable, // Długość/waga zależy od wyboru przy konfiguracji zawodów
-                CalculationLogic = CategoryCalculationLogic.ManualAssignment, // Na MVP
-                EntityType = CategoryEntityType.FishCatch,
-                RequiresSpecificFishSpecies = true, // Kluczowe!
-                AllowManualWinnerAssignment = true,
-                Created = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                LastModified = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            },
-            new CategoryDefinition
-            {
-                Id = 12,
-                Name = "Pierwsza Złowiona Ryba Zawodów",
-                Description = "Nagroda dla uczestnika, który jako pierwszy zarejestruje połów.",
-                IsGlobal = true,
-                Type = CategoryType.SpecialAchievement,
-                Metric = CategoryMetric.TimeOfCatch,
-                CalculationLogic = CategoryCalculationLogic.FirstOccurrence,
-                EntityType = CategoryEntityType.FishCatch,
-                RequiresSpecificFishSpecies = false,
-                AllowManualWinnerAssignment = false, // System może to wyłonić
-                Created = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                LastModified = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            },
-            new CategoryDefinition
-            {
-                Id = 13,
-                Name = "Najmłodszy Uczestnik z Rybą",
-                Description = "Nagroda dla najmłodszego uczestnika, który złowił jakąkolwiek rybę.",
-                IsGlobal = true,
-                Type = CategoryType.FunChallenge,
-                Metric = CategoryMetric.NotApplicable,
-                CalculationLogic = CategoryCalculationLogic.ManualAssignment, // Wymaga danych o wieku, na MVP manualnie
-                EntityType = CategoryEntityType.ParticipantProfile,
-                RequiresSpecificFishSpecies = false,
-                AllowManualWinnerAssignment = true,
-                Created = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                LastModified = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            },
-            new CategoryDefinition
-            {
-                Id = 14,
-                Name = "Największa Różnorodność Gatunków",
-                Description = "Nagroda dla uczestnika, który złowił najwięcej różnych gatunków ryb.",
-                IsGlobal = true,
-                Type = CategoryType.SpecialAchievement,
-                Metric = CategoryMetric.SpeciesVariety,
-                CalculationLogic = CategoryCalculationLogic.MaxValue,
-                EntityType = CategoryEntityType.ParticipantAggregateCatches,
-                RequiresSpecificFishSpecies = false,
-                AllowManualWinnerAssignment = false, // System może to policzyć
-                Created = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                LastModified = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            }
+            new CategoryDefinition(
+                name: "Największa Ryba Zawodów (Gatunek Dowolny)",
+                description: "Nagroda za największą (najdłuższą lub najcięższą - do ustalenia przez organizatora) rybę zawodów, niezależnie od gatunku.",
+                isGlobal: true,
+                type: CategoryType.SpecialAchievement,
+                metric: CategoryMetric.NotApplicable, // Organizator wybierze czy długość czy waga
+                calculationLogic: CategoryCalculationLogic.ManualAssignment, // Na MVP, potem można zautomatyzować
+                entityType: CategoryEntityType.FishCatch,
+                requiresSpecificFishSpecies: false,
+                allowManualWinnerAssignment: true
+            )
+            { Id = 10 },
+
+            new CategoryDefinition(
+                name: "Największa Ryba Określonego Gatunku",
+                description: "Nagroda za największą rybę wybranego gatunku (np. Największy Szczupak). Gatunek wybierany przy dodawaniu kategorii do zawodów.",
+                isGlobal: true,
+                type: CategoryType.SpecialAchievement,
+                metric: CategoryMetric.NotApplicable, // Długość/waga zależy od wyboru przy konfiguracji zawodów
+                calculationLogic: CategoryCalculationLogic.ManualAssignment,  // Na MVP
+                entityType: CategoryEntityType.FishCatch,
+                requiresSpecificFishSpecies: true, // Kluczowe!
+                allowManualWinnerAssignment: true
+            )
+            { Id = 11 },
+
+            new CategoryDefinition(
+                name: "Pierwsza Złowiona Ryba Zawodów",
+                description: "Nagroda dla uczestnika, który jako pierwszy zarejestruje połów.",
+                isGlobal: true,
+                type: CategoryType.SpecialAchievement,
+                metric: CategoryMetric.TimeOfCatch,
+                calculationLogic: CategoryCalculationLogic.FirstOccurrence,
+                entityType: CategoryEntityType.FishCatch,
+                requiresSpecificFishSpecies: false, 
+                allowManualWinnerAssignment: false  // System może to wyłonić
+            )
+            { Id = 12 },
+
+            new CategoryDefinition(
+                name: "Najmłodszy Uczestnik z Rybą",
+                description: "Nagroda dla najmłodszego uczestnika, który złowił jakąkolwiek rybę.",
+                isGlobal: true,
+                type: CategoryType.FunChallenge,
+                metric: CategoryMetric.NotApplicable,
+                calculationLogic: CategoryCalculationLogic.ManualAssignment,  // Wymaga danych o wieku, na MVP manualnie
+                entityType: CategoryEntityType.ParticipantProfile,
+                requiresSpecificFishSpecies: false,
+                allowManualWinnerAssignment: true
+            )
+            { Id = 13 },
+
+            new CategoryDefinition(
+                name: "Największa Różnorodność Gatunków",
+                description: "Nagroda dla uczestnika, który złowił najwięcej różnych gatunków ryb.",
+                isGlobal: true,
+                type: CategoryType.SpecialAchievement,
+                metric: CategoryMetric.SpeciesVariety,
+                calculationLogic: CategoryCalculationLogic.MaxValue,
+                entityType: CategoryEntityType.ParticipantAggregateCatches,
+                requiresSpecificFishSpecies: false,
+                allowManualWinnerAssignment: false  // System może to policzyć
+            )
+            { Id = 14 }
         );
     }
 }
