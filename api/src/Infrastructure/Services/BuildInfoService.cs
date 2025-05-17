@@ -1,4 +1,4 @@
-﻿using Fishio.Application.About.Models;
+﻿using Fishio.Application.About.Queries.GetApplicationInfo;
 using Microsoft.Extensions.Logging;
 
 namespace Fishio.Infrastructure.Services;
