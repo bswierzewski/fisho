@@ -40,6 +40,6 @@ public class ListFisheriesQueryHandler : IRequestHandler<ListFisheriesQuery, Pag
                 FishSpeciesCount = f.FishSpecies.Count,
             });
 
-        return await fisheriesQuery.ToPaginatedListAsync(request.Page, request.PageSize);
+        return await fisheriesQuery.ToPaginatedListAsync(request.Page ?? 1, request.PageSize ?? 10);
     }
 }

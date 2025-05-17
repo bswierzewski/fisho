@@ -47,11 +47,15 @@ public class GetFisheryDetailsQueryHandler : IRequestHandler<GetFisheryDetailsQu
             });
         }
 
+        var totalCompetitions = await _context.Competitions
+            .AsNoTracking()
+            .CountAsync(c => c.FisheryId == fishery.Id, cancellationToken);
+
         var statistics = new FisheryStatisticsDto
         {
             TotalCatchesCount = logbookEntriesOnFishery.Count,
             TotalAnglers = logbookEntriesOnFishery.Select(le => le.UserId).Distinct().Count(),
-            TotalCompetitions = _context.Competitions.Count(c => c.FisheryId == fishery.Id),
+            TotalCompetitions = totalCompetitions,
             LastCatchDate = logbookEntriesOnFishery.Any()
                 ? logbookEntriesOnFishery.Max(le => le.CatchTime)
                 : null

@@ -1,22 +1,18 @@
-namespace Fishio.Application.Users.Queries.SearchUsers;
+﻿namespace Fishio.Application.Users.Queries.SearchUsers;
 
 public record SearchUsersQuery : IRequest<List<UserDto>>
 {
-    public string SearchTerm { get; init; } = string.Empty;
-    public int MaxResults { get; init; } = 10;
+    public string? SearchTerm { get; init; } = null;
+    public int? MaxResults { get; init; } = 10;
 }
 
 public class SearchUsersQueryValidator : AbstractValidator<SearchUsersQuery>
 {
     public SearchUsersQueryValidator()
     {
-        RuleFor(x => x.SearchTerm)
-            .NotEmpty().WithMessage("Search term is required")
-            .MinimumLength(2).WithMessage("Search term must be at least 2 characters long");
-
         RuleFor(x => x.MaxResults)
-            .GreaterThan(0).WithMessage("Max results must be greater than 0")
-            .LessThanOrEqualTo(100).WithMessage("Max results cannot exceed 100");
+            .GreaterThan(0).WithMessage("Maksymalna liczba wyników musi być większa niż 0")
+            .LessThanOrEqualTo(100).WithMessage("Maksymalna liczba wyników nie może przekraczać 100");
     }
 }
 

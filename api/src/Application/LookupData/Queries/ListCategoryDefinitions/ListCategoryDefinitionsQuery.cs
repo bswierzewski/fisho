@@ -1,6 +1,5 @@
 namespace Fishio.Application.LookupData.Queries.ListCategoryDefinitions;
 
-// Można dodać filtry, np. po CategoryType, jeśli UI ma osobne sekcje
 public record ListCategoryDefinitionsQuery(CategoryType? FilterByType = null) : IRequest<IEnumerable<CategoryDefinitionDto>>;
 
 public class CategoryDefinitionDto
@@ -13,5 +12,5 @@ public class CategoryDefinitionDto
     public CategoryCalculationLogic CalculationLogic { get; set; }
     public CategoryEntityType EntityType { get; set; }
     public bool RequiresSpecificFishSpecies { get; set; }
-    public bool IsGlobal { get; set; } // Aby odróżnić globalne od tych tworzonych przez użytkownika (w przyszłości)
+    public bool IsGlobal { get; set; }
 }

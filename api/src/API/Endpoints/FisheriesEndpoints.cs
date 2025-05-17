@@ -1,4 +1,5 @@
 ﻿using Fishio.Application.Fisheries.Commands.CreateFishery;
+using Fishio.Application.Fisheries.Commands.DeleteFishery;
 using Fishio.Application.Fisheries.Commands.UpdateFishery;
 using Fishio.Application.Fisheries.Queries.GetFisheryDetails;
 using Fishio.Application.Fisheries.Queries.ListFisheries;
@@ -25,14 +26,10 @@ public static class FisheriesEndpoints
             .WithName(nameof(GetFisheryDetailsById));
 
         group.MapPut("/{fisheryId:int}", UpdateFisheryById)
-            .WithName(nameof(UpdateFisheryById))
-            .RequireAuthorization("FisheryEditorPolicy");
-    }
+            .WithName(nameof(UpdateFisheryById));
 
-    private static async Task<IResult> CreateFishery(ISender sender, [FromBody] CreateFisheryCommand command, CancellationToken ct)
-    {
-        var fisheryId = await sender.Send(command, ct);
-        return TypedResults.CreatedAtRoute(nameof(GetFisheryDetailsById), fisheryId.ToString(), new { id = fisheryId });
+        group.MapDelete("/{fisheryId:int}", DeleteFisheryById)
+            .WithName(nameof(DeleteFisheryById));
     }
 
     private static async Task<IResult> ListAllFisheries(ISender sender, [AsParameters] ListFisheriesQuery query, CancellationToken ct)
@@ -48,12 +45,26 @@ public static class FisheriesEndpoints
         return fishery != null ? TypedResults.Ok(fishery) : TypedResults.NotFound();
     }
 
+    private static async Task<IResult> CreateFishery(ISender sender, [FromBody] CreateFisheryCommand command, CancellationToken ct)
+    {
+        var fisheryId = await sender.Send(command, ct);
+        return TypedResults.Ok(fisheryId);
+    }
+
     private static async Task<IResult> UpdateFisheryById(ISender sender, [FromRoute] int fisheryId, [FromBody] UpdateFisheryCommand command, CancellationToken ct)
     {
         var updateCommand = command;
         if (updateCommand.Id == 0) return TypedResults.BadRequest("Empty FisheryId.");
         else if (updateCommand.Id != fisheryId) return TypedResults.BadRequest("Mismatched ID.");
         await sender.Send(updateCommand, ct);
+        return TypedResults.Ok();
+    }
+
+    private static async Task<IResult> DeleteFisheryById(ISender sender, [FromRoute] int fisheryId, CancellationToken ct)
+    {
+        if (fisheryId == 0) return TypedResults.BadRequest("Empty FisheryId.");
+        var deleteCommand = new DeleteFisheryCommand(fisheryId);
+        await sender.Send(deleteCommand, ct);
         return TypedResults.Ok();
     }
 }

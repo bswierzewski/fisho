@@ -2,11 +2,12 @@ namespace Fishio.Application.Fisheries.Queries.ListFisheries;
 
 public record ListFisheriesQuery : IRequest<PaginatedList<FisheryDto>>
 {
+    public int? Page { get; init; } = 1;
+    public int? PageSize { get; init; } = 10;
+
     public string? SearchTerm { get; init; }
     public int? FishSpeciesId { get; init; }
     public int? UserId { get; init; }
-    public int Page { get; init; } = 1;
-    public int PageSize { get; init; } = 10;
 }
 
 public class ListFisheriesQueryValidator : AbstractValidator<ListFisheriesQuery>

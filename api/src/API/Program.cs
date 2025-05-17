@@ -22,6 +22,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Fishio API V1"));
 }
+// Middleware do obsługi błędów
+app.UseExceptionHandler(options => { });
 
 app.UseAuthentication();    // 1. Uwierzytelnianie (np. Clerk JWT validation)
 app.UseMiddleware<UserProvisioningMiddleware>();  // 2. Nasze middleware do mapowania/provisioningu użytkownika domenowego

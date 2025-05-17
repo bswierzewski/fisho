@@ -44,5 +44,5 @@ public interface ICurrentUserService
     /// This is typically called by the UserProvisioningMiddleware or internally.
     /// </summary>
     /// <param name="domainUserId">The domain user ID.</param>
-    void SetDomainUserId(int domainUserId);
+    void SetUserId(int domainUserId);
 }

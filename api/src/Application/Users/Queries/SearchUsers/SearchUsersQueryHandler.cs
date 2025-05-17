@@ -11,7 +11,7 @@ public class SearchUsersQueryHandler : IRequestHandler<SearchUsersQuery, List<Us
 
     public async Task<List<UserDto>> Handle(SearchUsersQuery request, CancellationToken cancellationToken)
     {
-        var searchTermLower = request.SearchTerm.ToLower();
+        var searchTermLower = request.SearchTerm?.ToLower() ?? "";
 
         var query = _context.Users.AsQueryable();
 
@@ -20,11 +20,9 @@ public class SearchUsersQueryHandler : IRequestHandler<SearchUsersQuery, List<Us
             (u.Email != null && u.Email.ToLower().Contains(searchTermLower))
         );
 
-        // Sortowanie, aby wyniki były spójne (np. po nazwie)
         query = query.OrderBy(u => u.Name);
 
-        // Ograniczenie liczby wyników
-        query = query.Take(request.MaxResults);
+        query = query.Take(request.MaxResults ?? 10);
 
         var usersDto = await query
             .Select(u => new UserDto

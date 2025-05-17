@@ -1,5 +1,4 @@
-using System.ComponentModel;
-using System.Reflection;
+using Application.Common.Extensions;
 
 namespace Fishio.Application.LookupData.Queries.ListEnumValues;
 
@@ -28,28 +27,11 @@ public class ListEnumValuesQueryHandler : IRequestHandler<ListEnumValuesQuery, I
             {
                 Id = Convert.ToInt32(e),
                 Name = e.ToString(),
-                Description = GetEnumDescription(e)
+                Description = e.GetEnumDescription()
             })
             .OrderBy(e => e.Name)
             .ToList();
 
         return Task.FromResult<IEnumerable<EnumValueDto>>(enumValues);
-    }
-
-    private static string? GetEnumDescription(Enum value)
-    {
-        FieldInfo? fi = value.GetType().GetField(value.ToString());
-
-        if (fi != null)
-        {
-            DescriptionAttribute[] attributes =
-                (DescriptionAttribute[])fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
-
-            if (attributes.Length > 0)
-            {
-                return attributes[0].Description;
-            }
-        }
-        return value.ToString();
     }
 }

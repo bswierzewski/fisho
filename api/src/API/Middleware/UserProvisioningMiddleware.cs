@@ -24,11 +24,11 @@ public class UserProvisioningMiddleware
             _logger.LogDebug("User is authenticated. Attempting to get or provision domain user for ClerkUserId: {ClerkUserId}", currentUserService.ClerkUserId);
             try
             {
-                var domainUser = await currentUserService.GetOrProvisionDomainUserAsync(context.RequestAborted);
-                if (domainUser != null)
+                var user = await currentUserService.GetOrProvisionDomainUserAsync(context.RequestAborted);
+                if (user != null)
                 {
                     // currentUserService.SetDomainUserId(domainUser.Id); // Już ustawiane wewnątrz GetOrProvisionDomainUserAsync
-                    _logger.LogDebug("Domain user {DomainUserId} successfully retrieved or provisioned.", domainUser.Id);
+                    _logger.LogDebug("Domain user {UserId} successfully retrieved or provisioned.", user.Id);
                 }
                 else if (!string.IsNullOrEmpty(currentUserService.ClerkUserId)) // Jeśli był ClerkUserId, ale nie udało się zmapować
                 {

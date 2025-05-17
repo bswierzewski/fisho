@@ -1,5 +1,4 @@
-﻿// Fishio.Infrastructure/Services/CurrentUserService.cs
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
@@ -11,7 +10,7 @@ public class CurrentUserService : ICurrentUserService
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IApplicationDbContext _dbContext;
     private readonly ILogger<CurrentUserService> _logger;
-    private int? _cachedDomainUserId;
+    private int? _cachedUserId;
 
     public CurrentUserService(
         IHttpContextAccessor httpContextAccessor,
@@ -38,11 +37,11 @@ public class CurrentUserService : ICurrentUserService
 
     public bool IsAuthenticated => _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
 
-    public int? UserId => _cachedDomainUserId;
+    public int? UserId => _cachedUserId;
 
-    public void SetDomainUserId(int domainUserId)
+    public void SetUserId(int userId)
     {
-        _cachedDomainUserId = domainUserId;
+        _cachedUserId = userId;
     }
 
     public async Task<User?> GetOrProvisionDomainUserAsync(CancellationToken cancellationToken = default)
@@ -65,7 +64,7 @@ public class CurrentUserService : ICurrentUserService
 
         if (domainUser != null)
         {
-            SetDomainUserId(domainUser.Id);
+            SetUserId(domainUser.Id);
             _logger.LogDebug("Found existing domain user {DomainUserId} for ClerkUserId {ClerkUserId} (from JWT).", domainUser.Id, currentClerkUserId);
             return domainUser;
         }
@@ -78,20 +77,22 @@ public class CurrentUserService : ICurrentUserService
         var userName = principal?.FindFirst(ClaimTypes.Name)?.Value
                        ?? principal?.FindFirst("name")?.Value
                        ?? principal?.FindFirst("preferred_username")?.Value
-                       ?? "Clerk User";
+                       ?? "Default clerk UserName";
         var userEmail = principal?.FindFirst(ClaimTypes.Email)?.Value
                         ?? principal?.FindFirst("email")?.Value;
 
-        var newDomainUser = new User(currentClerkUserId, userName, userEmail);
+        var imageUrl = principal?.FindFirst("imageUrl")?.Value;
+
+        var newUser = new User(currentClerkUserId, userName, userEmail, imageUrl);
 
         try
         {
-            _dbContext.Users.Add(newDomainUser);
+            _dbContext.Users.Add(newUser);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
-            SetDomainUserId(newDomainUser.Id);
-            _logger.LogInformation("Successfully provisioned new domain user {DomainUserId} for ClerkUserId {ClerkUserId} (from JWT).", newDomainUser.Id, currentClerkUserId);
-            return newDomainUser;
+            SetUserId(newUser.Id);
+            _logger.LogInformation("Successfully provisioned new domain user {DomainUserId} for ClerkUserId {ClerkUserId} (from JWT).", newUser.Id, currentClerkUserId);
+            return newUser;
         }
         catch (Exception ex)
         {
