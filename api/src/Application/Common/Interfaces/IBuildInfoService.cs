@@ -1,4 +1,4 @@
-﻿using Fishio.Application.About.Models;
+﻿using Fishio.Application.About.Queries.GetApplicationInfo;
 
 namespace Fishio.Application.Common.Interfaces;
 
