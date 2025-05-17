@@ -1,6 +1,4 @@
-﻿using Ardalis.GuardClauses;
-
-namespace Fishio.Application.PublicResults.Queries.GetPublicCompetitionResults;
+﻿namespace Fishio.Application.PublicResults.Queries.GetPublicCompetitionResults;
 
 public class GetPublicCompetitionResultsQueryHandler : IRequestHandler<GetPublicCompetitionResultsQuery, PublicCompetitionResultsDto>
 {
@@ -16,10 +14,10 @@ public class GetPublicCompetitionResultsQueryHandler : IRequestHandler<GetPublic
         var competition = await _context.Competitions
             .AsNoTracking()
             .Include(c => c.Organizer)
-            .Include(c => c.CompetitionCategories)
+            .Include(c => c.Categories)
                 .ThenInclude(cc => cc.CategoryDefinition)
-            .Include(c => c.CompetitionCategories)
-                .ThenInclude(cc => cc.SpecificFishSpecies)
+            .Include(c => c.Categories)
+                .ThenInclude(cc => cc.FishSpecies)
             .Include(c => c.Participants)
                 .ThenInclude(p => p.User)
             .Include(c => c.FishCatches)
@@ -47,7 +45,7 @@ public class GetPublicCompetitionResultsQueryHandler : IRequestHandler<GetPublic
             CompetitionStartTime = competition.StartTime,
             CompetitionEndTime = competition.EndTime,
             CompetitionStatus = competition.Status,
-            CompetitionLocationText = competition.LocationText,
+            CompetitionLocation = competition.Location,
             CompetitionImageUrl = competition.ImageUrl,
             OrganizerName = competition.Organizer?.Name
         };
@@ -55,7 +53,7 @@ public class GetPublicCompetitionResultsQueryHandler : IRequestHandler<GetPublic
         var allCompetitionCatches = competition.FishCatches.ToList();
         var allCompetitionParticipants = competition.Participants.ToList();
 
-        foreach (var cc in competition.CompetitionCategories.Where(cat => cat.IsEnabled).OrderBy(cat => cat.SortOrder))
+        foreach (var cc in competition.Categories.Where(cat => cat.IsEnabled).OrderBy(cat => cat.SortOrder))
         {
             var categoryResultDto = new PublicCategoryResultDto
             {
@@ -66,22 +64,20 @@ public class GetPublicCompetitionResultsQueryHandler : IRequestHandler<GetPublic
                 CategoryType = cc.CategoryDefinition.Type,
                 CategoryMetric = cc.CategoryDefinition.Metric,
                 CategoryCalculationLogic = cc.CategoryDefinition.CalculationLogic,
-                SpecificFishSpeciesName = cc.SpecificFishSpecies?.Name,
+                SpecificFishSpeciesName = cc.FishSpecies?.Name,
                 MaxWinnersToDisplay = cc.MaxWinnersToDisplay,
                 IsManuallyAssignedOrNotCalculated = false
             };
 
             var relevantCatchesForCategory = allCompetitionCatches;
-            if (cc.CategoryDefinition.RequiresSpecificFishSpecies && cc.SpecificFishSpeciesId.HasValue)
+            if (cc.CategoryDefinition.RequiresSpecificFishSpecies && cc.FishSpeciesId.HasValue)
             {
                 relevantCatchesForCategory = allCompetitionCatches
-                    .Where(f => f.SpeciesName.Equals(cc.SpecificFishSpecies?.Name, StringComparison.OrdinalIgnoreCase))
+                    .Where(f => f.FishSpeciesId == cc.FishSpeciesId)
                     .ToList();
             }
-            else if (cc.CategoryDefinition.RequiresSpecificFishSpecies && !cc.SpecificFishSpeciesId.HasValue)
-            {
-                relevantCatchesForCategory = new List<CompetitionFishCatch>();
-            }
+            else if (cc.CategoryDefinition.RequiresSpecificFishSpecies && !cc.FishSpeciesId.HasValue)
+                relevantCatchesForCategory = [];
 
             switch (cc.CategoryDefinition.CalculationLogic)
             {
@@ -126,11 +122,11 @@ public class GetPublicCompetitionResultsQueryHandler : IRequestHandler<GetPublic
         return new PublicFishCatchDto
         {
             FishCatchId = fishCatch.Id,
-            SpeciesName = fishCatch.SpeciesName,
-            LengthCm = fishCatch.LengthCm,
-            WeightKg = fishCatch.WeightKg,
+            SpeciesName = fishCatch.FishSpecies?.Name ?? "Nieznany gatunek",
+            LengthCm = fishCatch.Length,
+            WeightKg = fishCatch.Weight,
             CatchTime = fishCatch.CatchTime,
-            PhotoUrl = fishCatch.PhotoUrl
+            PhotoUrl = fishCatch.ImageUrl
         };
     }
 
@@ -165,7 +161,7 @@ public class GetPublicCompetitionResultsQueryHandler : IRequestHandler<GetPublic
                 .Select(p => new
                 {
                     Participant = p,
-                    Score = catches.Where(c => c.ParticipantId == p.Id).Select(c => c.SpeciesName).Distinct().Count(),
+                    Score = catches.Where(c => c.ParticipantId == p.Id).Select(c => c.FishSpeciesId).Distinct().Count(),
                     RelevantCatches = catches.Where(c => c.ParticipantId == p.Id).ToList()
                 })
                 .Where(ps => ps.Score > 0)
@@ -183,8 +179,8 @@ public class GetPublicCompetitionResultsQueryHandler : IRequestHandler<GetPublic
         var scoredCatches = catches.Select(fishCatch =>
         {
             decimal? value = null;
-            if (compCategory.CategoryDefinition.Metric == CategoryMetric.LengthCm) value = fishCatch.LengthCm;
-            else if (compCategory.CategoryDefinition.Metric == CategoryMetric.WeightKg) value = fishCatch.WeightKg;
+            if (compCategory.CategoryDefinition.Metric == CategoryMetric.LengthCm) value = fishCatch.Length;
+            else if (compCategory.CategoryDefinition.Metric == CategoryMetric.WeightKg) value = fishCatch.Weight;
             // Inne metryki dla MaxValue, jeśli będą
             return new { Catch = fishCatch, Value = value, ParticipantId = fishCatch.ParticipantId };
         })
@@ -260,9 +256,9 @@ public class GetPublicCompetitionResultsQueryHandler : IRequestHandler<GetPublic
                 decimal totalScore = 0;
 
                 if (compCategory.CategoryDefinition.Metric == CategoryMetric.LengthCm)
-                    totalScore = participantCatches.Sum(c => c.LengthCm ?? 0);
+                    totalScore = participantCatches.Sum(c => c.Length ?? 0);
                 else if (compCategory.CategoryDefinition.Metric == CategoryMetric.WeightKg)
-                    totalScore = participantCatches.Sum(c => c.WeightKg ?? 0);
+                    totalScore = participantCatches.Sum(c => c.Weight ?? 0);
                 else if (compCategory.CategoryDefinition.Metric == CategoryMetric.FishCount)
                     totalScore = participantCatches.Count();
 
@@ -324,8 +320,8 @@ public class GetPublicCompetitionResultsQueryHandler : IRequestHandler<GetPublic
         var scoredCatches = catches.Select(fishCatch =>
         {
             decimal? value = null;
-            if (compCategory.CategoryDefinition.Metric == CategoryMetric.LengthCm) value = fishCatch.LengthCm;
-            else if (compCategory.CategoryDefinition.Metric == CategoryMetric.WeightKg) value = fishCatch.WeightKg;
+            if (compCategory.CategoryDefinition.Metric == CategoryMetric.LengthCm) value = fishCatch.Length;
+            else if (compCategory.CategoryDefinition.Metric == CategoryMetric.WeightKg) value = fishCatch.Weight;
             // Inne metryki dla MinValue
             return new { Catch = fishCatch, Value = value, ParticipantId = fishCatch.ParticipantId };
         })

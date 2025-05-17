@@ -23,7 +23,7 @@ public class DeleteLogbookEntryCommandHandler : IRequestHandler<DeleteLogbookEnt
         if (logbookEntry == null)
             throw new NotFoundException(nameof(LogbookEntry), request.Id.ToString());
 
-        var currentUserId = _currentUserService.DomainUserId;
+        var currentUserId = _currentUserService.UserId;
         if (logbookEntry.UserId != currentUserId)
             throw new ForbiddenAccessException();
 

@@ -31,7 +31,7 @@ public class ListLogbookEntriesQueryValidator : AbstractValidator<ListLogbookEnt
 public record LogbookEntryDto
 {
     public int Id { get; init; }
-    public string PhotoUrl { get; set; } = string.Empty;
+    public string ImageUrl { get; set; } = string.Empty;
     public int FisheryId { get; init; }
     public string? FisheryName { get; init; } = string.Empty;
     public int FishSpeciesId { get; init; }
@@ -40,4 +40,4 @@ public record LogbookEntryDto
     public decimal? Weight { get; init; }
     public string? Notes { get; init; }
     public DateTimeOffset CaughtAt { get; init; }
-} 
+}

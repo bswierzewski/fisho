@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Persistence.Configurations;
+namespace Fishio.Infrastructure.Persistence.Configurations;
 
 public class FishSpeciesConfiguration : IEntityTypeConfiguration<FishSpecies>
 {
     public void Configure(EntityTypeBuilder<FishSpecies> builder)
     {
-        builder.HasKey(fs => fs.Id); // Upewnij się, że klucz główny jest zdefiniowany
+        builder.HasKey(fs => fs.Id);
 
         builder.Property(e => e.Name)
             .IsRequired()

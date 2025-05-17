@@ -1,7 +1,11 @@
-﻿namespace Fishio.Domain.Enums;
+﻿using System.ComponentModel;
+
+namespace Fishio.Domain.Enums;
 
 public enum CompetitionType
 {
-    Open,    // Otwarte
-    Closed   // Zamknięte
+    [Description("Publiczny")]
+    Public,
+    [Description("Prywatny")]
+    Private
 }

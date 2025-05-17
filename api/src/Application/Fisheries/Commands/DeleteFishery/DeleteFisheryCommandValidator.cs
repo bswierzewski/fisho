@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace Fishio.Application.Fisheries.Commands.DeleteFishery;
+﻿namespace Fishio.Application.Fisheries.Commands.DeleteFishery;
 
 public class DeleteFisheryCommandValidator : AbstractValidator<DeleteFisheryCommand>
 {

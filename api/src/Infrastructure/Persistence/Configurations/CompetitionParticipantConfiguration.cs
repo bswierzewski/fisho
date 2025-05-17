@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Persistence.Configurations;
+namespace Fishio.Infrastructure.Persistence.Configurations;
 
 public class CompetitionParticipantConfiguration : IEntityTypeConfiguration<CompetitionParticipant>
 {
@@ -12,14 +12,8 @@ public class CompetitionParticipantConfiguration : IEntityTypeConfiguration<Comp
         builder.HasIndex(e => new { e.CompetitionId, e.GuestIdentifier }).IsUnique().HasFilter("\"GuestIdentifier\" IS NOT NULL");
 
         builder.HasOne(d => d.Competition)
-              .WithMany(p => p.Participants)
-              .HasForeignKey(d => d.CompetitionId)
-              .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasOne(d => d.User)
-              .WithMany(p => p.CompetitionParticipations)
-              .HasForeignKey(d => d.UserId)
-              .IsRequired(false) // Bo może być gość
-              .OnDelete(DeleteBehavior.SetNull);
+            .WithMany(p => p.Participants)
+            .HasForeignKey(d => d.CompetitionId)
+            .OnDelete(DeleteBehavior.Cascade); // If we delete the competition, we delete the participants
     }
 }

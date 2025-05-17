@@ -15,15 +15,16 @@ public class CreateFisheryCommandHandler : IRequestHandler<CreateFisheryCommand,
 
     public async Task<int> Handle(CreateFisheryCommand request, CancellationToken cancellationToken)
     {
-        var creatorUserId = _currentUserService.DomainUserId;
+        var creatorUserId = _currentUserService.UserId;
 
         Guard.Against.Null(creatorUserId, nameof(creatorUserId), "Użytkownik musi być zalogowany, aby utworzyć łowisko.");
+        Guard.Against.NullOrWhiteSpace(request.Name, nameof(request.Name), "Nazwa łowiska jest wymagana.");
 
         var fishery = new Fishery(
+            creatorUserId.Value,
             request.Name,
-            creatorUserId.Value, // Przekazujemy Id zalogowanego użytkownika
-            request.Location,
-            request.ImageUrl
+            request.ImageUrl,
+            request.Location
         );
 
         if (request.FishSpeciesIds != null && request.FishSpeciesIds.Any())
@@ -34,7 +35,7 @@ public class CreateFisheryCommandHandler : IRequestHandler<CreateFisheryCommand,
 
             foreach (var species in speciesToAdd)
             {
-                fishery.AddSpecies(species); // Metoda domenowa
+                fishery.AddSpecies(species);
             }
         }
 
@@ -44,4 +45,4 @@ public class CreateFisheryCommandHandler : IRequestHandler<CreateFisheryCommand,
 
         return fishery.Id;
     }
-} 
+}

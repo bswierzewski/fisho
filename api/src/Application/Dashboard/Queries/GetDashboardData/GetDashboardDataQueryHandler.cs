@@ -13,9 +13,9 @@ public class GetDashboardDataQueryHandler : IRequestHandler<GetDashboardDataQuer
         _currentUserService = currentUserService;
     }
 
-public async Task<DashboardDataDto> Handle(GetDashboardDataQuery request, CancellationToken cancellationToken)
+    public async Task<DashboardDataDto> Handle(GetDashboardDataQuery request, CancellationToken cancellationToken)
     {
-        var userId = _currentUserService.DomainUserId;
+        var userId = _currentUserService.UserId;
         if (userId == null)
         {
             // Powinno być obsługiwane przez autoryzację, ale jako zabezpieczenie
@@ -110,4 +110,4 @@ public async Task<DashboardDataDto> Handle(GetDashboardDataQuery request, Cancel
 
         return dashboardDto;
     }
-} 
+}

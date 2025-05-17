@@ -22,7 +22,7 @@ public class PublicCompetitionResultsDto
     public DateTimeOffset CompetitionStartTime { get; set; }
     public DateTimeOffset CompetitionEndTime { get; set; }
     public CompetitionStatus CompetitionStatus { get; set; }
-    public string? CompetitionLocationText { get; set; }
+    public string? CompetitionLocation { get; set; }
     public string? CompetitionImageUrl { get; set; }
     public string? OrganizerName { get; set; } // Optional: if you want to display it
     public List<PublicCategoryResultDto> Categories { get; set; } = new();

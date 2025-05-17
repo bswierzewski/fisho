@@ -1,12 +1,10 @@
 using System.ComponentModel;
 using System.Reflection;
-using Ardalis.GuardClauses;
 
 namespace Fishio.Application.LookupData.Queries.ListEnumValues;
 
 public class ListEnumValuesQueryHandler : IRequestHandler<ListEnumValuesQuery, IEnumerable<EnumValueDto>>
 {
-    // Można wstrzyknąć listę dozwolonych typów enumów, jeśli chcemy ograniczyć dostęp
     private static readonly Dictionary<string, Type> AllowedEnumTypes = new()
     {
         { nameof(CategoryType), typeof(CategoryType) },
@@ -16,7 +14,7 @@ public class ListEnumValuesQueryHandler : IRequestHandler<ListEnumValuesQuery, I
         { nameof(CompetitionStatus), typeof(CompetitionStatus) },
         { nameof(CompetitionType), typeof(CompetitionType) },
         { nameof(ParticipantRole), typeof(ParticipantRole) }
-        // Dodaj tutaj inne enumy, które chcesz udostępnić
+        // { nameof(YourEnumName), typeof(YourEnumType) }
     };
 
     public Task<IEnumerable<EnumValueDto>> Handle(ListEnumValuesQuery request, CancellationToken cancellationToken)
@@ -32,7 +30,7 @@ public class ListEnumValuesQueryHandler : IRequestHandler<ListEnumValuesQuery, I
                 Name = e.ToString(),
                 Description = GetEnumDescription(e)
             })
-            .OrderBy(e => e.Name) // Opcjonalnie sortuj
+            .OrderBy(e => e.Name)
             .ToList();
 
         return Task.FromResult<IEnumerable<EnumValueDto>>(enumValues);
@@ -52,6 +50,6 @@ public class ListEnumValuesQueryHandler : IRequestHandler<ListEnumValuesQuery, I
                 return attributes[0].Description;
             }
         }
-        return value.ToString(); // Lub null, jeśli brak opisu
+        return value.ToString();
     }
 }

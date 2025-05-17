@@ -16,7 +16,7 @@ public interface ICurrentUserService
     /// This ID is typically populated after the UserProvisioningMiddleware has run.
     /// Returns null if the user is not authenticated or not yet provisioned in the domain.
     /// </summary>
-    int? DomainUserId { get; }
+    int? UserId { get; }
 
     /// <summary>
     /// Gets a value indicating whether the current user is authenticated.

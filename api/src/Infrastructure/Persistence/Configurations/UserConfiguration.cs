@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Persistence.Configurations;
+namespace Fishio.Infrastructure.Persistence.Configurations;
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {
@@ -11,7 +11,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(e => e.Name).IsRequired().HasMaxLength(255);
         builder.Property(e => e.Email).HasMaxLength(255);
 
-        // Unikalny email, jeśli nie jest null
+        // Unique email if not null
         builder.HasIndex(e => e.Email).IsUnique().HasFilter("\"Email\" IS NOT NULL");
     }
 }

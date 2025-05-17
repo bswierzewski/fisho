@@ -1,27 +1,29 @@
 ﻿namespace Fishio.Domain.Entities;
 
-// Plik: CompetitionParticipant.cs (Tabela łącząca dla uczestników i ich ról)
-public class CompetitionParticipant : BaseAuditableEntity // Uczestnictwo też może być audytowalne
+/// <summary>
+/// Represents a participant in a competition.
+/// This can be a user or a guest.
+/// The participant can have different roles such as competitor, judge, or organizer.
+/// The participant can be added by the organizer or join on their own.
+/// </summary>
+public class CompetitionParticipant : BaseAuditableEntity
 {
     public int CompetitionId { get; private set; }
     public virtual Competition Competition { get; private set; } = null!;
 
-    public int? UserId { get; private set; } // Nullable for guest participants
+    public int? UserId { get; private set; }
     public virtual User? User { get; private set; }
 
-    public string? GuestName { get; private set; } // For participants without an account
-    public string? GuestIdentifier { get; private set; } // Optional unique ID for guest
+    public string? GuestName { get; private set; }
+    public string? GuestIdentifier { get; private set; }
 
     public ParticipantRole Role { get; private set; }
-    public bool AddedByOrganizer { get; private set; } // True if manually added by organizer
+    public bool AddedByOrganizer { get; private set; }
 
-    // Navigation property
-    public virtual ICollection<CompetitionFishCatch> FishCatches { get; private set; } = new List<CompetitionFishCatch>();
+    public virtual ICollection<CompetitionFishCatch> FishCatches { get; private set; } = [];
 
-    // Private constructor for EF Core
     private CompetitionParticipant() { }
 
-    // Constructor for registered user
     public CompetitionParticipant(Competition competition, User user, ParticipantRole role, bool addedByOrganizer)
     {
         Competition = competition;
@@ -32,7 +34,6 @@ public class CompetitionParticipant : BaseAuditableEntity // Uczestnictwo też m
         AddedByOrganizer = addedByOrganizer;
     }
 
-    // Constructor for guest participant
     public CompetitionParticipant(Competition competition, string guestName, ParticipantRole role, bool addedByOrganizer, string? guestIdentifier = null)
     {
         Competition = competition;

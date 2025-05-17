@@ -10,10 +10,8 @@
     public bool RequiresSpecificFishSpecies { get; private set; }
     public bool AllowManualWinnerAssignment { get; private set; }
 
-    // Prywatny konstruktor dla EF Core do materializacji obiektów z bazy
     private CategoryDefinition() { }
 
-    // Publiczny konstruktor dla HasData i potencjalnie dla testów
     public CategoryDefinition(
         string name,
         string? description,

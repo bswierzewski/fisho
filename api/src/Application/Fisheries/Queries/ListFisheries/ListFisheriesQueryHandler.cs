@@ -29,7 +29,7 @@ public class ListFisheriesQueryHandler : IRequestHandler<ListFisheriesQuery, Pag
         // Ręczne mapowanie i paginacja
         var fisheriesQuery = query
             .Include(f => f.User) // Dla OwnerName
-            .Include(f => f.DefinedSpecies) // Dla FishSpeciesCount
+            .Include(f => f.FishSpecies) // Dla FishSpeciesCount
             .OrderBy(f => f.Name)
             .Select(f => new FisheryDto
             {
@@ -37,9 +37,9 @@ public class ListFisheriesQueryHandler : IRequestHandler<ListFisheriesQuery, Pag
                 Name = f.Name,
                 Location = f.Location,
                 ImageUrl = f.ImageUrl,
-                FishSpeciesCount = f.DefinedSpecies.Count,
+                FishSpeciesCount = f.FishSpecies.Count,
             });
 
         return await fisheriesQuery.ToPaginatedListAsync(request.Page, request.PageSize);
     }
-} 
+}

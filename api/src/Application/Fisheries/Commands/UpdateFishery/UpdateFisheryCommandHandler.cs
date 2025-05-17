@@ -26,17 +26,17 @@ public class UpdateFisheryCommandHandler : IRequestHandler<UpdateFisheryCommand,
             throw new NotFoundException(nameof(Fishery), request.Id.ToString());
         }
 
-        var currentUserId = _currentUserService.DomainUserId;
+        var currentUserId = _currentUserService.UserId;
         if (fishery.UserId != currentUserId /* && !currentUserService.IsAdmin */) // Dodaj sprawdzenie roli admina, jeśli jest
         {
             throw new ForbiddenAccessException();
         }
 
-        fishery.UpdateDetails(request.Name, request.Location, request.ImageUrl); // Metoda domenowa
+        fishery.UpdateDetails(request.Name, request.ImageUrl, request.Location); // Metoda domenowa
 
         // _fisheryRepository.UpdateAsync(fishery, cancellationToken); // Jeśli używasz repo
         await _context.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;
     }
-} 
+}

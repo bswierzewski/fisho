@@ -17,7 +17,7 @@ public class GetLogbookEntryDetailsQueryValidator : AbstractValidator<GetLogbook
 public record LogbookEntryDetailsDto
 {
     public int Id { get; init; }
-    public string PhotoUrl { get; set; } = string.Empty;
+    public string ImageUrl { get; set; } = string.Empty;
     public int? FisheryId { get; init; }
     public string? FisheryName { get; init; } = string.Empty;
     public int? FishSpeciesId { get; init; }
@@ -28,4 +28,4 @@ public record LogbookEntryDetailsDto
     public DateTimeOffset CaughtAt { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
     public DateTimeOffset? LastModifiedAt { get; init; }
-} 
+}

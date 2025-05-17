@@ -38,7 +38,7 @@ public class CurrentUserService : ICurrentUserService
 
     public bool IsAuthenticated => _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
 
-    public int? DomainUserId => _cachedDomainUserId;
+    public int? UserId => _cachedDomainUserId;
 
     public void SetDomainUserId(int domainUserId)
     {

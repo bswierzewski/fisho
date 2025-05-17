@@ -1,7 +1,6 @@
 ﻿namespace Fishio.Domain.Entities;
 
-// Plik: CompetitionFishCatch.cs
-public class CompetitionFishCatch : BaseAuditableEntity // Zgłoszenie połowu też audytowalne
+public class CompetitionFishCatch : BaseAuditableEntity
 {
     public int CompetitionId { get; private set; }
     public virtual Competition Competition { get; private set; } = null!;
@@ -12,21 +11,28 @@ public class CompetitionFishCatch : BaseAuditableEntity // Zgłoszenie połowu t
     public int JudgeId { get; private set; }
     public virtual User Judge { get; private set; } = null!;
 
-    public string SpeciesName { get; private set; } = string.Empty; // Could link to FishSpecies if catches are always predefined species
-    public decimal? LengthCm { get; private set; }
-    public decimal? WeightKg { get; private set; }
-    public string PhotoUrl { get; private set; } = string.Empty;
-    public DateTimeOffset CatchTime { get; private set; }
+    public int FishSpeciesId { get; private set; }
+    public virtual FishSpecies FishSpecies { get; private set; } = null!;
 
-    // Private constructor for EF Core
+    /// <summary>
+    /// The length of the fish in centimeters.
+    /// </summary>
+    public decimal? Length { get; private set; }
+    /// <summary>
+    /// The weight of the fish in kilograms.
+    /// </summary>
+    public decimal? Weight { get; private set; }
+    public string ImageUrl { get; private set; } = string.Empty;
+    public DateTimeOffset CatchTime { get; private set; } = DateTimeOffset.UtcNow;
+
     private CompetitionFishCatch() { }
 
     public CompetitionFishCatch(
         Competition competition,
         CompetitionParticipant participant,
         User judge,
-        string speciesName,
-        string photoUrl,
+        int fishSpeciesId,
+        string imageUrl,
         DateTimeOffset catchTime)
     {
         Competition = competition;
@@ -35,8 +41,8 @@ public class CompetitionFishCatch : BaseAuditableEntity // Zgłoszenie połowu t
         ParticipantId = participant.Id;
         Judge = judge;
         JudgeId = judge.Id;
-        SpeciesName = speciesName;
-        PhotoUrl = photoUrl;
+        FishSpeciesId = fishSpeciesId;
+        ImageUrl = imageUrl;
         CatchTime = catchTime;
     }
 }

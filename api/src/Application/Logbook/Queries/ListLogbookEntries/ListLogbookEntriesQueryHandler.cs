@@ -17,24 +17,18 @@ public class ListLogbookEntriesQueryHandler : IRequestHandler<ListLogbookEntries
 
     public async Task<PaginatedList<LogbookEntryDto>> Handle(ListLogbookEntriesQuery request, CancellationToken cancellationToken)
     {
-        var userId = _currentUserService.DomainUserId;
+        var userId = _currentUserService.UserId;
         if (!userId.HasValue)
-        {
             throw new UnauthorizedAccessException("Użytkownik musi być zalogowany, aby wyświetlić dziennik.");
-        }
 
         var query = _context.LogbookEntries
             .AsNoTracking()
             .Where(le => le.UserId == userId.Value);
 
         if (request.FishSpeciesId.HasValue)
-        {
             query = query.Where(le => le.FishSpeciesId == request.FishSpeciesId.Value);
-        }
         if (request.FromDate.HasValue)
-        {
             query = query.Where(le => le.CatchTime >= request.FromDate.Value);
-        }
         if (request.ToDate.HasValue)
         {
             // Dodaj jeden dzień do FilterByDateTo, aby uwzględnić cały dzień
@@ -42,9 +36,7 @@ public class ListLogbookEntriesQueryHandler : IRequestHandler<ListLogbookEntries
             query = query.Where(le => le.CatchTime < dateTo);
         }
         if (request.FisheryId.HasValue)
-        {
             query = query.Where(le => le.FisheryId == request.FisheryId.Value);
-        }
 
         // Ręczne mapowanie i paginacja
         var logbookEntriesQuery = query
@@ -57,7 +49,7 @@ public class ListLogbookEntriesQueryHandler : IRequestHandler<ListLogbookEntries
                 CaughtAt = le.CatchTime,
                 Length = le.Length,
                 Weight = le.Weight,
-                PhotoUrl = le.PhotoUrl,
+                ImageUrl = le.ImageUrl,
                 FisheryName = le.Fishery != null ? le.Fishery.Name : null
             });
 

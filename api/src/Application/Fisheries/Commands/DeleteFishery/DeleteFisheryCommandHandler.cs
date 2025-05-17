@@ -21,14 +21,11 @@ public class DeleteFisheryCommandHandler : IRequestHandler<DeleteFisheryCommand,
         if (fishery == null)
             throw new NotFoundException(nameof(Fishery), request.Id.ToString());
 
-
-        var currentUserId = _currentUserService.DomainUserId;
+        var currentUserId = _currentUserService.UserId;
         if (fishery.UserId != currentUserId /* && !currentUserService.IsAdmin */)
-        {
             throw new ForbiddenAccessException();
-        }
 
-        // Opcjonalna walidacja: Czy łowisko jest używane w LogbookEntries?
+        // Optional validation: Check if the fishery is used in LogbookEntries
         // bool isUsedInLogbook = await _context.LogbookEntries.AnyAsync(le => le.FisheryId == request.Id, cancellationToken);
         // if (isUsedInLogbook)
         // {

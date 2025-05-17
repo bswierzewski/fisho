@@ -12,6 +12,6 @@ public class ListCompetitionsQueryHandler : IRequestHandler<ListCompetitionsQuer
     public async Task<List<CompetitionDto>> Handle(ListCompetitionsQuery request, CancellationToken cancellationToken)
     {
         // TODO: Implement the logic for listing competitions
-        return new List<CompetitionDto>();
+        return await Task.FromResult(new List<CompetitionDto>());
     }
-} 
+}

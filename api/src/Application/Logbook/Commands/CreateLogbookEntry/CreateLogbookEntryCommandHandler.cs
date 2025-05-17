@@ -15,7 +15,7 @@ public class CreateLogbookEntryCommandHandler : IRequestHandler<CreateLogbookEnt
 
     public async Task<int> Handle(CreateLogbookEntryCommand request, CancellationToken cancellationToken)
     {
-        var userId = _currentUserService.DomainUserId;
+        var userId = _currentUserService.UserId;
         if (!userId.HasValue)
         {
             throw new UnauthorizedAccessException("Użytkownik musi być zalogowany, aby dodać wpis do dziennika.");
@@ -41,4 +41,4 @@ public class CreateLogbookEntryCommandHandler : IRequestHandler<CreateLogbookEnt
 
         return logbookEntry.Id;
     }
-} 
+}

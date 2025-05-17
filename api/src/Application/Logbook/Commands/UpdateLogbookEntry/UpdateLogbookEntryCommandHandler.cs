@@ -16,6 +16,6 @@ public class UpdateLogbookEntryCommandHandler : IRequestHandler<UpdateLogbookEnt
     public async Task<Unit> Handle(UpdateLogbookEntryCommand request, CancellationToken cancellationToken)
     {
         // TODO: Implement the logic for updating a logbook entry
-        return Unit.Value;
+        return await Task.FromResult(Unit.Value);
     }
-} 
+}

@@ -25,7 +25,7 @@ public class GetLogbookEntryDetailsQueryHandler : IRequestHandler<GetLogbookEntr
             throw new NotFoundException(nameof(LogbookEntry), request.Id.ToString());
         }
 
-        var currentUserId = _currentUserService.DomainUserId;
+        var currentUserId = _currentUserService.UserId;
         if (logbookEntry.UserId != currentUserId)
         {
             // Zamiast rzucać Forbidden, można też rzucić NotFound, aby nie ujawniać istnienia wpisu
@@ -40,7 +40,7 @@ public class GetLogbookEntryDetailsQueryHandler : IRequestHandler<GetLogbookEntr
             FishSpeciesName = logbookEntry.FishSpecies?.Name ?? "",
             Length = logbookEntry.Length,
             Weight = logbookEntry.Weight,
-            PhotoUrl = logbookEntry.PhotoUrl,
+            ImageUrl = logbookEntry.ImageUrl,
             CaughtAt = logbookEntry.CatchTime,
             Notes = logbookEntry.Notes,
             FisheryId = logbookEntry.FisheryId,
@@ -49,4 +49,4 @@ public class GetLogbookEntryDetailsQueryHandler : IRequestHandler<GetLogbookEntr
             LastModifiedAt = logbookEntry.LastModified
         };
     }
-} 
+}

@@ -3,53 +3,48 @@
 public class Fishery : BaseAuditableEntity
 {
     public string Name { get; private set; } = string.Empty;
-    public string? Location { get; private set; }
     public string? ImageUrl { get; private set; }
+    public string? Location { get; private set; }
 
-    public int? UserId { get; private set; } // Creator/Maintainer of this fishery entry, nullable
+    /// <summary>
+    /// Creator/Maintainer of this fishery entry
+    /// </summary>
+    public int? UserId { get; private set; }
     public virtual User? User { get; private set; }
 
-    // Navigation properties
-    public virtual ICollection<LogbookEntry> LogbookEntries { get; private set; } = new List<LogbookEntry>();
-    public virtual ICollection<FishSpecies> DefinedSpecies { get; private set; } = new List<FishSpecies>(); // Many-to-many
+    public virtual ICollection<LogbookEntry> LogbookEntries { get; private set; } = [];
+    public virtual ICollection<FishSpecies> FishSpecies { get; private set; } = [];
+    public virtual ICollection<Competition> Competitions { get; private set; } = [];
 
-    // Private constructor for EF Core
     private Fishery() { }
 
-    public Fishery(string name, int userId, string location, string? imageUrl)
+    public Fishery(int userId, string name, string? imageUrl, string? location)
     {
         Guard.Against.NullOrWhiteSpace(name, nameof(name), "Nazwa łowiska jest wymagana.");
+
         Name = name;
-
         UserId = userId;
-
         Location = location;
-
         ImageUrl = imageUrl;
     }
 
-    public void UpdateDetails(string? name, string? location, string? imageUrl)
+    public void UpdateDetails(string name, string? imageUrl, string? location)
     {
         Guard.Against.NullOrWhiteSpace(name, nameof(name));
-        Name = name!;
+        Name = name;
 
-        Guard.Against.NullOrWhiteSpace(location, nameof(location));
         Location = location;
-
-        Guard.Against.NullOrWhiteSpace(imageUrl, nameof(imageUrl));
         ImageUrl = imageUrl;
     }
 
     public void AddSpecies(FishSpecies species)
     {
-        if (!DefinedSpecies.Contains(species))
-        {
-            DefinedSpecies.Add(species);
-        }
+        if (!FishSpecies.Contains(species))
+            FishSpecies.Add(species);
     }
 
     public void RemoveSpecies(FishSpecies species)
     {
-        DefinedSpecies.Remove(species);
+        FishSpecies.Remove(species);
     }
 }
