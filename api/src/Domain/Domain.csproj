@@ -4,6 +4,8 @@
 		<TargetFramework>net9.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<RootNamespace>Fishio.Domain</RootNamespace>
+		<AssemblyName>Fishio.Domain</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>
