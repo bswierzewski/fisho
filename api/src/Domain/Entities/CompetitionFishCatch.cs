@@ -14,35 +14,86 @@ public class CompetitionFishCatch : BaseAuditableEntity
     public int FishSpeciesId { get; private set; }
     public virtual FishSpecies FishSpecies { get; private set; } = null!;
 
-    /// <summary>
-    /// The length of the fish in centimeters.
-    /// </summary>
-    public decimal? Length { get; private set; }
-    /// <summary>
-    /// The weight of the fish in kilograms.
-    /// </summary>
-    public decimal? Weight { get; private set; }
+    public FishLength? Length { get; private set; }
+    public FishWeight? Weight { get; private set; }
     public string ImageUrl { get; private set; } = string.Empty;
     public DateTimeOffset CatchTime { get; private set; } = DateTimeOffset.UtcNow;
 
     private CompetitionFishCatch() { }
 
-    public CompetitionFishCatch(
+    // Konstruktor wewnętrzny, tworzenie przez Competition.RecordFishCatch
+    internal CompetitionFishCatch(
         Competition competition,
         CompetitionParticipant participant,
         User judge,
-        int fishSpeciesId,
+        FishSpecies fishSpecies,
         string imageUrl,
-        DateTimeOffset catchTime)
+        DateTimeOffset catchTime,
+        FishLength? length = null,
+        FishWeight? weight = null)
     {
-        Competition = competition;
+        Guard.Against.Null(competition, nameof(competition));
+        Guard.Against.Null(participant, nameof(participant));
+        Guard.Against.Null(judge, nameof(judge));
+        Guard.Against.Null(fishSpecies, nameof(fishSpecies));
+        Guard.Against.NullOrWhiteSpace(imageUrl, nameof(imageUrl));
+        Guard.Against.Default(catchTime, nameof(catchTime));
+
+        if (catchTime < competition.Schedule.Start || catchTime > competition.Schedule.End)
+            throw new ArgumentOutOfRangeException(nameof(catchTime), "Czas połowu musi mieścić się w czasie trwania zawodów.");
+
         CompetitionId = competition.Id;
-        Participant = participant;
+        Competition = competition;
         ParticipantId = participant.Id;
-        Judge = judge;
+        Participant = participant;
         JudgeId = judge.Id;
-        FishSpeciesId = fishSpeciesId;
+        Judge = judge;
+        FishSpeciesId = fishSpecies.Id;
+        FishSpecies = fishSpecies;
         ImageUrl = imageUrl;
         CatchTime = catchTime;
+        Length = length;
+        Weight = weight;
+    }
+
+    public bool CanBeModifiedBy(User user)
+    {
+        // Tylko sędzia, który zarejestrował połów, lub organizator może modyfikować (przykładowa reguła)
+        // Oraz zawody nie mogą być zakończone
+        if (Competition.IsFinished() || Competition.Status == CompetitionStatus.Cancelled) return false;
+
+        bool isJudgeWhoRecorded = JudgeId == user.Id;
+        bool isOrganizer = Competition.OrganizerId == user.Id;
+        // Można dodać rolę administratora systemu
+
+        return isJudgeWhoRecorded || isOrganizer;
+    }
+
+    public void UpdateMeasurements(FishLength? length, FishWeight? weight, User modifyingUser)
+    {
+        if (!CanBeModifiedBy(modifyingUser))
+            throw new InvalidOperationException("Brak uprawnień do modyfikacji tego połowu lub zawody są zakończone.");
+
+        // Dodatkowa walidacja, jeśli jest potrzebna
+        // np. czy przynajmniej jedna miara jest podana, jeśli wymaga tego kategoria główna
+        var primaryCategory = Competition.Categories.FirstOrDefault(c => c.IsPrimaryScoring && c.IsEnabled);
+        if (primaryCategory != null)
+        {
+            var metric = primaryCategory.CategoryDefinition.Metric;
+            if ((metric == CategoryMetric.LengthCm && length == null) ||
+                (metric == CategoryMetric.WeightKg && weight == null))
+            {
+                // throw new ArgumentException($"Dla głównej kategorii punktacyjnej ({metric}) wymagane jest podanie odpowiedniej miary (długość/waga).");
+            }
+        }
+        if (length == null && weight == null)
+        {
+            // throw new ArgumentException("Należy podać przynajmniej długość lub wagę ryby.");
+        }
+
+
+        Length = length;
+        Weight = weight;
+        // AddDomainEvent(new FishCatchMeasurementsUpdatedEvent(this, modifyingUser));
     }
 }

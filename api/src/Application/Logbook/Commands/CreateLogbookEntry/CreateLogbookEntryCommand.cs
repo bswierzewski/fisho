@@ -2,7 +2,7 @@
 
 public record CreateLogbookEntryCommand : IRequest<int>
 {
-    public string? PhotoUrl { get; init; }
+    public string? ImageUrl { get; init; }
     public int? FisheryId { get; init; }
     public int? FishSpeciesId { get; init; }
     public decimal? Length { get; init; }

@@ -13,6 +13,7 @@ public class GetPublicCompetitionResultsQueryHandler : IRequestHandler<GetPublic
     {
         var competition = await _context.Competitions
             .AsNoTracking()
+            .Include(c => c.Fishery)
             .Include(c => c.Organizer)
             .Include(c => c.Categories)
                 .ThenInclude(cc => cc.CategoryDefinition)
@@ -42,10 +43,10 @@ public class GetPublicCompetitionResultsQueryHandler : IRequestHandler<GetPublic
         {
             CompetitionId = competition.Id,
             CompetitionName = competition.Name,
-            CompetitionStartTime = competition.StartTime,
-            CompetitionEndTime = competition.EndTime,
+            CompetitionStartTime = competition.Schedule.Start,
+            CompetitionEndTime = competition.Schedule.End,
             CompetitionStatus = competition.Status,
-            CompetitionLocation = competition.Location,
+            CompetitionLocation = competition.Fishery.Location,
             CompetitionImageUrl = competition.ImageUrl,
             OrganizerName = competition.Organizer?.Name
         };
@@ -256,9 +257,9 @@ public class GetPublicCompetitionResultsQueryHandler : IRequestHandler<GetPublic
                 decimal totalScore = 0;
 
                 if (compCategory.CategoryDefinition.Metric == CategoryMetric.LengthCm)
-                    totalScore = participantCatches.Sum(c => c.Length ?? 0);
+                    totalScore = participantCatches.Sum(c => c.Length?.Value ?? 0);
                 else if (compCategory.CategoryDefinition.Metric == CategoryMetric.WeightKg)
-                    totalScore = participantCatches.Sum(c => c.Weight ?? 0);
+                    totalScore = participantCatches.Sum(c => c.Weight?.Value ?? 0);
                 else if (compCategory.CategoryDefinition.Metric == CategoryMetric.FishCount)
                     totalScore = participantCatches.Count();
 

@@ -22,25 +22,54 @@ public class CompetitionParticipant : BaseAuditableEntity
 
     public virtual ICollection<CompetitionFishCatch> FishCatches { get; private set; } = [];
 
+    // Prywatny konstruktor dla EF Core
     private CompetitionParticipant() { }
 
-    public CompetitionParticipant(Competition competition, User user, ParticipantRole role, bool addedByOrganizer)
+    // Konstruktor wewnętrzny, tworzenie przez Competition.AddParticipant
+    internal CompetitionParticipant(Competition competition, User user, ParticipantRole role, bool addedByOrganizer)
     {
-        Competition = competition;
+        Guard.Against.Null(competition, nameof(competition));
+        Guard.Against.Null(user, nameof(user));
+
         CompetitionId = competition.Id;
-        User = user;
+        Competition = competition;
         UserId = user.Id;
+        User = user;
         Role = role;
         AddedByOrganizer = addedByOrganizer;
     }
 
-    public CompetitionParticipant(Competition competition, string guestName, ParticipantRole role, bool addedByOrganizer, string? guestIdentifier = null)
+    // Konstruktor wewnętrzny dla gości, tworzenie przez Competition.AddGuestParticipant
+    internal CompetitionParticipant(Competition competition, string guestName, ParticipantRole role, bool addedByOrganizer, string? guestIdentifier = null)
     {
-        Competition = competition;
+        Guard.Against.Null(competition, nameof(competition));
+        Guard.Against.NullOrWhiteSpace(guestName, nameof(guestName));
+        if (role == ParticipantRole.Organizer || role == ParticipantRole.Judge)
+        {
+            throw new ArgumentException("Goście nie mogą pełnić roli Organizatora ani Sędziego.", nameof(role));
+        }
+
         CompetitionId = competition.Id;
+        Competition = competition;
         GuestName = guestName;
         GuestIdentifier = guestIdentifier;
         Role = role;
         AddedByOrganizer = addedByOrganizer;
+    }
+
+    public void ChangeRole(ParticipantRole newRole, User assigningUser /* Można dodać logikę uprawnień */)
+    {
+        // TODO: Dodać walidację, czy assigningUser ma uprawnienia do zmiany roli
+        // TODO: Dodać walidację, czy zmiana roli jest dozwolona (np. gość na sędziego)
+        if (UserId == null && (newRole == ParticipantRole.Judge || newRole == ParticipantRole.Organizer))
+        {
+            throw new InvalidOperationException("Gość nie może zostać Sędzią ani Organizatorem.");
+        }
+
+        // Przykład: Sędzia nie może stać się zwykłym zawodnikiem, jeśli ma już zarejestrowane połowy jako sędzia
+        // (lub odwrotnie, zawodnik sędzią, jeśli ma połowy jako zawodnik) - zależy od reguł.
+
+        Role = newRole;
+        // Można dodać zdarzenie domenowe: ParticipantRoleChangedEvent
     }
 }

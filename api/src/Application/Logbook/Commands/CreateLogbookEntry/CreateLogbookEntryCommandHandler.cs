@@ -1,4 +1,6 @@
-﻿namespace Fishio.Application.Logbook.Commands.CreateLogbookEntry;
+﻿using Fishio.Domain.ValueObjects;
+
+namespace Fishio.Application.Logbook.Commands.CreateLogbookEntry;
 
 public class CreateLogbookEntryCommandHandler : IRequestHandler<CreateLogbookEntryCommand, int>
 {
@@ -23,10 +25,10 @@ public class CreateLogbookEntryCommandHandler : IRequestHandler<CreateLogbookEnt
 
         var logbookEntry = new LogbookEntry(
             userId.Value,
-            request.PhotoUrl,
+            request.ImageUrl ?? "",
             request.CaughtAt,
-            request.Length,
-            request.Weight,
+            new FishLength(request.Length ?? 0),
+            new FishWeight(request.Weight ?? 0),
             request.Notes,
             request.FishSpeciesId,
             request.FisheryId

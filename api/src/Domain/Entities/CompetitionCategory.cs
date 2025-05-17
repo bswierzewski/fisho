@@ -21,29 +21,74 @@ public class CompetitionCategory : BaseAuditableEntity
 
     private CompetitionCategory() { }
 
+    // Konstruktor wewnętrzny, tworzenie przez Competition.AddCategory
     internal CompetitionCategory(
-        int competitionId,
-        int categoryDefinitionId,
-        int? fishSpeciesId,
-        string? customNameOverride,
-        string? customDescriptionOverride,
-        int sortOrder,
+        Competition competition,
+        CategoryDefinition categoryDefinition,
         bool isPrimaryScoring,
-        int maxWinnersToDisplay,
-        bool isEnabled)
+        int sortOrder = 0,
+        int maxWinnersToDisplay = 1,
+        int? fishSpeciesId = null,
+        string? customNameOverride = null,
+        string? customDescriptionOverride = null)
     {
-        Guard.Against.NegativeOrZero(competitionId, nameof(competitionId));
-        Guard.Against.NegativeOrZero(categoryDefinitionId, nameof(categoryDefinitionId));
+        Guard.Against.Null(competition, nameof(competition));
+        Guard.Against.Null(categoryDefinition, nameof(categoryDefinition));
         Guard.Against.NegativeOrZero(maxWinnersToDisplay, nameof(maxWinnersToDisplay));
+        if (fishSpeciesId.HasValue) Guard.Against.NegativeOrZero(fishSpeciesId.Value, nameof(fishSpeciesId));
 
-        CompetitionId = competitionId;
-        CategoryDefinitionId = categoryDefinitionId;
+        if (categoryDefinition.RequiresSpecificFishSpecies && !fishSpeciesId.HasValue)
+        {
+            throw new ArgumentException($"Kategoria '{categoryDefinition.Name}' wymaga zdefiniowania konkretnego gatunku ryby.", nameof(fishSpeciesId));
+        }
+        if (!categoryDefinition.RequiresSpecificFishSpecies && fishSpeciesId.HasValue)
+        {
+            throw new ArgumentException($"Kategoria '{categoryDefinition.Name}' nie powinna mieć zdefiniowanego gatunku ryby.", nameof(fishSpeciesId));
+        }
+
+
+        CompetitionId = competition.Id;
+        Competition = competition;
+        CategoryDefinitionId = categoryDefinition.Id;
+        CategoryDefinition = categoryDefinition;
+        IsPrimaryScoring = isPrimaryScoring;
+        SortOrder = sortOrder;
+        MaxWinnersToDisplay = maxWinnersToDisplay;
         FishSpeciesId = fishSpeciesId;
         CustomNameOverride = customNameOverride;
         CustomDescriptionOverride = customDescriptionOverride;
-        SortOrder = sortOrder;
-        IsPrimaryScoring = isPrimaryScoring;
-        MaxWinnersToDisplay = maxWinnersToDisplay;
-        IsEnabled = isEnabled;
+        IsEnabled = true;
     }
+
+    public void UpdateConfiguration(
+        bool isPrimaryScoring,
+        int sortOrder,
+        int maxWinnersToDisplay,
+        int? fishSpeciesId,
+        string? customNameOverride,
+        string? customDescriptionOverride)
+    {
+        // TODO: Dodać walidację, czy można modyfikować (np. zawody nie trwają/zakończone)
+        Guard.Against.NegativeOrZero(maxWinnersToDisplay, nameof(maxWinnersToDisplay));
+        if (fishSpeciesId.HasValue) Guard.Against.NegativeOrZero(fishSpeciesId.Value, nameof(fishSpeciesId));
+
+        if (CategoryDefinition.RequiresSpecificFishSpecies && !fishSpeciesId.HasValue)
+        {
+            throw new ArgumentException($"Kategoria '{CategoryDefinition.Name}' wymaga zdefiniowania konkretnego gatunku ryby.", nameof(fishSpeciesId));
+        }
+        if (!CategoryDefinition.RequiresSpecificFishSpecies && fishSpeciesId.HasValue)
+        {
+            throw new ArgumentException($"Kategoria '{CategoryDefinition.Name}' nie powinna mieć zdefiniowanego gatunku ryby.", nameof(fishSpeciesId));
+        }
+
+        IsPrimaryScoring = isPrimaryScoring;
+        SortOrder = sortOrder;
+        MaxWinnersToDisplay = maxWinnersToDisplay;
+        FishSpeciesId = fishSpeciesId;
+        CustomNameOverride = customNameOverride;
+        CustomDescriptionOverride = customDescriptionOverride;
+    }
+
+    public void Enable() => IsEnabled = true;
+    public void Disable() => IsEnabled = false;
 }

@@ -56,25 +56,25 @@ public class GetDashboardDataQueryHandler : IRequestHandler<GetDashboardDataQuer
 
         // 3. Upcoming Events (np. 3 najbliższe)
         var upcomingParticipating = userCompetitionsAsParticipant
-            .Where(cp => cp.Competition.StartTime > now && (cp.Competition.Status == CompetitionStatus.Scheduled || cp.Competition.Status == CompetitionStatus.AcceptingRegistrations))
-            .OrderBy(cp => cp.Competition.StartTime)
+            .Where(cp => cp.Competition.Schedule.Start > now && (cp.Competition.Status == CompetitionStatus.Scheduled || cp.Competition.Status == CompetitionStatus.AcceptingRegistrations))
+            .OrderBy(cp => cp.Competition.Schedule.Start)
             .Select(cp => new UpcomingEventDto
             {
                 CompetitionId = cp.CompetitionId,
                 CompetitionName = cp.Competition.Name,
-                StartTime = cp.Competition.StartTime,
+                StartTime = cp.Competition.Schedule.Start,
                 RoleInCompetition = "Uczestnik",
                 Status = cp.Competition.Status
             });
 
         var upcomingOrganizing = userCompetitionsAsOrganizer
-            .Where(c => c.StartTime > now && (c.Status == CompetitionStatus.Scheduled || c.Status == CompetitionStatus.AcceptingRegistrations))
-            .OrderBy(c => c.StartTime)
+            .Where(c => c.Schedule.Start > now && (c.Status == CompetitionStatus.Scheduled || c.Status == CompetitionStatus.AcceptingRegistrations))
+            .OrderBy(c => c.Schedule.Start)
             .Select(c => new UpcomingEventDto
             {
                 CompetitionId = c.Id,
                 CompetitionName = c.Name,
-                StartTime = c.StartTime,
+                StartTime = c.Schedule.Start,
                 RoleInCompetition = "Organizator",
                 Status = c.Status
             });

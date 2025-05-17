@@ -38,11 +38,11 @@ public class GetFisheryDetailsQueryHandler : IRequestHandler<GetFisheryDetailsQu
                 Id = definedSpecies.Id,
                 Name = definedSpecies.Name,
                 CatchesCount = catchesOfThisSpecies.Count,
-                AverageLength = catchesOfThisSpecies.Any(c => c.Length.HasValue)
-                    ? Math.Round(catchesOfThisSpecies.Average(c => c.Length ?? 0), 2)
+                AverageLength = catchesOfThisSpecies.Any(c => c.Length != null)
+                    ? Math.Round(catchesOfThisSpecies.Average(c => c.Length?.Value ?? 0), 2)
                     : null,
-                AverageWeight = catchesOfThisSpecies.Any(c => c.Weight.HasValue)
-                    ? Math.Round(catchesOfThisSpecies.Average(c => c.Weight ?? 0), 3)
+                AverageWeight = catchesOfThisSpecies.Any(c => c.Weight != null)
+                    ? Math.Round(catchesOfThisSpecies.Average(c => c.Weight?.Value ?? 0), 3)
                     : null
             });
         }

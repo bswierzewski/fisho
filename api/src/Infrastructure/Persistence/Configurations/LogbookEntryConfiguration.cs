@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Fishio.Domain.ValueObjects;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Fishio.Infrastructure.Persistence.Configurations;
@@ -8,8 +9,18 @@ public class LogbookEntryConfiguration : IEntityTypeConfiguration<LogbookEntry>
     public void Configure(EntityTypeBuilder<LogbookEntry> builder)
     {
         builder.Property(e => e.ImageUrl).IsRequired();
-        builder.Property(e => e.Length).HasColumnType("decimal(6, 2)");
-        builder.Property(e => e.Weight).HasColumnType("decimal(7, 3)");
+
+        builder.Property(le => le.Length)
+               .HasConversion(
+                   l => l == null ? (decimal?)null : l.Value, // Do bazy
+                   value => value == null ? null : new FishLength(value.Value)) // Z bazy
+               .HasColumnName("LengthCm");
+
+        builder.Property(le => le.Weight)
+               .HasConversion(
+                   w => w == null ? (decimal?)null : w.Value,
+                   value => value == null ? null : new FishWeight(value.Value))
+               .HasColumnName("WeightKg");
 
         builder.HasOne(d => d.User)
             .WithMany(p => p.LogbookEntries)
