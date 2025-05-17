@@ -26,5 +26,10 @@ public class CompetitionFishCatchConfiguration : IEntityTypeConfiguration<Compet
                   .WithMany(p => p.JudgedFishCatches)
                   .HasForeignKey(d => d.JudgeId)
                   .OnDelete(DeleteBehavior.Restrict); // Nie usuwaj sędziego, jeśli ma zgłoszenia
-      }
+
+            builder.HasOne(d => d.FishSpecies)
+                    .WithMany()
+                    .HasForeignKey(d => d.FishSpeciesId)
+                    .OnDelete(DeleteBehavior.Restrict); // Nie usuwaj gatunku, jeśli istnieją zgłoszenia połowów tego gatunku
+    }
 }
