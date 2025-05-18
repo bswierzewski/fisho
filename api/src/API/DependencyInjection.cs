@@ -24,34 +24,7 @@ public static class DependencyInjection
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options =>
         {
-            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Fishio API", Version = "v1" });
-
-            // Definicja schematu zabezpieczeń JWT dla Swaggera
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                In = ParameterLocation.Header,
-                Description = "Please enter a valid JWT token. Example: \"Bearer {token}\"",
-                Name = "Authorization",
-                Type = SecuritySchemeType.Http, // Zmieniono z ApiKey na Http dla schematu Bearer
-                BearerFormat = "JWT",
-                Scheme = "Bearer" // Jawne określenie schematu
-            });
-
-            // Wymaganie schematu zabezpieczeń dla wszystkich endpointów (można to dostosować)
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer" // Musi pasować do Id z AddSecurityDefinition
-                        }
-                    },
-                    Array.Empty<string>() // Pusta lista stringów
-                }
-            });
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Fishio API", Version = "v1" });          
         });
 
         // --- Konfiguracja Zachowania API ---

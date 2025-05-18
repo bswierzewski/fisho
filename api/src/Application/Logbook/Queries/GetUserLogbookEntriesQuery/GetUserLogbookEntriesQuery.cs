@@ -1,6 +1,6 @@
 ﻿namespace Fishio.Application.Logbook.Queries.ListLogbookEntries;
 
-public class GetUserLogbookEntriesQuery : IRequest<PaginatedList<LogbookEntryDto>>
+public class GetUserLogbookEntriesQuery : IRequest<PaginatedList<UserLogbookEntryDto>>
 {
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
@@ -21,7 +21,7 @@ public class ListLogbookEntriesQueryValidator : AbstractValidator<GetUserLogbook
 }
 
 // Możemy użyć record dla DTO, jeśli preferujemy zwięzłość i niemutowalność
-public record LogbookEntryDto
+public record UserLogbookEntryDto
 {
     public int Id { get; init; }
     public string ImageUrl { get; init; } = string.Empty;

@@ -26,12 +26,12 @@ public static class LogbookEndpoints
 
         group.MapGet("/", GetCurrentUserLogbookEntries)
             .WithName(nameof(GetCurrentUserLogbookEntries))
-            .Produces<PaginatedList<Application.Logbook.Queries.ListLogbookEntries.LogbookEntryDto>>(StatusCodes.Status200OK)
+            .Produces<PaginatedList<UserLogbookEntryDto>>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status401Unauthorized);
 
         group.MapGet("/{id:int}", GetLogbookEntryDetailsById) // Zmieniono nazwę metody
             .WithName(nameof(GetLogbookEntryDetailsById))
-            .Produces<Application.LogbookEntries.Queries.GetLogbookEntryById.LogbookEntryDto>(StatusCodes.Status200OK)
+            .Produces<LogbookEntryDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound) // Jeśli handler zwróci null
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status403Forbidden); // Jeśli handler rzuci Forbidden
