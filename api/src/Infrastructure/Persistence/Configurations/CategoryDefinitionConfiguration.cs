@@ -1,7 +1,6 @@
 ﻿using Fishio.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Fishio.Infrastructure.Persistence.Configurations;
 
@@ -12,22 +11,30 @@ public class CategoryDefinitionConfiguration : IEntityTypeConfiguration<Category
         builder.HasKey(cd => cd.Id);
 
         builder.Property(cd => cd.Name)
-            .HasMaxLength(255)
-            .IsRequired();
+            .IsRequired()
+            .HasMaxLength(150);
+        builder.HasIndex(cd => cd.Name).IsUnique(false); // Nazwa może nie być unikalna globalnie, jeśli np. użytkownicy tworzą swoje
 
-        builder.Property(cd => cd.Description).HasColumnType("text");
+        builder.Property(cd => cd.Description)
+            .HasMaxLength(1000);
+
+        builder.Property(cd => cd.IsGlobal).IsRequired();
+
+        // Konfiguracja BaseAuditableEntity
+        builder.Property(cd => cd.Created).IsRequired();
+        builder.Property(cd => cd.LastModified).IsRequired();
 
         builder.Property(cd => cd.Type)
-            .HasConversion(new EnumToStringConverter<CategoryType>());
+            .HasConversion<string>();
 
         builder.Property(cd => cd.Metric)
-            .HasConversion(new EnumToStringConverter<CategoryMetric>());
+            .HasConversion<string>();
 
         builder.Property(cd => cd.CalculationLogic)
-            .HasConversion(new EnumToStringConverter<CategoryCalculationLogic>());
+            .HasConversion<string>();
 
         builder.Property(cd => cd.EntityType)
-            .HasConversion(new EnumToStringConverter<CategoryEntityType>());
+            .HasConversion<string>();
 
         // --- HasData ---
         builder.HasData(

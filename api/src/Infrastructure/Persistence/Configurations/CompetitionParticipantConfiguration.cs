@@ -7,13 +7,40 @@ public class CompetitionParticipantConfiguration : IEntityTypeConfiguration<Comp
 {
     public void Configure(EntityTypeBuilder<CompetitionParticipant> builder)
     {
-        builder.Property(e => e.Role).IsRequired().HasMaxLength(50);
-        builder.HasIndex(e => new { e.CompetitionId, e.UserId }).IsUnique().HasFilter("\"UserId\" IS NOT NULL");
-        builder.HasIndex(e => new { e.CompetitionId, e.GuestIdentifier }).IsUnique().HasFilter("\"GuestIdentifier\" IS NOT NULL");
+        builder.HasKey(cp => cp.Id);
 
-        builder.HasOne(d => d.Competition)
-            .WithMany(p => p.Participants)
-            .HasForeignKey(d => d.CompetitionId)
-            .OnDelete(DeleteBehavior.Cascade); // If we delete the competition, we delete the participants
+        // Relacja z Competition
+        builder.HasOne(cp => cp.Competition)
+            .WithMany(c => c.Participants)
+            .HasForeignKey(cp => cp.CompetitionId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Relacja z User (opcjonalna, bo może być gość)
+        builder.HasOne(cp => cp.User)
+            .WithMany(u => u.CompetitionParticipations)
+            .HasForeignKey(cp => cp.UserId)
+            .OnDelete(DeleteBehavior.Restrict); // Jeśli User jest usuwany, a jest uczestnikiem, nie pozwól (lub Cascade jeśli to pożądane)
+
+        builder.Property(cp => cp.GuestName).HasMaxLength(200);
+        builder.Property(cp => cp.GuestIdentifier).HasMaxLength(100);
+
+        builder.Property(cp => cp.Role).IsRequired();
+        builder.Property(cp => cp.AddedByOrganizer).IsRequired();
+
+        // Unikalny indeks dla (CompetitionId, UserId) jeśli UserId nie jest null
+        builder.HasIndex(cp => new { cp.CompetitionId, cp.UserId })
+            .IsUnique()
+            .HasFilter("\"UserId\" IS NOT NULL");
+
+        // Unikalny indeks dla (CompetitionId, GuestIdentifier) jeśli GuestIdentifier nie jest null
+        builder.HasIndex(cp => new { cp.CompetitionId, cp.GuestIdentifier })
+            .IsUnique()
+            .HasFilter("\"GuestIdentifier\" IS NOT NULL");
+
+
+        // Konfiguracja BaseAuditableEntity
+        builder.Property(cp => cp.Created).IsRequired();
+        builder.Property(cp => cp.LastModified).IsRequired();
     }
 }

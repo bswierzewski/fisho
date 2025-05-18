@@ -12,7 +12,6 @@ public class FishSpecies : BaseEntity
     public virtual ICollection<CompetitionFishCatch> CompetitionFishCatches { get; private set; } = [];
     public virtual ICollection<CompetitionCategory> CompetitionCategories { get; private set; } = [];
 
-
     private FishSpecies() { } // Dla EF Core
 
     public FishSpecies(string name)

@@ -1,11 +1,20 @@
 ﻿namespace Fishio.Application.Fisheries.Commands.DeleteFishery;
 
-public record DeleteFisheryCommand(int Id) : IRequest<Unit>;
+public class DeleteFisheryCommand : IRequest<bool> // Zwraca bool wskazujący sukces
+{
+    public int Id { get; set; }
+
+    public DeleteFisheryCommand(int id)
+    {
+        Id = id;
+    }
+}
 
 public class DeleteFisheryCommandValidator : AbstractValidator<DeleteFisheryCommand>
 {
     public DeleteFisheryCommandValidator()
     {
-        RuleFor(v => v.Id).GreaterThan(0);
+        RuleFor(v => v.Id)
+            .NotEmpty().WithMessage("ID łowiska jest wymagane.");
     }
 }

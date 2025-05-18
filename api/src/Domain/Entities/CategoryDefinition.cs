@@ -12,6 +12,8 @@ public class CategoryDefinition : BaseAuditableEntity
     public bool RequiresSpecificFishSpecies { get; private set; }
     public bool AllowManualWinnerAssignment { get; private set; }
 
+    public virtual ICollection<CompetitionCategory> CompetitionCategories { get; private set; } = [];
+    
     // Prywatny konstruktor dla EF Core
     private CategoryDefinition() { }
 

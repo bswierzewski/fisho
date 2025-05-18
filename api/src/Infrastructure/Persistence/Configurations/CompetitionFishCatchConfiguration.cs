@@ -8,39 +8,60 @@ public class CompetitionFishCatchConfiguration : IEntityTypeConfiguration<Compet
 {
     public void Configure(EntityTypeBuilder<CompetitionFishCatch> builder)
     {
-        builder.Property(e => e.ImageUrl).IsRequired();
-        builder.Property(e => e.FishSpeciesId).IsRequired();
+        builder.HasKey(cfc => cfc.Id);
 
+        // Relacja z Competition
+        builder.HasOne(cfc => cfc.Competition)
+            .WithMany(c => c.FishCatches)
+            .HasForeignKey(cfc => cfc.CompetitionId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Relacja z CompetitionParticipant
+        builder.HasOne(cfc => cfc.Participant)
+            .WithMany(cp => cp.FishCatches)
+            .HasForeignKey(cfc => cfc.ParticipantId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict); // Nie usuwaj połowu, jeśli uczestnik jest usuwany (lub Cascade)
+
+        // Relacja z User (Judge)
+        builder.HasOne(cfc => cfc.Judge)
+            .WithMany(u => u.JudgedFishCatches)
+            .HasForeignKey(cfc => cfc.JudgeId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict); // Nie usuwaj połowu, jeśli sędzia jest usuwany
+
+        // Relacja z FishSpecies
+        builder.HasOne(cfc => cfc.FishSpecies)
+            .WithMany(fs => fs.CompetitionFishCatches) // Dodaj ICollection<CompetitionFishCatch> CompetitionFishCatches w FishSpecies
+            .HasForeignKey(cfc => cfc.FishSpeciesId)
+            .IsRequired() // Zakładamy, że gatunek jest zawsze wymagany dla połowu w zawodach
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Konfiguracja Value Object FishLength
         builder.Property(cfc => cfc.Length)
-               .HasConversion(
-                   l => l == null ? (decimal?)null : l.Value,
-                   value => value == null ? null : new FishLength(value.Value))
-               .HasColumnName("LengthCm");
+            .HasConversion(
+                l => l == null ? (decimal?)null : l.Value,
+                value => value == null ? null : new FishLength(value.Value))
+            .HasColumnName("LengthCm")
+            .HasPrecision(7, 2);
 
+        // Konfiguracja Value Object FishWeight
         builder.Property(cfc => cfc.Weight)
-               .HasConversion(
-                   w => w == null ? (decimal?)null : w.Value,
-                   value => value == null ? null : new FishWeight(value.Value))
-               .HasColumnName("WeightKg");
+            .HasConversion(
+                w => w == null ? (decimal?)null : w.Value,
+                value => value == null ? null : new FishWeight(value.Value))
+            .HasColumnName("WeightKg")
+            .HasPrecision(7, 3);
 
-        builder.HasOne(d => d.Competition)
-                  .WithMany(p => p.FishCatches)
-                  .HasForeignKey(d => d.CompetitionId)
-                  .OnDelete(DeleteBehavior.Cascade); // Jeśli usuniemy zawody, usuwamy zgłoszenia
+        builder.Property(cfc => cfc.ImageUrl)
+            .IsRequired()
+            .HasMaxLength(2048);
 
-        builder.HasOne(d => d.Participant)
-              .WithMany(p => p.FishCatches)
-              .HasForeignKey(d => d.ParticipantId)
-              .OnDelete(DeleteBehavior.Cascade); // Jeśli usuniemy uczestnika z zawodów, usuwamy jego zgłoszenia
+        builder.Property(cfc => cfc.CatchTime).IsRequired();
 
-        builder.HasOne(d => d.Judge)
-              .WithMany(p => p.JudgedFishCatches)
-              .HasForeignKey(d => d.JudgeId)
-              .OnDelete(DeleteBehavior.Restrict); // Nie usuwaj sędziego, jeśli ma zgłoszenia
-
-        builder.HasOne(d => d.FishSpecies)
-                .WithMany()
-                .HasForeignKey(d => d.FishSpeciesId)
-                .OnDelete(DeleteBehavior.Restrict); // Nie usuwaj gatunku, jeśli istnieją zgłoszenia połowów tego gatunku
+        // Konfiguracja BaseAuditableEntity
+        builder.Property(cfc => cfc.Created).IsRequired();
+        builder.Property(cfc => cfc.LastModified).IsRequired();
     }
 }

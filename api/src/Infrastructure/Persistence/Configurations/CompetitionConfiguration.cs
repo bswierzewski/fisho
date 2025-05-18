@@ -1,7 +1,5 @@
-﻿using Fishio.Domain.Enums;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Fishio.Infrastructure.Persistence.Configurations;
 
@@ -12,38 +10,72 @@ public class CompetitionConfiguration : IEntityTypeConfiguration<Competition>
         builder.HasKey(c => c.Id);
 
         builder.Property(c => c.Name)
-            .HasMaxLength(255)
-            .IsRequired();
+            .IsRequired()
+            .HasMaxLength(250);
 
-        builder.Property(c => c.ResultsToken)
-            .HasMaxLength(64)
-            .IsRequired();
-        builder.HasIndex(c => c.ResultsToken).IsUnique();
-
-        builder.Property(c => c.Rules).HasColumnType("text");
-        builder.Property(c => c.ImageUrl).HasColumnType("text");
-
-        builder.Property(c => c.Type)
-            .HasConversion(new EnumToStringConverter<CompetitionType>());
-
-        builder.Property(c => c.Status)
-            .HasConversion(new EnumToStringConverter<CompetitionStatus>());
-
+        // Konfiguracja Value Object DateTimeRange dla Schedule
         builder.OwnsOne(c => c.Schedule, scheduleBuilder =>
         {
-            scheduleBuilder.Property(s => s.Start).HasColumnName("StartTime");
-            scheduleBuilder.Property(s => s.End).HasColumnName("EndTime");
+            scheduleBuilder.Property(s => s.Start)
+                .HasColumnName("StartTime")
+                .IsRequired();
+            scheduleBuilder.Property(s => s.End)
+                .HasColumnName("EndTime")
+                .IsRequired();
         });
 
-        builder.HasOne(c => c.Fishery)
-               .WithMany(f => f.Competitions)
-               .HasForeignKey(c => c.FisheryId)
-               .IsRequired(); // Jawne określenie, że relacja jest wymagana
+        builder.Property(c => c.Rules)
+            .HasColumnType("text"); // Dla długiego tekstu regulaminu
 
+        builder.Property(c => c.Type)
+            .HasConversion<string>()
+            .IsRequired();
+
+        builder.Property(c => c.Status)
+            .HasConversion<string>()
+            .IsRequired();
+
+        builder.Property(c => c.ImageUrl)
+            .HasMaxLength(2048);
+
+        builder.Property(c => c.ResultsToken)
+            .IsRequired()
+            .HasMaxLength(64);
+        builder.HasIndex(c => c.ResultsToken).IsUnique();
+
+        // Relacja z User (Organizer)
         builder.HasOne(c => c.Organizer)
-            .WithMany()
+            .WithMany(u => u.OrganizedCompetitions)
             .HasForeignKey(c => c.OrganizerId)
-            .OnDelete(DeleteBehavior.Cascade); // Jeśli usuniemy organizatora, jego zawody też
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict); // Nie można usunąć organizatora, jeśli ma zawody
+
+        // Relacja z Fishery
+        builder.HasOne(c => c.Fishery)
+            .WithMany(f => f.Competitions)
+            .HasForeignKey(c => c.FisheryId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict); // Nie można usunąć łowiska, jeśli są na nim zawody
+
+        // Relacje z kolekcjami (CompetitionCategory, CompetitionParticipant, CompetitionFishCatch)
+        // są konfigurowane przez EF Core jako one-to-many z odpowiednimi FK w encjach "many".
+        // Użycie prywatnych pól dla kolekcji:
+        builder.Navigation(c => c.Categories)
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .HasField("_categories");
+
+        builder.Navigation(c => c.Participants)
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .HasField("_participants");
+
+        builder.Navigation(c => c.FishCatches)
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .HasField("_fishCatches");
+
+
+        // Konfiguracja BaseAuditableEntity
+        builder.Property(c => c.Created).IsRequired();
+        builder.Property(c => c.LastModified).IsRequired();
 
     }
 }

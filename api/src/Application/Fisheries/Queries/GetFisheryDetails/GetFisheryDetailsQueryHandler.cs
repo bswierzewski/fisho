@@ -4,7 +4,7 @@ public class GetFisheryDetailsQueryHandler : IRequestHandler<GetFisheryDetailsQu
 {
     private readonly IApplicationDbContext _context;
 
-    public GetFisheryDetailsQueryHandler(IApplicationDbContext context, IMapper mapper)
+    public GetFisheryDetailsQueryHandler(IApplicationDbContext context)
     {
         _context = context;
     }

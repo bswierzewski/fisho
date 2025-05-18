@@ -1,9 +1,6 @@
 ﻿namespace Fishio.Application.Fisheries.Queries.GetFisheryDetails;
 
-public record GetFisheryDetailsQuery : IRequest<FisheryDetailsDto>
-{
-    public int Id { get; init; }
-}
+public record GetFisheryDetailsQuery(int Id) : IRequest<FisheryDetailsDto>;
 
 public class GetFisheryDetailsQueryValidator : AbstractValidator<GetFisheryDetailsQuery>
 {

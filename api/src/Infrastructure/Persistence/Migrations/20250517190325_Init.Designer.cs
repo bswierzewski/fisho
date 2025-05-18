@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250517111935_Init")]
+    [Migration("20250517190325_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -25,7 +25,22 @@ namespace Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("CategoryDefinition", b =>
+            modelBuilder.Entity("FisheryFishSpecies", b =>
+                {
+                    b.Property<int>("FisheryId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FishSpeciesId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("FisheryId", "FishSpeciesId");
+
+                    b.HasIndex("FishSpeciesId");
+
+                    b.ToTable("FisheryFishSpecies", (string)null);
+                });
+
+            modelBuilder.Entity("Fishio.Domain.Entities.CategoryDefinition", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -47,7 +62,8 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
 
                     b.Property<string>("EntityType")
                         .IsRequired()
@@ -68,8 +84,8 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
 
                     b.Property<bool>("RequiresSpecificFishSpecies")
                         .HasColumnType("boolean");
@@ -79,6 +95,8 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name");
 
                     b.ToTable("CategoryDefinitions");
 
@@ -235,21 +253,6 @@ namespace Infrastructure.Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("FishSpeciesFishery", b =>
-                {
-                    b.Property<int>("FishSpeciesId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("FisheriesId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("FishSpeciesId", "FisheriesId");
-
-                    b.HasIndex("FisheriesId");
-
-                    b.ToTable("FishSpeciesFishery");
-                });
-
             modelBuilder.Entity("Fishio.Domain.Entities.Competition", b =>
                 {
                     b.Property<int>("Id")
@@ -264,14 +267,12 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("integer");
 
-                    b.Property<DateTimeOffset>("EndTime")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int>("FisheryId")
                         .HasColumnType("integer");
 
                     b.Property<string>("ImageUrl")
-                        .HasColumnType("text");
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
 
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("timestamp with time zone");
@@ -279,13 +280,10 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<int?>("LastModifiedBy")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Location")
-                        .HasColumnType("text");
-
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
 
                     b.Property<int>("OrganizerId")
                         .HasColumnType("integer");
@@ -298,9 +296,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<string>("Rules")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("StartTime")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
@@ -308,9 +303,6 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -320,8 +312,6 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasIndex("ResultsToken")
                         .IsUnique();
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Competitions");
                 });
@@ -347,17 +337,20 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("CustomDescriptionOverride")
-                        .HasColumnType("text");
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
 
                     b.Property<string>("CustomNameOverride")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
 
                     b.Property<int?>("FishSpeciesId")
                         .HasColumnType("integer");
 
                     b.Property<bool>("IsEnabled")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("IsPrimaryScoring")
                         .HasColumnType("boolean");
@@ -369,7 +362,9 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int>("MaxWinnersToDisplay")
-                        .HasColumnType("integer");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
 
                     b.Property<int>("SortOrder")
                         .HasColumnType("integer");
@@ -378,9 +373,9 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasIndex("CategoryDefinitionId");
 
-                    b.HasIndex("CompetitionId");
-
                     b.HasIndex("FishSpeciesId");
+
+                    b.HasIndex("CompetitionId", "SortOrder");
 
                     b.ToTable("CompetitionCategories");
                 });
@@ -410,7 +405,8 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
 
                     b.Property<int>("JudgeId")
                         .HasColumnType("integer");
@@ -422,13 +418,17 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.Property<decimal?>("Length")
-                        .HasColumnType("decimal(6, 2)");
+                        .HasPrecision(7, 2)
+                        .HasColumnType("numeric(7,2)")
+                        .HasColumnName("LengthCm");
 
                     b.Property<int>("ParticipantId")
                         .HasColumnType("integer");
 
                     b.Property<decimal?>("Weight")
-                        .HasColumnType("decimal(7, 3)");
+                        .HasPrecision(7, 3)
+                        .HasColumnType("numeric(7,3)")
+                        .HasColumnName("WeightKg");
 
                     b.HasKey("Id");
 
@@ -464,10 +464,12 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("GuestIdentifier")
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("GuestName")
-                        .HasColumnType("text");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("timestamp with time zone");
@@ -476,7 +478,6 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int>("Role")
-                        .HasMaxLength(50)
                         .HasColumnType("integer");
 
                     b.Property<int?>("UserId")
@@ -507,8 +508,8 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -516,58 +517,6 @@ namespace Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("FishSpecies");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Szczupak"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Okoń"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Sandacz"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Karp"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "Leszcz"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Name = "Płoć"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Name = "Lin"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Name = "Sum"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Name = "Węgorz"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Name = "Pstrąg potokowy"
-                        });
                 });
 
             modelBuilder.Entity("Fishio.Domain.Entities.Fishery", b =>
@@ -585,7 +534,8 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("ImageUrl")
-                        .HasColumnType("text");
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
 
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("timestamp with time zone");
@@ -594,12 +544,13 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Location")
-                        .HasColumnType("text");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<int?>("UserId")
                         .HasColumnType("integer");
@@ -628,8 +579,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("integer");
 
-                    b.Property<int>("FishSpeciesId")
-                        .HasMaxLength(255)
+                    b.Property<int?>("FishSpeciesId")
                         .HasColumnType("integer");
 
                     b.Property<int?>("FisheryId")
@@ -637,7 +587,8 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
 
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("timestamp with time zone");
@@ -646,16 +597,21 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.Property<decimal?>("Length")
-                        .HasColumnType("decimal(6, 2)");
+                        .HasPrecision(7, 2)
+                        .HasColumnType("numeric(7,2)")
+                        .HasColumnName("LengthCm");
 
                     b.Property<string>("Notes")
-                        .HasColumnType("text");
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.Property<decimal?>("Weight")
-                        .HasColumnType("decimal(7, 3)");
+                        .HasPrecision(7, 3)
+                        .HasColumnType("numeric(7,3)")
+                        .HasColumnName("WeightKg");
 
                     b.HasKey("Id");
 
@@ -678,7 +634,8 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Property<string>("ClerkUserId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
@@ -687,11 +644,12 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)");
 
                     b.Property<string>("ImageUrl")
-                        .HasColumnType("text");
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
 
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("timestamp with time zone");
@@ -701,8 +659,8 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.HasKey("Id");
 
@@ -716,7 +674,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("FishSpeciesFishery", b =>
+            modelBuilder.Entity("FisheryFishSpecies", b =>
                 {
                     b.HasOne("Fishio.Domain.Entities.FishSpecies", null)
                         .WithMany()
@@ -726,7 +684,7 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasOne("Fishio.Domain.Entities.Fishery", null)
                         .WithMany()
-                        .HasForeignKey("FisheriesId")
+                        .HasForeignKey("FisheryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -736,28 +694,48 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasOne("Fishio.Domain.Entities.Fishery", "Fishery")
                         .WithMany("Competitions")
                         .HasForeignKey("FisheryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Fishio.Domain.Entities.User", "Organizer")
-                        .WithMany()
+                        .WithMany("OrganizedCompetitions")
                         .HasForeignKey("OrganizerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Fishio.Domain.Entities.User", null)
-                        .WithMany("OrganizedCompetitions")
-                        .HasForeignKey("UserId");
+                    b.OwnsOne("Fishio.Domain.ValueObjects.DateTimeRange", "Schedule", b1 =>
+                        {
+                            b1.Property<int>("CompetitionId")
+                                .HasColumnType("integer");
+
+                            b1.Property<DateTimeOffset>("End")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("EndTime");
+
+                            b1.Property<DateTimeOffset>("Start")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("StartTime");
+
+                            b1.HasKey("CompetitionId");
+
+                            b1.ToTable("Competitions");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CompetitionId");
+                        });
 
                     b.Navigation("Fishery");
 
                     b.Navigation("Organizer");
+
+                    b.Navigation("Schedule")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Fishio.Domain.Entities.CompetitionCategory", b =>
                 {
-                    b.HasOne("CategoryDefinition", "CategoryDefinition")
-                        .WithMany()
+                    b.HasOne("Fishio.Domain.Entities.CategoryDefinition", "CategoryDefinition")
+                        .WithMany("CompetitionCategories")
                         .HasForeignKey("CategoryDefinitionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -769,8 +747,9 @@ namespace Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.HasOne("Fishio.Domain.Entities.FishSpecies", "FishSpecies")
-                        .WithMany()
-                        .HasForeignKey("FishSpeciesId");
+                        .WithMany("CompetitionCategories")
+                        .HasForeignKey("FishSpeciesId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("CategoryDefinition");
 
@@ -788,9 +767,9 @@ namespace Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.HasOne("Fishio.Domain.Entities.FishSpecies", "FishSpecies")
-                        .WithMany()
+                        .WithMany("CompetitionFishCatches")
                         .HasForeignKey("FishSpeciesId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Fishio.Domain.Entities.User", "Judge")
@@ -802,7 +781,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.HasOne("Fishio.Domain.Entities.CompetitionParticipant", "Participant")
                         .WithMany("FishCatches")
                         .HasForeignKey("ParticipantId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Competition");
@@ -824,7 +803,8 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasOne("Fishio.Domain.Entities.User", "User")
                         .WithMany("CompetitionParticipations")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Competition");
 
@@ -835,7 +815,8 @@ namespace Infrastructure.Persistence.Migrations
                 {
                     b.HasOne("Fishio.Domain.Entities.User", "User")
                         .WithMany("CreatedFisheries")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("User");
                 });
@@ -843,10 +824,9 @@ namespace Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Fishio.Domain.Entities.LogbookEntry", b =>
                 {
                     b.HasOne("Fishio.Domain.Entities.FishSpecies", "FishSpecies")
-                        .WithMany()
+                        .WithMany("LogbookEntries")
                         .HasForeignKey("FishSpeciesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Fishio.Domain.Entities.Fishery", "Fishery")
                         .WithMany("LogbookEntries")
@@ -866,6 +846,11 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Fishio.Domain.Entities.CategoryDefinition", b =>
+                {
+                    b.Navigation("CompetitionCategories");
+                });
+
             modelBuilder.Entity("Fishio.Domain.Entities.Competition", b =>
                 {
                     b.Navigation("Categories");
@@ -878,6 +863,15 @@ namespace Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Fishio.Domain.Entities.CompetitionParticipant", b =>
                 {
                     b.Navigation("FishCatches");
+                });
+
+            modelBuilder.Entity("Fishio.Domain.Entities.FishSpecies", b =>
+                {
+                    b.Navigation("CompetitionCategories");
+
+                    b.Navigation("CompetitionFishCatches");
+
+                    b.Navigation("LogbookEntries");
                 });
 
             modelBuilder.Entity("Fishio.Domain.Entities.Fishery", b =>

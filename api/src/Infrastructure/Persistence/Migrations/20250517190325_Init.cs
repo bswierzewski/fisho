@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -20,8 +19,8 @@ namespace Infrastructure.Persistence.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
                     IsGlobal = table.Column<bool>(type: "boolean", nullable: false),
                     Type = table.Column<string>(type: "text", nullable: false),
                     Metric = table.Column<string>(type: "text", nullable: false),
@@ -45,7 +44,7 @@ namespace Infrastructure.Persistence.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false)
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -58,10 +57,10 @@ namespace Infrastructure.Persistence.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ClerkUserId = table.Column<string>(type: "text", nullable: false),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    ImageUrl = table.Column<string>(type: "text", nullable: true),
+                    ClerkUserId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Email = table.Column<string>(type: "character varying(254)", maxLength: 254, nullable: true),
+                    ImageUrl = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<int>(type: "integer", nullable: true),
                     LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -78,9 +77,9 @@ namespace Infrastructure.Persistence.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    ImageUrl = table.Column<string>(type: "text", nullable: true),
-                    Location = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    ImageUrl = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
+                    Location = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     UserId = table.Column<int>(type: "integer", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<int>(type: "integer", nullable: true),
@@ -94,7 +93,8 @@ namespace Infrastructure.Persistence.Migrations
                         name: "FK_Fisheries_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -103,18 +103,16 @@ namespace Infrastructure.Persistence.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Name = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: false),
                     StartTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     EndTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Location = table.Column<string>(type: "text", nullable: true),
                     Rules = table.Column<string>(type: "text", nullable: true),
                     Type = table.Column<string>(type: "text", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
-                    ImageUrl = table.Column<string>(type: "text", nullable: true),
+                    ImageUrl = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
                     ResultsToken = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     OrganizerId = table.Column<int>(type: "integer", nullable: false),
                     FisheryId = table.Column<int>(type: "integer", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<int>(type: "integer", nullable: true),
                     LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -128,39 +126,34 @@ namespace Infrastructure.Persistence.Migrations
                         column: x => x.FisheryId,
                         principalTable: "Fisheries",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Competitions_Users_OrganizerId",
                         column: x => x.OrganizerId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Competitions_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "FishSpeciesFishery",
+                name: "FisheryFishSpecies",
                 columns: table => new
                 {
-                    FishSpeciesId = table.Column<int>(type: "integer", nullable: false),
-                    FisheriesId = table.Column<int>(type: "integer", nullable: false)
+                    FisheryId = table.Column<int>(type: "integer", nullable: false),
+                    FishSpeciesId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FishSpeciesFishery", x => new { x.FishSpeciesId, x.FisheriesId });
+                    table.PrimaryKey("PK_FisheryFishSpecies", x => new { x.FisheryId, x.FishSpeciesId });
                     table.ForeignKey(
-                        name: "FK_FishSpeciesFishery_FishSpecies_FishSpeciesId",
+                        name: "FK_FisheryFishSpecies_FishSpecies_FishSpeciesId",
                         column: x => x.FishSpeciesId,
                         principalTable: "FishSpecies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_FishSpeciesFishery_Fisheries_FisheriesId",
-                        column: x => x.FisheriesId,
+                        name: "FK_FisheryFishSpecies_Fisheries_FisheryId",
+                        column: x => x.FisheryId,
                         principalTable: "Fisheries",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -173,12 +166,12 @@ namespace Infrastructure.Persistence.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<int>(type: "integer", nullable: false),
-                    ImageUrl = table.Column<string>(type: "text", nullable: false),
+                    ImageUrl = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
                     CatchTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Length = table.Column<decimal>(type: "numeric(6,2)", nullable: true),
-                    Weight = table.Column<decimal>(type: "numeric(7,3)", nullable: true),
-                    Notes = table.Column<string>(type: "text", nullable: true),
-                    FishSpeciesId = table.Column<int>(type: "integer", maxLength: 255, nullable: false),
+                    LengthCm = table.Column<decimal>(type: "numeric(7,2)", precision: 7, scale: 2, nullable: true),
+                    WeightKg = table.Column<decimal>(type: "numeric(7,3)", precision: 7, scale: 3, nullable: true),
+                    Notes = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
+                    FishSpeciesId = table.Column<int>(type: "integer", nullable: true),
                     FisheryId = table.Column<int>(type: "integer", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<int>(type: "integer", nullable: true),
@@ -193,7 +186,7 @@ namespace Infrastructure.Persistence.Migrations
                         column: x => x.FishSpeciesId,
                         principalTable: "FishSpecies",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_LogbookEntries_Fisheries_FisheryId",
                         column: x => x.FisheryId,
@@ -217,12 +210,12 @@ namespace Infrastructure.Persistence.Migrations
                     CompetitionId = table.Column<int>(type: "integer", nullable: false),
                     CategoryDefinitionId = table.Column<int>(type: "integer", nullable: false),
                     FishSpeciesId = table.Column<int>(type: "integer", nullable: true),
-                    CustomNameOverride = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    CustomDescriptionOverride = table.Column<string>(type: "text", nullable: true),
+                    CustomNameOverride = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: true),
+                    CustomDescriptionOverride = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
                     SortOrder = table.Column<int>(type: "integer", nullable: false),
                     IsPrimaryScoring = table.Column<bool>(type: "boolean", nullable: false),
-                    MaxWinnersToDisplay = table.Column<int>(type: "integer", nullable: false),
-                    IsEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    MaxWinnersToDisplay = table.Column<int>(type: "integer", nullable: false, defaultValue: 1),
+                    IsEnabled = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<int>(type: "integer", nullable: true),
                     LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -247,7 +240,8 @@ namespace Infrastructure.Persistence.Migrations
                         name: "FK_CompetitionCategories_FishSpecies_FishSpeciesId",
                         column: x => x.FishSpeciesId,
                         principalTable: "FishSpecies",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -258,9 +252,9 @@ namespace Infrastructure.Persistence.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     CompetitionId = table.Column<int>(type: "integer", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: true),
-                    GuestName = table.Column<string>(type: "text", nullable: true),
-                    GuestIdentifier = table.Column<string>(type: "text", nullable: true),
-                    Role = table.Column<int>(type: "integer", maxLength: 50, nullable: false),
+                    GuestName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    GuestIdentifier = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    Role = table.Column<int>(type: "integer", nullable: false),
                     AddedByOrganizer = table.Column<bool>(type: "boolean", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<int>(type: "integer", nullable: true),
@@ -280,7 +274,8 @@ namespace Infrastructure.Persistence.Migrations
                         name: "FK_CompetitionParticipants_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -293,9 +288,9 @@ namespace Infrastructure.Persistence.Migrations
                     ParticipantId = table.Column<int>(type: "integer", nullable: false),
                     JudgeId = table.Column<int>(type: "integer", nullable: false),
                     FishSpeciesId = table.Column<int>(type: "integer", nullable: false),
-                    Length = table.Column<decimal>(type: "numeric(6,2)", nullable: true),
-                    Weight = table.Column<decimal>(type: "numeric(7,3)", nullable: true),
-                    ImageUrl = table.Column<string>(type: "text", nullable: false),
+                    LengthCm = table.Column<decimal>(type: "numeric(7,2)", precision: 7, scale: 2, nullable: true),
+                    WeightKg = table.Column<decimal>(type: "numeric(7,3)", precision: 7, scale: 3, nullable: true),
+                    ImageUrl = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
                     CatchTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<int>(type: "integer", nullable: true),
@@ -310,7 +305,7 @@ namespace Infrastructure.Persistence.Migrations
                         column: x => x.ParticipantId,
                         principalTable: "CompetitionParticipants",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_CompetitionFishCatches_Competitions_CompetitionId",
                         column: x => x.CompetitionId,
@@ -322,7 +317,7 @@ namespace Infrastructure.Persistence.Migrations
                         column: x => x.FishSpeciesId,
                         principalTable: "FishSpecies",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_CompetitionFishCatches_Users_JudgeId",
                         column: x => x.JudgeId,
@@ -348,22 +343,10 @@ namespace Infrastructure.Persistence.Migrations
                     { 14, false, "MaxValue", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Nagroda dla uczestnika, który złowił najwięcej różnych gatunków ryb.", "ParticipantAggregateCatches", true, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "SpeciesVariety", "Największa Różnorodność Gatunków", false, "SpecialAchievement" }
                 });
 
-            migrationBuilder.InsertData(
-                table: "FishSpecies",
-                columns: new[] { "Id", "Name" },
-                values: new object[,]
-                {
-                    { 1, "Szczupak" },
-                    { 2, "Okoń" },
-                    { 3, "Sandacz" },
-                    { 4, "Karp" },
-                    { 5, "Leszcz" },
-                    { 6, "Płoć" },
-                    { 7, "Lin" },
-                    { 8, "Sum" },
-                    { 9, "Węgorz" },
-                    { 10, "Pstrąg potokowy" }
-                });
+            migrationBuilder.CreateIndex(
+                name: "IX_CategoryDefinitions_Name",
+                table: "CategoryDefinitions",
+                column: "Name");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CompetitionCategories_CategoryDefinitionId",
@@ -371,9 +354,9 @@ namespace Infrastructure.Persistence.Migrations
                 column: "CategoryDefinitionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CompetitionCategories_CompetitionId",
+                name: "IX_CompetitionCategories_CompetitionId_SortOrder",
                 table: "CompetitionCategories",
-                column: "CompetitionId");
+                columns: new[] { "CompetitionId", "SortOrder" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_CompetitionCategories_FishSpeciesId",
@@ -436,25 +419,20 @@ namespace Infrastructure.Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Competitions_UserId",
-                table: "Competitions",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Fisheries_UserId",
                 table: "Fisheries",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FisheryFishSpecies_FishSpeciesId",
+                table: "FisheryFishSpecies",
+                column: "FishSpeciesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FishSpecies_Name",
                 table: "FishSpecies",
                 column: "Name",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FishSpeciesFishery_FisheriesId",
-                table: "FishSpeciesFishery",
-                column: "FisheriesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LogbookEntries_FisheryId",
@@ -495,7 +473,7 @@ namespace Infrastructure.Persistence.Migrations
                 name: "CompetitionFishCatches");
 
             migrationBuilder.DropTable(
-                name: "FishSpeciesFishery");
+                name: "FisheryFishSpecies");
 
             migrationBuilder.DropTable(
                 name: "LogbookEntries");

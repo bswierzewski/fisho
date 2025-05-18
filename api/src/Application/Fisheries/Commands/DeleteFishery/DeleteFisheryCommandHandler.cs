@@ -2,10 +2,11 @@
 
 namespace Fishio.Application.Fisheries.Commands.DeleteFishery;
 
-public class DeleteFisheryCommandHandler : IRequestHandler<DeleteFisheryCommand, Unit>
+public class DeleteFisheryCommandHandler : IRequestHandler<DeleteFisheryCommand, bool>
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUserService _currentUserService;
+    // private readonly IImageStorageService _imageStorageService; // Jeśli chcesz usuwać zdjęcie
 
     public DeleteFisheryCommandHandler(IApplicationDbContext context, ICurrentUserService currentUserService)
     {
@@ -13,29 +14,39 @@ public class DeleteFisheryCommandHandler : IRequestHandler<DeleteFisheryCommand,
         _currentUserService = currentUserService;
     }
 
-    public async Task<Unit> Handle(DeleteFisheryCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeleteFisheryCommand request, CancellationToken cancellationToken)
     {
-        var fishery = await _context.Fisheries
+        var fisheryToDelete = await _context.Fisheries
+            .Include(f => f.Competitions) // Sprawdź, czy nie ma powiązanych zawodów
             .FirstOrDefaultAsync(f => f.Id == request.Id, cancellationToken);
 
-        if (fishery == null)
+        if (fisheryToDelete == null)
+        {
             throw new NotFoundException(nameof(Fishery), request.Id.ToString());
+        }
 
-        var currentUserId = _currentUserService.UserId;
-        if (fishery.UserId != currentUserId /* && !currentUserService.IsAdmin */)
+        var currentUser = await _currentUserService.GetOrProvisionDomainUserAsync(cancellationToken);
+        if (fisheryToDelete.UserId != currentUser?.Id /* && !currentUser.IsAdmin */)
+        {
             throw new ForbiddenAccessException();
+        }
 
-        // Optional validation: Check if the fishery is used in LogbookEntries
-        // bool isUsedInLogbook = await _context.LogbookEntries.AnyAsync(le => le.FisheryId == request.Id, cancellationToken);
-        // if (isUsedInLogbook)
+        // Sprawdzenie reguł biznesowych przed usunięciem
+        if (fisheryToDelete.Competitions.Any())
+        {
+            // Zamiast rzucać wyjątek, można zwrócić Result.Failure lub podobny mechanizm
+            throw new InvalidOperationException("Nie można usunąć łowiska, ponieważ są z nim powiązane zawody. Najpierw usuń lub odłącz zawody.");
+        }
+
+        // Opcjonalnie: usuń zdjęcie z IImageStorageService, jeśli istnieje
+        // if (!string.IsNullOrEmpty(fisheryToDelete.ImageUrl))
         // {
-        //     throw new DeleteFailureException(nameof(Domain.Entities.Fishery), request.Id, "Nie można usunąć łowiska, ponieważ jest powiązane z wpisami w dzienniku.");
+        //     await _imageStorageService.DeleteImageAsync(fisheryToDelete.ImagePublicId);
         // }
 
-        _context.Fisheries.Remove(fishery);
+        _context.Fisheries.Remove(fisheryToDelete);
+        var result = await _context.SaveChangesAsync(cancellationToken);
 
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return Unit.Value;
+        return result > 0;
     }
 }
