@@ -1,49 +1,63 @@
 namespace Fishio.Application.Dashboard.Queries.GetDashboardData;
 
-public record GetDashboardDataQuery : IRequest<DashboardDataDto>;
-
-public class DashboardDataDto
+public class GetDashboardDataQuery : IRequest<DashboardDto>
 {
-    public UserSummaryDto UserSummary { get; set; } = new();
-    public CompetitionSummaryDto CompetitionSummary { get; set; } = new();
-    public LogbookSummaryDto LogbookSummary { get; set; } = new();
-    public List<UpcomingEventDto> UpcomingEvents { get; set; } = new();
+    private const int DefaultPageSize = 5;
+    private const int MaxPageSize = 20; // Maksymalna liczba elementów, jaką można zażądać
+
+    private int _maxRecentItems = DefaultPageSize;
+    public int? MaxRecentItems
+    {
+        get => _maxRecentItems;
+        set => _maxRecentItems = (value.HasValue && value.Value > 0 && value.Value <= MaxPageSize) ? value.Value : DefaultPageSize;
+    }
+
+    private int _maxFeaturedItems = DefaultPageSize;
+    public int? MaxFeaturedItems
+    {
+        get => _maxFeaturedItems;
+        set => _maxFeaturedItems = (value.HasValue && value.Value > 0 && value.Value <= MaxPageSize) ? value.Value : DefaultPageSize;
+    }
 }
 
-public class UserSummaryDto
+// Używamy record dla DTOs, ponieważ są to proste nośniki danych
+public record DashboardCompetitionSummaryDto
 {
-    public string UserName { get; set; } = string.Empty;
-    // Można dodać więcej informacji o użytkowniku, jeśli potrzebne
+    public int Id { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public DateTimeOffset StartTime { get; init; }
+    public CompetitionStatus Status { get; init; }
+    public string? FisheryName { get; init; } // Nazwa łowiska
+    public bool IsOrganizer { get; init; }
+    public bool IsJudge { get; init; }
+    public bool IsParticipant { get; init; }
 }
 
-public class CompetitionSummaryDto
+public record DashboardLogbookSummaryDto
 {
-    public int ParticipatingCount { get; set; }
-    public int OrganizingCount { get; set; }
+    public int Id { get; init; }
+    public string ImageUrl { get; init; } = string.Empty;
+    public DateTimeOffset CatchTime { get; init; }
+    public string? FishSpeciesName { get; init; }
+    public decimal? LengthInCm { get; init; }
+    public decimal? WeightInKg { get; init; }
 }
 
-public class LogbookSummaryDto
+public record DashboardFisherySummaryDto
 {
-    public int TotalLogbookEntries { get; set; }
-    public int TotalFishCaughtInLogbook { get; set; } // Przykładowa statystyka
-    public List<RecentLogbookEntryDto> RecentEntries { get; set; } = new();
+    public int Id { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public string? Location { get; init; }
+    public string? ImageUrl { get; init; }
+    public int FishSpeciesCount { get; init; }
 }
 
-public class RecentLogbookEntryDto
+public record DashboardDto
 {
-    public int Id { get; set; }
-    public required string SpeciesName { get; set; }
-    public DateTimeOffset CatchTime { get; set; }
-    public decimal? LengthCm { get; set; }
-    public decimal? WeightKg { get; set; }
-    public string? FisheryName { get; set; } // Opcjonalnie
-}
-
-public class UpcomingEventDto // Może to być zarówno zawody, w których uczestniczy, jak i te, które organizuje
-{
-    public int CompetitionId { get; set; }
-    public required string CompetitionName { get; set; }
-    public DateTimeOffset StartTime { get; set; }
-    public string RoleInCompetition { get; set; } = string.Empty; // Np. "Organizator", "Uczestnik"
-    public Domain.Enums.CompetitionStatus Status { get; set; }
+    public string UserName { get; init; } = string.Empty;
+    public List<DashboardCompetitionSummaryDto> MyUpcomingCompetitions { get; init; } = new(); // Zawody, w których biorę udział lub organizuję/sędziuję, które się jeszcze nie odbyły lub trwają
+    public List<DashboardCompetitionSummaryDto> MyRecentCompetitions { get; init; } = new(); // Ostatnie zakończone zawody, w których brałem udział
+    public List<DashboardLogbookSummaryDto> RecentLogbookEntries { get; init; } = new(); // Ostatnie 3-5 wpisów
+    public List<DashboardCompetitionSummaryDto> OpenCompetitions { get; init; } = new(); // Kilka otwartych zawodów do odkrycia
+    public List<DashboardFisherySummaryDto> FeaturedFisheries { get; init; } = new(); // Kilka łowisk do odkrycia
 }

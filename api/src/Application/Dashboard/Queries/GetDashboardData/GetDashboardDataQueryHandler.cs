@@ -1,112 +1,146 @@
 namespace Fishio.Application.Dashboard.Queries.GetDashboardData;
 
-public class GetDashboardDataQueryHandler : IRequestHandler<GetDashboardDataQuery, DashboardDataDto>
+public class GetDashboardDataQueryHandler : IRequestHandler<GetDashboardDataQuery, DashboardDto>
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUserService _currentUserService;
+    private readonly TimeProvider _timeProvider;
 
     public GetDashboardDataQueryHandler(
         IApplicationDbContext context,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        TimeProvider timeProvider)
     {
         _context = context;
         _currentUserService = currentUserService;
+        _timeProvider = timeProvider;
     }
 
-    public async Task<DashboardDataDto> Handle(GetDashboardDataQuery request, CancellationToken cancellationToken)
+    public async Task<DashboardDto> Handle(GetDashboardDataQuery request, CancellationToken cancellationToken)
     {
-        var userId = _currentUserService.UserId;
-        if (userId == null)
+        var currentUser = await _currentUserService.GetOrProvisionDomainUserAsync(cancellationToken);
+        if (currentUser == null || currentUser.Id == 0)
         {
-            // Powinno być obsługiwane przez autoryzację, ale jako zabezpieczenie
-            throw new UnauthorizedAccessException("Użytkownik nie jest zalogowany.");
+            throw new UnauthorizedAccessException("Użytkownik nie jest zidentyfikowany lub nie istnieje w domenie.");
         }
 
-        var dashboardDto = new DashboardDataDto();
-
-        // 1. User Summary
-        var user = await _context.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
-        if (user != null)
+        var dashboardDto = new DashboardDto
         {
-            dashboardDto.UserSummary.UserName = user.Name;
-        }
+            UserName = currentUser.Name
+        };
 
-        // 2. Competition Summary
-        var now = DateTimeOffset.UtcNow;
+        var now = _timeProvider.GetUtcNow();
 
-        var userCompetitionsAsParticipant = await _context.CompetitionParticipants
+        // 1. Moje Zawody
+        var userCompetitionsQuery = _context.CompetitionParticipants
             .AsNoTracking()
-            .Where(cp => cp.UserId == userId)
-            .Include(cp => cp.Competition)
-            .ToListAsync(cancellationToken);
-
-        var userCompetitionsAsOrganizer = await _context.Competitions
-            .AsNoTracking()
-            .Where(c => c.OrganizerId == userId)
-            .ToListAsync(cancellationToken);
-
-        dashboardDto.CompetitionSummary.ParticipatingCount = userCompetitionsAsParticipant
-            .Count(cp => cp.Competition.Status != CompetitionStatus.Draft && cp.Competition.Status != CompetitionStatus.Cancelled);
-
-        dashboardDto.CompetitionSummary.OrganizingCount = userCompetitionsAsOrganizer
-            .Count(c => c.Status != CompetitionStatus.Draft && c.Status != CompetitionStatus.Cancelled);
-
-
-        // 3. Upcoming Events (np. 3 najbliższe)
-        var upcomingParticipating = userCompetitionsAsParticipant
-            .Where(cp => cp.Competition.Schedule.Start > now && (cp.Competition.Status == CompetitionStatus.Scheduled || cp.Competition.Status == CompetitionStatus.AcceptingRegistrations))
-            .OrderBy(cp => cp.Competition.Schedule.Start)
-            .Select(cp => new UpcomingEventDto
+            .Where(cp => cp.UserId == currentUser.Id)
+            .Select(cp => new
             {
-                CompetitionId = cp.CompetitionId,
-                CompetitionName = cp.Competition.Name,
-                StartTime = cp.Competition.Schedule.Start,
-                RoleInCompetition = "Uczestnik",
-                Status = cp.Competition.Status
+                Competition = cp.Competition,
+                cp.Competition.Fishery,
+                Role = cp.Role
             });
 
-        var upcomingOrganizing = userCompetitionsAsOrganizer
-            .Where(c => c.Schedule.Start > now && (c.Status == CompetitionStatus.Scheduled || c.Status == CompetitionStatus.AcceptingRegistrations))
-            .OrderBy(c => c.Schedule.Start)
-            .Select(c => new UpcomingEventDto
-            {
-                CompetitionId = c.Id,
-                CompetitionName = c.Name,
-                StartTime = c.Schedule.Start,
-                RoleInCompetition = "Organizator",
-                Status = c.Status
-            });
+        var allMyCompetitions = await userCompetitionsQuery
+            .OrderByDescending(x => x.Competition.Schedule.Start)
+            .ToListAsync(cancellationToken);
 
-        dashboardDto.UpcomingEvents = upcomingParticipating
-            .Concat(upcomingOrganizing)
-            .OrderBy(e => e.StartTime)
-            .Take(3) // Weź 3 najbliższe
-            .ToList();
+        dashboardDto.MyUpcomingCompetitions.AddRange(
+            allMyCompetitions
+                .Where(x => x.Competition.Status == CompetitionStatus.Upcoming ||
+                              x.Competition.Status == CompetitionStatus.Ongoing ||
+                              x.Competition.Status == CompetitionStatus.AcceptingRegistrations ||
+                              x.Competition.Status == CompetitionStatus.Scheduled)
+                .Take(request.MaxRecentItems) // Użycie wartości z requestu
+                .Select(x => new DashboardCompetitionSummaryDto
+                {
+                    Id = x.Competition.Id,
+                    Name = x.Competition.Name,
+                    StartTime = x.Competition.Schedule.Start,
+                    Status = x.Competition.Status,
+                    FisheryName = x.Fishery?.Name,
+                    IsOrganizer = x.Role == ParticipantRole.Organizer || x.Competition.OrganizerId == currentUser.Id,
+                    IsJudge = x.Role == ParticipantRole.Judge,
+                    IsParticipant = x.Role == ParticipantRole.Competitor
+                }));
 
-        // 4. Logbook Summary
-        var userLogbookEntries = await _context.LogbookEntries
+        dashboardDto.MyRecentCompetitions.AddRange(
+            allMyCompetitions
+                .Where(x => x.Competition.Status == CompetitionStatus.Finished)
+                .OrderByDescending(x => x.Competition.Schedule.End)
+                .Take(request.MaxRecentItems) // Użycie wartości z requestu
+                .Select(x => new DashboardCompetitionSummaryDto
+                {
+                    Id = x.Competition.Id,
+                    Name = x.Competition.Name,
+                    StartTime = x.Competition.Schedule.Start,
+                    Status = x.Competition.Status,
+                    FisheryName = x.Fishery?.Name,
+                    IsOrganizer = x.Role == ParticipantRole.Organizer || x.Competition.OrganizerId == currentUser.Id,
+                    IsJudge = x.Role == ParticipantRole.Judge,
+                    IsParticipant = x.Role == ParticipantRole.Competitor
+                }));
+
+        // 2. Ostatnie Połowy (z Dziennika)
+        var recentLogbookEntries = await _context.LogbookEntries
             .AsNoTracking()
-            .Where(le => le.UserId == userId)
-            .Include(le => le.Fishery) // Opcjonalnie, jeśli chcesz nazwę łowiska
+            .Where(le => le.UserId == currentUser.Id)
             .OrderByDescending(le => le.CatchTime)
-            .ToListAsync(cancellationToken);
-
-        dashboardDto.LogbookSummary.TotalLogbookEntries = userLogbookEntries.Count;
-        dashboardDto.LogbookSummary.TotalFishCaughtInLogbook = userLogbookEntries.Count; // Prosta suma, można rozbudować o sumę wag/długości jeśli są zawsze podawane
-
-        dashboardDto.LogbookSummary.RecentEntries = userLogbookEntries
-            .Take(3) // Weź 3 ostatnie
-            .Select(le => new RecentLogbookEntryDto
+            .Take(request.MaxRecentItems) // Użycie wartości z requestu
+            .Include(le => le.FishSpecies)
+            .Select(le => new DashboardLogbookSummaryDto
             {
                 Id = le.Id,
-                SpeciesName = le.FishSpecies?.Name ?? "",
+                ImageUrl = le.ImageUrl,
                 CatchTime = le.CatchTime,
-                LengthCm = le.Length,
-                WeightKg = le.Weight,
-                FisheryName = le.Fishery?.Name
-            }).ToList();
+                FishSpeciesName = le.FishSpecies != null ? le.FishSpecies.Name : null,
+                LengthInCm = le.Length != null ? le.Length.Value : (decimal?)null,
+                WeightInKg = le.Weight != null ? le.Weight.Value : (decimal?)null
+            })
+            .ToListAsync(cancellationToken);
+        dashboardDto.RecentLogbookEntries.AddRange(recentLogbookEntries);
+
+        // 3. Odkryj Otwarte Zawody
+        var openCompetitions = await _context.Competitions
+            .AsNoTracking()
+            .Where(c => (c.Type == CompetitionType.Public) &&
+                        (c.Status == CompetitionStatus.AcceptingRegistrations || c.Status == CompetitionStatus.Upcoming || c.Status == CompetitionStatus.Scheduled) &&
+                        c.OrganizerId != currentUser.Id &&
+                        !c.Participants.Any(p => p.UserId == currentUser.Id))
+            .OrderBy(c => c.Schedule.Start)
+            .Take(request.MaxFeaturedItems) // Użycie wartości z requestu
+            .Include(c => c.Fishery)
+            .Select(c => new DashboardCompetitionSummaryDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                StartTime = c.Schedule.Start,
+                Status = c.Status,
+                FisheryName = c.Fishery != null ? c.Fishery.Name : null,
+                IsOrganizer = false,
+                IsJudge = false,
+                IsParticipant = false
+            })
+            .ToListAsync(cancellationToken);
+        dashboardDto.OpenCompetitions.AddRange(openCompetitions);
+
+        // 4. Lista Łowisk (Polecane/Nowe)
+        var featuredFisheries = await _context.Fisheries
+            .AsNoTracking()
+            .OrderByDescending(f => f.Created)
+            .Take(request.MaxFeaturedItems) // Użycie wartości z requestu
+            .Include(f => f.FishSpecies)
+            .Select(f => new DashboardFisherySummaryDto
+            {
+                Id = f.Id,
+                Name = f.Name,
+                Location = f.Location,
+                ImageUrl = f.ImageUrl,
+                FishSpeciesCount = f.FishSpecies.Count
+            })
+            .ToListAsync(cancellationToken);
+        dashboardDto.FeaturedFisheries.AddRange(featuredFisheries);
 
         return dashboardDto;
     }

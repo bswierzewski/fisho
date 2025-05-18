@@ -1,4 +1,4 @@
-namespace Fishio.Application.About.Queries.GetApplicationInfo;
+﻿namespace Fishio.Application.About.Queries.GetApplicationInfo;
 
 public class GetApplicationInfoQueryHandler : IRequestHandler<GetApplicationInfoQuery, ApplicationInfoDto>
 {
@@ -17,22 +17,15 @@ public class GetApplicationInfoQueryHandler : IRequestHandler<GetApplicationInfo
         {
             Name = "Fishio",
             Version = "1.0.0",
-            Description = "Platform for organizing and participating in fishing competitions",
+            Description = "Platforma do organizowania i udziału w zawodach wędkarskich",
             Features = new()
             {
-                "Competition Management",
-                "Participant Management",
-                "Fish Catch Recording",
-                "Public Results",
-                "Personal Logbook",
-                "Fishery Management"
-            },
-            Technologies = new()
-            {
-                { "Backend", ".NET 9 (Minimal API)" },
-                { "Frontend", "Next.js (React, TypeScript, App Router)" },
-                { "Database", "PostgreSQL (Production), SQLite (Development)" },
-                { "Authentication", "Clerk" }
+                "Zarządzanie zawodami",
+                "Zarządzanie uczestnikami",
+                "Rejestracja złowionych ryb",
+                "Wyniki publiczne",
+                "Osobisty dziennik połowów",
+                "Zarządzanie łowiskami"
             },
             BuildInfo = buildInfo
         };

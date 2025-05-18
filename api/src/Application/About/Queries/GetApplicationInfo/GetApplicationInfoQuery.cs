@@ -8,7 +8,6 @@ public record ApplicationInfoDto
     public string Version { get; init; } = string.Empty;
     public string Description { get; init; } = string.Empty;
     public List<string> Features { get; init; } = new();
-    public Dictionary<string, string> Technologies { get; init; } = new();
     public BuildInformation BuildInfo { get; init; } = new();
 }
 
