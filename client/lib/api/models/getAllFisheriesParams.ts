@@ -6,7 +6,7 @@
  */
 
 export type GetAllFisheriesParams = {
-PageNumber: number;
-PageSize: number;
-SearchTerm?: string;
+  PageNumber: number;
+  PageSize: number;
+  SearchTerm?: string;
 };

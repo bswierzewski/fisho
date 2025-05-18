@@ -5,8 +5,7 @@
  * OpenAPI spec version: v1
  */
 
-export type CategoryCalculationLogic = typeof CategoryCalculationLogic[keyof typeof CategoryCalculationLogic];
-
+export type CategoryCalculationLogic = (typeof CategoryCalculationLogic)[keyof typeof CategoryCalculationLogic];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CategoryCalculationLogic = {
@@ -15,5 +14,5 @@ export const CategoryCalculationLogic = {
   NUMBER_2: 2,
   NUMBER_3: 3,
   NUMBER_4: 4,
-  NUMBER_5: 5,
+  NUMBER_5: 5
 } as const;

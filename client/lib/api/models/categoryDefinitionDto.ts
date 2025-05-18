@@ -4,10 +4,10 @@
  * Fishio API
  * OpenAPI spec version: v1
  */
-import type { CategoryType } from './categoryType';
-import type { CategoryMetric } from './categoryMetric';
 import type { CategoryCalculationLogic } from './categoryCalculationLogic';
 import type { CategoryEntityType } from './categoryEntityType';
+import type { CategoryMetric } from './categoryMetric';
+import type { CategoryType } from './categoryType';
 
 export interface CategoryDefinitionDto {
   id?: number;

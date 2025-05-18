@@ -5,13 +5,12 @@
  * OpenAPI spec version: v1
  */
 
-export type CategoryType = typeof CategoryType[keyof typeof CategoryType];
-
+export type CategoryType = (typeof CategoryType)[keyof typeof CategoryType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CategoryType = {
   NUMBER_1: 1,
   NUMBER_2: 2,
   NUMBER_3: 3,
-  NUMBER_4: 4,
+  NUMBER_4: 4
 } as const;

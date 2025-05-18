@@ -5,4 +5,6 @@
  * OpenAPI spec version: v1
  */
 
-export interface Void { [key: string]: unknown }
+export interface Void {
+  [key: string]: unknown;
+}

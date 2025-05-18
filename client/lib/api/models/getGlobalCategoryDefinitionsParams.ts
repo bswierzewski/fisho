@@ -7,5 +7,5 @@
 import type { CategoryType } from './categoryType';
 
 export type GetGlobalCategoryDefinitionsParams = {
-FilterByType?: CategoryType;
+  FilterByType?: CategoryType;
 };

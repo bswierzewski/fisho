@@ -5,8 +5,8 @@
  * OpenAPI spec version: v1
  */
 import type { DashboardCompetitionSummaryDto } from './dashboardCompetitionSummaryDto';
-import type { DashboardLogbookSummaryDto } from './dashboardLogbookSummaryDto';
 import type { DashboardFisherySummaryDto } from './dashboardFisherySummaryDto';
+import type { DashboardLogbookSummaryDto } from './dashboardLogbookSummaryDto';
 
 export interface DashboardDto {
   /** @nullable */

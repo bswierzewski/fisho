@@ -6,6 +6,6 @@
  */
 
 export type GetUserDashboardDataParams = {
-MaxRecentItems: number;
-MaxFeaturedItems: number;
+  MaxRecentItems: number;
+  MaxFeaturedItems: number;
 };

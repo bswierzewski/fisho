@@ -8,11 +8,11 @@ import type { CompetitionStatus } from './competitionStatus';
 import type { CompetitionType } from './competitionType';
 
 export type ListAvailableCompetitionsParams = {
-SearchTerm?: string;
-Status?: CompetitionStatus;
-Type?: CompetitionType;
-FromDate?: string;
-ToDate?: string;
-Page: number;
-PageSize: number;
+  SearchTerm?: string;
+  Status?: CompetitionStatus;
+  Type?: CompetitionType;
+  FromDate?: string;
+  ToDate?: string;
+  Page: number;
+  PageSize: number;
 };

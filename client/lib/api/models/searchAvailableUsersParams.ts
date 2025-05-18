@@ -6,6 +6,6 @@
  */
 
 export type SearchAvailableUsersParams = {
-SearchTerm?: string;
-MaxResults?: number;
+  SearchTerm?: string;
+  MaxResults?: number;
 };

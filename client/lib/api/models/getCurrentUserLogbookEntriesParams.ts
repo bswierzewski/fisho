@@ -6,6 +6,6 @@
  */
 
 export type GetCurrentUserLogbookEntriesParams = {
-PageNumber: number;
-PageSize: number;
+  PageNumber: number;
+  PageSize: number;
 };

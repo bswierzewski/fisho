@@ -5,8 +5,7 @@
  * OpenAPI spec version: v1
  */
 
-export type CompetitionStatus = typeof CompetitionStatus[keyof typeof CompetitionStatus];
-
+export type CompetitionStatus = (typeof CompetitionStatus)[keyof typeof CompetitionStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CompetitionStatus = {
@@ -17,5 +16,5 @@ export const CompetitionStatus = {
   NUMBER_4: 4,
   NUMBER_5: 5,
   NUMBER_6: 6,
-  NUMBER_7: 7,
+  NUMBER_7: 7
 } as const;

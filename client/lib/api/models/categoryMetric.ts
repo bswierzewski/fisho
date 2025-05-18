@@ -5,8 +5,7 @@
  * OpenAPI spec version: v1
  */
 
-export type CategoryMetric = typeof CategoryMetric[keyof typeof CategoryMetric];
-
+export type CategoryMetric = (typeof CategoryMetric)[keyof typeof CategoryMetric];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CategoryMetric = {
@@ -15,5 +14,5 @@ export const CategoryMetric = {
   NUMBER_2: 2,
   NUMBER_3: 3,
   NUMBER_4: 4,
-  NUMBER_5: 5,
+  NUMBER_5: 5
 } as const;

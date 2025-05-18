@@ -6,10 +6,11 @@ module.exports = {
       target: 'http://localhost:7000/swagger/v1/swagger.json'
     },
     output: {
-      mode: 'tags-split', // Dobre dla organizacji
+      mode: 'tags', // Dobre dla organizacji
       client: 'react-query', // Używamy TanStack Query (v4 lub v5)
       target: 'lib/api/endpoints', // Gdzie generować hooki i funkcje endpointów
       schemas: 'lib/api/models', // Gdzie generować typy/schematy
+      prettier: true, // Użyj Prettiera do formatowania
       override: {
         mutator: {
           path: 'lib/api/axios.ts', // Ścieżka do Twojego pliku
