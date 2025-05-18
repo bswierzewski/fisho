@@ -1,15 +1,20 @@
-namespace Fishio.Application.Logbook.Commands.DeleteLogbookEntry;
+﻿namespace Fishio.Application.LogbookEntries.Commands.DeleteLogbookEntry;
 
-public record DeleteLogbookEntryCommand : IRequest<Unit>
+public class DeleteLogbookEntryCommand : IRequest<bool> // Zwraca bool wskazujący sukces
 {
-    public int Id { get; init; }
+    public int Id { get; set; }
+
+    public DeleteLogbookEntryCommand(int id)
+    {
+        Id = id;
+    }
 }
 
 public class DeleteLogbookEntryCommandValidator : AbstractValidator<DeleteLogbookEntryCommand>
 {
     public DeleteLogbookEntryCommandValidator()
     {
-        RuleFor(x => x.Id)
-            .NotEmpty().WithMessage("Logbook entry ID is required");
+        RuleFor(v => v.Id)
+            .NotEmpty().WithMessage("ID wpisu jest wymagane.");
     }
-} 
+}

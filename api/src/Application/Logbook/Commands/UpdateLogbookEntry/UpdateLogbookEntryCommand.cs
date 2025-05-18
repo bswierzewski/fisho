@@ -1,42 +1,73 @@
-namespace Fishio.Application.Logbook.Commands.UpdateLogbookEntry;
+﻿using Microsoft.AspNetCore.Http; // Dla IFormFile
 
-public record UpdateLogbookEntryCommand : IRequest<Unit>
+namespace Fishio.Application.LogbookEntries.Commands.UpdateLogbookEntry;
+
+public class UpdateLogbookEntryCommand : IRequest<bool> // Zwraca bool wskazujący sukces
 {
-    public int LogbookEntryId { get; init; }
-    public int FisheryId { get; init; }
-    public int FishSpeciesId { get; init; }
-    public decimal Length { get; init; }
-    public decimal? Weight { get; init; }
-    public string? Notes { get; init; }
-    public DateTime CaughtAt { get; init; }
+    public int Id { get; set; } // ID wpisu do aktualizacji
+    public IFormFile? Image { get; set; } // Nowe zdjęcie (opcjonalne)
+    public bool RemoveCurrentImage { get; set; } = false;
+    public DateTimeOffset? CatchTime { get; set; }
+    public decimal? LengthInCm { get; set; }
+    public decimal? WeightInKg { get; set; }
+    public string? Notes { get; set; }
+    public int? FishSpeciesId { get; set; }
+    public int? FisheryId { get; set; }
 }
 
 public class UpdateLogbookEntryCommandValidator : AbstractValidator<UpdateLogbookEntryCommand>
 {
     public UpdateLogbookEntryCommandValidator()
     {
-        RuleFor(x => x.LogbookEntryId)
-            .NotEmpty().WithMessage("Logbook entry ID is required");
+        RuleFor(x => x.Id)
+            .NotEmpty().WithMessage("ID wpisu jest wymagane.");
 
-        RuleFor(x => x.FisheryId)
-            .NotEmpty().WithMessage("Fishery ID is required");
+        When(x => x.Image != null, () =>
+        {
+            RuleFor(x => x.Image)
+                .Must(BeAValidImage).WithMessage("Nieprawidłowy format zdjęcia lub za duży plik (max 5MB).");
+        });
 
-        RuleFor(x => x.FishSpeciesId)
-            .NotEmpty().WithMessage("Fish species ID is required");
+        RuleFor(x => x.CatchTime)
+            .LessThanOrEqualTo(DateTimeOffset.UtcNow.AddHours(1))
+            .When(x => x.CatchTime.HasValue)
+            .WithMessage("Czas połowu nie może być znacznie w przyszłości.");
 
-        RuleFor(x => x.Length)
-            .GreaterThan(0).WithMessage("Length must be greater than 0");
+        When(x => x.LengthInCm.HasValue, () =>
+        {
+            RuleFor(x => x.LengthInCm)
+                .GreaterThan(0).WithMessage("Długość musi być wartością dodatnią.")
+                .LessThanOrEqualTo(500).WithMessage("Długość nie może przekraczać 500 cm.");
+        });
 
-        RuleFor(x => x.Weight)
-            .GreaterThan(0).When(x => x.Weight.HasValue)
-            .WithMessage("Weight must be greater than 0 when provided");
+        When(x => x.WeightInKg.HasValue, () =>
+        {
+            RuleFor(x => x.WeightInKg)
+                .GreaterThan(0).WithMessage("Waga musi być wartością dodatnią.")
+                .LessThanOrEqualTo(200).WithMessage("Waga nie może przekraczać 200 kg.");
+        });
 
         RuleFor(x => x.Notes)
-            .MaximumLength(500).When(x => x.Notes != null)
-            .WithMessage("Notes cannot exceed 500 characters");
+            .MaximumLength(2000).WithMessage("Notatki nie mogą przekraczać 2000 znaków.");
 
-        RuleFor(x => x.CaughtAt)
-            .NotEmpty().WithMessage("Caught at date is required")
-            .LessThanOrEqualTo(DateTime.UtcNow).WithMessage("Caught at date cannot be in the future");
+        When(x => x.FishSpeciesId.HasValue, () =>
+        {
+            RuleFor(x => x.FishSpeciesId)
+                .GreaterThan(0).WithMessage("Nieprawidłowe ID gatunku ryby.");
+        });
+
+        When(x => x.FisheryId.HasValue, () =>
+        {
+            RuleFor(x => x.FisheryId)
+                .GreaterThan(0).WithMessage("Nieprawidłowe ID łowiska.");
+        });
     }
-} 
+
+    private bool BeAValidImage(IFormFile? file)
+    {
+        if (file == null || file.Length == 0) return true; // Opcjonalne, jeśli null - nie waliduj
+        if (file.Length > 5 * 1024 * 1024) return false; // Max 5MB
+        var allowedTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/webp" };
+        return allowedTypes.Contains(file.ContentType.ToLower());
+    }
+}

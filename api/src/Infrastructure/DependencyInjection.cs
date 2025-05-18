@@ -1,4 +1,5 @@
-﻿using Ardalis.GuardClauses;
+﻿using Application.Common.Interfaces.Services;
+using Ardalis.GuardClauses;
 using Fishio.Infrastructure.Services;
 using Infrastructure.Data.Interceptors;
 using Infrastructure.Persistence;
@@ -34,5 +35,6 @@ public static class DependencyInjection
 
         builder.Services.AddSingleton<IBuildInfoService, BuildInfoService>();
         builder.Services.AddSingleton(TimeProvider.System);
+        builder.Services.AddSingleton<IImageStorageService, ImageStorageService>();
     }
 }

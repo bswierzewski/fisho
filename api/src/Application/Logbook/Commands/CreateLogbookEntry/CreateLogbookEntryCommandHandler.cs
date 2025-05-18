@@ -1,45 +1,69 @@
-﻿using Fishio.Domain.ValueObjects;
+﻿using Application.Common.Interfaces.Services;
+using Fishio.Domain.ValueObjects; // Dla FishLength, FishWeight
 
-namespace Fishio.Application.Logbook.Commands.CreateLogbookEntry;
+namespace Fishio.Application.LogbookEntries.Commands.CreateLogbookEntry;
 
 public class CreateLogbookEntryCommandHandler : IRequestHandler<CreateLogbookEntryCommand, int>
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IImageStorageService _imageStorageService;
 
     public CreateLogbookEntryCommandHandler(
         IApplicationDbContext context,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        IImageStorageService imageStorageService)
     {
         _context = context;
         _currentUserService = currentUserService;
+        _imageStorageService = imageStorageService;
     }
 
     public async Task<int> Handle(CreateLogbookEntryCommand request, CancellationToken cancellationToken)
     {
-        var userId = _currentUserService.UserId;
-        if (!userId.HasValue)
+        // Używamy UserId (int?) z ICurrentUserService, który powinien być ustawiony przez middleware
+        var domainUserId = _currentUserService.UserId;
+
+        if (!domainUserId.HasValue || domainUserId.Value == 0)
         {
-            throw new UnauthorizedAccessException("Użytkownik musi być zalogowany, aby dodać wpis do dziennika.");
+            // Ten scenariusz nie powinien wystąpić, jeśli UserProvisioningMiddleware działa poprawnie
+            // i endpoint jest chroniony przez .RequireAuthorization().
+            // Jeśli jednak wystąpi, oznacza to problem z przepływem uwierzytelniania/provisioningu.
+            throw new UnauthorizedAccessException("Nie udało się zidentyfikować użytkownika domenowego.");
         }
 
+        ImageUploadResult imageResult;
+        await using (var memoryStream = new MemoryStream())
+        {
+            await request.Image.CopyToAsync(memoryStream, cancellationToken);
+            memoryStream.Position = 0;
+            imageResult = await _imageStorageService.UploadImageAsync(
+                memoryStream,
+                request.Image.FileName,
+                $"logbook/{domainUserId.Value}"); // Używamy domainUserId.Value
+        }
+
+        if (!imageResult.Success || string.IsNullOrEmpty(imageResult.Url))
+        {
+            throw new ApplicationException($"Nie udało się przesłać zdjęcia dla wpisu w dzienniku: {imageResult.ErrorMessage}");
+        }
+
+        FishLength? length = request.LengthInCm.HasValue ? new FishLength(request.LengthInCm.Value) : null;
+        FishWeight? weight = request.WeightInKg.HasValue ? new FishWeight(request.WeightInKg.Value) : null;
+
         var logbookEntry = new LogbookEntry(
-            userId.Value,
-            request.ImageUrl ?? "",
-            request.CaughtAt,
-            new FishLength(request.Length ?? 0),
-            new FishWeight(request.Weight ?? 0),
-            request.Notes,
-            request.FishSpeciesId,
-            request.FisheryId
+            userId: domainUserId.Value, // Używamy domainUserId.Value
+            imageUrl: imageResult.Url,
+            catchTime: request.CatchTime,
+            length: length,
+            weight: weight,
+            notes: request.Notes,
+            fishSpeciesId: request.FishSpeciesId,
+            fisheryId: request.FisheryId
         );
-        // Pola audytu (Created, CreatedBy etc.) zostaną ustawione przez BaseAuditableEntity
-        // lub można je ustawić tutaj, jeśli ICurrentUserService dostarcza CreatedBy
 
         _context.LogbookEntries.Add(logbookEntry);
-        // await _logbookRepository.AddAsync(logbookEntry, cancellationToken);
-
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken); // Interceptory zajmą się Created, CreatedBy itp.
 
         return logbookEntry.Id;
     }
