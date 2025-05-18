@@ -18,7 +18,6 @@ import type {
 } from '@tanstack/react-query';
 
 import { customInstance } from '../axios';
-import type { ErrorType } from '../axios';
 import type { DashboardDto, GetUserDashboardDataParams, ProblemDetails } from '../models';
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -37,7 +36,7 @@ export const getGetUserDashboardDataQueryKey = (params: GetUserDashboardDataPara
 
 export const getGetUserDashboardDataQueryOptions = <
   TData = Awaited<ReturnType<typeof getUserDashboardData>>,
-  TError = ErrorType<ProblemDetails>
+  TError = ProblemDetails
 >(
   params: GetUserDashboardDataParams,
   options?: {
@@ -60,11 +59,11 @@ export const getGetUserDashboardDataQueryOptions = <
 };
 
 export type GetUserDashboardDataQueryResult = NonNullable<Awaited<ReturnType<typeof getUserDashboardData>>>;
-export type GetUserDashboardDataQueryError = ErrorType<ProblemDetails>;
+export type GetUserDashboardDataQueryError = ProblemDetails;
 
 export function useGetUserDashboardData<
   TData = Awaited<ReturnType<typeof getUserDashboardData>>,
-  TError = ErrorType<ProblemDetails>
+  TError = ProblemDetails
 >(
   params: GetUserDashboardDataParams,
   options: {
@@ -83,7 +82,7 @@ export function useGetUserDashboardData<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetUserDashboardData<
   TData = Awaited<ReturnType<typeof getUserDashboardData>>,
-  TError = ErrorType<ProblemDetails>
+  TError = ProblemDetails
 >(
   params: GetUserDashboardDataParams,
   options?: {
@@ -102,7 +101,7 @@ export function useGetUserDashboardData<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetUserDashboardData<
   TData = Awaited<ReturnType<typeof getUserDashboardData>>,
-  TError = ErrorType<ProblemDetails>
+  TError = ProblemDetails
 >(
   params: GetUserDashboardDataParams,
   options?: {
@@ -114,7 +113,7 @@ export function useGetUserDashboardData<
 
 export function useGetUserDashboardData<
   TData = Awaited<ReturnType<typeof getUserDashboardData>>,
-  TError = ErrorType<ProblemDetails>
+  TError = ProblemDetails
 >(
   params: GetUserDashboardDataParams,
   options?: {

@@ -21,7 +21,6 @@ import type {
 } from '@tanstack/react-query';
 
 import { customInstance } from '../axios';
-import type { ErrorType } from '../axios';
 import type {
   CreateLogbookEntryCommand,
   GetCurrentUserLogbookEntriesParams,
@@ -69,7 +68,7 @@ export const createNewLogbookEntry = (
 };
 
 export const getCreateNewLogbookEntryMutationOptions = <
-  TError = ErrorType<HttpValidationProblemDetails | ProblemDetails>,
+  TError = HttpValidationProblemDetails | ProblemDetails,
   TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
@@ -106,12 +105,9 @@ export const getCreateNewLogbookEntryMutationOptions = <
 
 export type CreateNewLogbookEntryMutationResult = NonNullable<Awaited<ReturnType<typeof createNewLogbookEntry>>>;
 export type CreateNewLogbookEntryMutationBody = CreateLogbookEntryCommand;
-export type CreateNewLogbookEntryMutationError = ErrorType<HttpValidationProblemDetails | ProblemDetails>;
+export type CreateNewLogbookEntryMutationError = HttpValidationProblemDetails | ProblemDetails;
 
-export const useCreateNewLogbookEntry = <
-  TError = ErrorType<HttpValidationProblemDetails | ProblemDetails>,
-  TContext = unknown
->(
+export const useCreateNewLogbookEntry = <TError = HttpValidationProblemDetails | ProblemDetails, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof createNewLogbookEntry>>,
@@ -149,7 +145,7 @@ export const getGetCurrentUserLogbookEntriesQueryKey = (params: GetCurrentUserLo
 
 export const getGetCurrentUserLogbookEntriesQueryOptions = <
   TData = Awaited<ReturnType<typeof getCurrentUserLogbookEntries>>,
-  TError = ErrorType<ProblemDetails>
+  TError = ProblemDetails
 >(
   params: GetCurrentUserLogbookEntriesParams,
   options?: {
@@ -174,11 +170,11 @@ export const getGetCurrentUserLogbookEntriesQueryOptions = <
 export type GetCurrentUserLogbookEntriesQueryResult = NonNullable<
   Awaited<ReturnType<typeof getCurrentUserLogbookEntries>>
 >;
-export type GetCurrentUserLogbookEntriesQueryError = ErrorType<ProblemDetails>;
+export type GetCurrentUserLogbookEntriesQueryError = ProblemDetails;
 
 export function useGetCurrentUserLogbookEntries<
   TData = Awaited<ReturnType<typeof getCurrentUserLogbookEntries>>,
-  TError = ErrorType<ProblemDetails>
+  TError = ProblemDetails
 >(
   params: GetCurrentUserLogbookEntriesParams,
   options: {
@@ -197,7 +193,7 @@ export function useGetCurrentUserLogbookEntries<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetCurrentUserLogbookEntries<
   TData = Awaited<ReturnType<typeof getCurrentUserLogbookEntries>>,
-  TError = ErrorType<ProblemDetails>
+  TError = ProblemDetails
 >(
   params: GetCurrentUserLogbookEntriesParams,
   options?: {
@@ -216,7 +212,7 @@ export function useGetCurrentUserLogbookEntries<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetCurrentUserLogbookEntries<
   TData = Awaited<ReturnType<typeof getCurrentUserLogbookEntries>>,
-  TError = ErrorType<ProblemDetails>
+  TError = ProblemDetails
 >(
   params: GetCurrentUserLogbookEntriesParams,
   options?: {
@@ -228,7 +224,7 @@ export function useGetCurrentUserLogbookEntries<
 
 export function useGetCurrentUserLogbookEntries<
   TData = Awaited<ReturnType<typeof getCurrentUserLogbookEntries>>,
-  TError = ErrorType<ProblemDetails>
+  TError = ProblemDetails
 >(
   params: GetCurrentUserLogbookEntriesParams,
   options?: {
@@ -262,7 +258,7 @@ export const getGetLogbookEntryDetailsByIdQueryKey = (id: number) => {
 
 export const getGetLogbookEntryDetailsByIdQueryOptions = <
   TData = Awaited<ReturnType<typeof getLogbookEntryDetailsById>>,
-  TError = ErrorType<ProblemDetails | void>
+  TError = ProblemDetails | void
 >(
   id: number,
   options?: {
@@ -285,11 +281,11 @@ export const getGetLogbookEntryDetailsByIdQueryOptions = <
 };
 
 export type GetLogbookEntryDetailsByIdQueryResult = NonNullable<Awaited<ReturnType<typeof getLogbookEntryDetailsById>>>;
-export type GetLogbookEntryDetailsByIdQueryError = ErrorType<ProblemDetails | void>;
+export type GetLogbookEntryDetailsByIdQueryError = ProblemDetails | void;
 
 export function useGetLogbookEntryDetailsById<
   TData = Awaited<ReturnType<typeof getLogbookEntryDetailsById>>,
-  TError = ErrorType<ProblemDetails | void>
+  TError = ProblemDetails | void
 >(
   id: number,
   options: {
@@ -308,7 +304,7 @@ export function useGetLogbookEntryDetailsById<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetLogbookEntryDetailsById<
   TData = Awaited<ReturnType<typeof getLogbookEntryDetailsById>>,
-  TError = ErrorType<ProblemDetails | void>
+  TError = ProblemDetails | void
 >(
   id: number,
   options?: {
@@ -327,7 +323,7 @@ export function useGetLogbookEntryDetailsById<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetLogbookEntryDetailsById<
   TData = Awaited<ReturnType<typeof getLogbookEntryDetailsById>>,
-  TError = ErrorType<ProblemDetails | void>
+  TError = ProblemDetails | void
 >(
   id: number,
   options?: {
@@ -339,7 +335,7 @@ export function useGetLogbookEntryDetailsById<
 
 export function useGetLogbookEntryDetailsById<
   TData = Awaited<ReturnType<typeof getLogbookEntryDetailsById>>,
-  TError = ErrorType<ProblemDetails | void>
+  TError = ProblemDetails | void
 >(
   id: number,
   options?: {
@@ -400,7 +396,7 @@ export const updateExistingLogbookEntry = (
 };
 
 export const getUpdateExistingLogbookEntryMutationOptions = <
-  TError = ErrorType<HttpValidationProblemDetails | ProblemDetails>,
+  TError = HttpValidationProblemDetails | ProblemDetails,
   TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
@@ -439,10 +435,10 @@ export type UpdateExistingLogbookEntryMutationResult = NonNullable<
   Awaited<ReturnType<typeof updateExistingLogbookEntry>>
 >;
 export type UpdateExistingLogbookEntryMutationBody = UpdateLogbookEntryCommand;
-export type UpdateExistingLogbookEntryMutationError = ErrorType<HttpValidationProblemDetails | ProblemDetails>;
+export type UpdateExistingLogbookEntryMutationError = HttpValidationProblemDetails | ProblemDetails;
 
 export const useUpdateExistingLogbookEntry = <
-  TError = ErrorType<HttpValidationProblemDetails | ProblemDetails>,
+  TError = HttpValidationProblemDetails | ProblemDetails,
   TContext = unknown
 >(
   options?: {
@@ -469,10 +465,7 @@ export const deleteExistingLogbookEntry = (id: number, options?: SecondParameter
   return customInstance<void>({ url: `/api/logbook/${id}`, method: 'DELETE' }, options);
 };
 
-export const getDeleteExistingLogbookEntryMutationOptions = <
-  TError = ErrorType<ProblemDetails>,
-  TContext = unknown
->(options?: {
+export const getDeleteExistingLogbookEntryMutationOptions = <TError = ProblemDetails, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteExistingLogbookEntry>>,
     TError,
@@ -503,9 +496,9 @@ export type DeleteExistingLogbookEntryMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteExistingLogbookEntry>>
 >;
 
-export type DeleteExistingLogbookEntryMutationError = ErrorType<ProblemDetails>;
+export type DeleteExistingLogbookEntryMutationError = ProblemDetails;
 
-export const useDeleteExistingLogbookEntry = <TError = ErrorType<ProblemDetails>, TContext = unknown>(
+export const useDeleteExistingLogbookEntry = <TError = ProblemDetails, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof deleteExistingLogbookEntry>>,

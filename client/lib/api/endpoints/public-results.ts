@@ -18,7 +18,6 @@ import type {
 } from '@tanstack/react-query';
 
 import { customInstance } from '../axios';
-import type { ErrorType } from '../axios';
 import type { Void } from '../models';
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -37,7 +36,7 @@ export const getGetResultsByTokenQueryKey = (token: string) => {
 
 export const getGetResultsByTokenQueryOptions = <
   TData = Awaited<ReturnType<typeof getResultsByToken>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   token: string,
   options?: {
@@ -60,12 +59,9 @@ export const getGetResultsByTokenQueryOptions = <
 };
 
 export type GetResultsByTokenQueryResult = NonNullable<Awaited<ReturnType<typeof getResultsByToken>>>;
-export type GetResultsByTokenQueryError = ErrorType<unknown>;
+export type GetResultsByTokenQueryError = unknown;
 
-export function useGetResultsByToken<
-  TData = Awaited<ReturnType<typeof getResultsByToken>>,
-  TError = ErrorType<unknown>
->(
+export function useGetResultsByToken<TData = Awaited<ReturnType<typeof getResultsByToken>>, TError = unknown>(
   token: string,
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getResultsByToken>>, TError, TData>> &
@@ -81,10 +77,7 @@ export function useGetResultsByToken<
   },
   queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetResultsByToken<
-  TData = Awaited<ReturnType<typeof getResultsByToken>>,
-  TError = ErrorType<unknown>
->(
+export function useGetResultsByToken<TData = Awaited<ReturnType<typeof getResultsByToken>>, TError = unknown>(
   token: string,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getResultsByToken>>, TError, TData>> &
@@ -100,10 +93,7 @@ export function useGetResultsByToken<
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetResultsByToken<
-  TData = Awaited<ReturnType<typeof getResultsByToken>>,
-  TError = ErrorType<unknown>
->(
+export function useGetResultsByToken<TData = Awaited<ReturnType<typeof getResultsByToken>>, TError = unknown>(
   token: string,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getResultsByToken>>, TError, TData>>;
@@ -112,10 +102,7 @@ export function useGetResultsByToken<
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-export function useGetResultsByToken<
-  TData = Awaited<ReturnType<typeof getResultsByToken>>,
-  TError = ErrorType<unknown>
->(
+export function useGetResultsByToken<TData = Awaited<ReturnType<typeof getResultsByToken>>, TError = unknown>(
   token: string,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getResultsByToken>>, TError, TData>>;

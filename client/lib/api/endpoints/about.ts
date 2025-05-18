@@ -18,7 +18,6 @@ import type {
 } from '@tanstack/react-query';
 
 import { customInstance } from '../axios';
-import type { ErrorType } from '../axios';
 import type { ApplicationInfoDto } from '../models';
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -33,7 +32,7 @@ export const getGetApplicationInformationQueryKey = () => {
 
 export const getGetApplicationInformationQueryOptions = <
   TData = Awaited<ReturnType<typeof getApplicationInformation>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationInformation>>, TError, TData>>;
   request?: SecondParameter<typeof customInstance>;
@@ -53,11 +52,11 @@ export const getGetApplicationInformationQueryOptions = <
 };
 
 export type GetApplicationInformationQueryResult = NonNullable<Awaited<ReturnType<typeof getApplicationInformation>>>;
-export type GetApplicationInformationQueryError = ErrorType<unknown>;
+export type GetApplicationInformationQueryError = unknown;
 
 export function useGetApplicationInformation<
   TData = Awaited<ReturnType<typeof getApplicationInformation>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationInformation>>, TError, TData>> &
@@ -75,7 +74,7 @@ export function useGetApplicationInformation<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetApplicationInformation<
   TData = Awaited<ReturnType<typeof getApplicationInformation>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationInformation>>, TError, TData>> &
@@ -93,7 +92,7 @@ export function useGetApplicationInformation<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetApplicationInformation<
   TData = Awaited<ReturnType<typeof getApplicationInformation>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationInformation>>, TError, TData>>;
@@ -104,7 +103,7 @@ export function useGetApplicationInformation<
 
 export function useGetApplicationInformation<
   TData = Awaited<ReturnType<typeof getApplicationInformation>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getApplicationInformation>>, TError, TData>>;

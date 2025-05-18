@@ -18,7 +18,6 @@ import type {
 } from '@tanstack/react-query';
 
 import { customInstance } from '../axios';
-import type { ErrorType } from '../axios';
 import type { SearchAvailableUsersParams, Void } from '../models';
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -37,7 +36,7 @@ export const getSearchAvailableUsersQueryKey = (params?: SearchAvailableUsersPar
 
 export const getSearchAvailableUsersQueryOptions = <
   TData = Awaited<ReturnType<typeof searchAvailableUsers>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   params?: SearchAvailableUsersParams,
   options?: {
@@ -60,12 +59,9 @@ export const getSearchAvailableUsersQueryOptions = <
 };
 
 export type SearchAvailableUsersQueryResult = NonNullable<Awaited<ReturnType<typeof searchAvailableUsers>>>;
-export type SearchAvailableUsersQueryError = ErrorType<unknown>;
+export type SearchAvailableUsersQueryError = unknown;
 
-export function useSearchAvailableUsers<
-  TData = Awaited<ReturnType<typeof searchAvailableUsers>>,
-  TError = ErrorType<unknown>
->(
+export function useSearchAvailableUsers<TData = Awaited<ReturnType<typeof searchAvailableUsers>>, TError = unknown>(
   params: undefined | SearchAvailableUsersParams,
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof searchAvailableUsers>>, TError, TData>> &
@@ -81,10 +77,7 @@ export function useSearchAvailableUsers<
   },
   queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useSearchAvailableUsers<
-  TData = Awaited<ReturnType<typeof searchAvailableUsers>>,
-  TError = ErrorType<unknown>
->(
+export function useSearchAvailableUsers<TData = Awaited<ReturnType<typeof searchAvailableUsers>>, TError = unknown>(
   params?: SearchAvailableUsersParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof searchAvailableUsers>>, TError, TData>> &
@@ -100,10 +93,7 @@ export function useSearchAvailableUsers<
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useSearchAvailableUsers<
-  TData = Awaited<ReturnType<typeof searchAvailableUsers>>,
-  TError = ErrorType<unknown>
->(
+export function useSearchAvailableUsers<TData = Awaited<ReturnType<typeof searchAvailableUsers>>, TError = unknown>(
   params?: SearchAvailableUsersParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof searchAvailableUsers>>, TError, TData>>;
@@ -112,10 +102,7 @@ export function useSearchAvailableUsers<
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-export function useSearchAvailableUsers<
-  TData = Awaited<ReturnType<typeof searchAvailableUsers>>,
-  TError = ErrorType<unknown>
->(
+export function useSearchAvailableUsers<TData = Awaited<ReturnType<typeof searchAvailableUsers>>, TError = unknown>(
   params?: SearchAvailableUsersParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof searchAvailableUsers>>, TError, TData>>;

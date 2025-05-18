@@ -6,11 +6,12 @@
  */
 import type { ParticipantRole } from './participantRole';
 
-export interface AddParticipantCommand {
-  competitionId?: number;
+export interface CompetitionParticipantDto {
+  id?: number;
   /** @nullable */
   userId?: number | null;
   /** @nullable */
-  guestName?: string | null;
+  name?: string | null;
   role?: ParticipantRole;
+  addedByOrganizer?: boolean;
 }

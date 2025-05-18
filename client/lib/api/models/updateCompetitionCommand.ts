@@ -5,9 +5,9 @@
  * OpenAPI spec version: v1
  */
 import type { CompetitionType } from './competitionType';
-import type { SpecialCategoryDefinitionCommandDto } from './specialCategoryDefinitionCommandDto';
 
-export interface CreateCompetitionCommand {
+export interface UpdateCompetitionCommand {
+  id?: number;
   /** @nullable */
   name?: string | null;
   startTime?: string;
@@ -18,9 +18,5 @@ export interface CreateCompetitionCommand {
   type?: CompetitionType;
   /** @nullable */
   image?: Blob | null;
-  primaryScoringCategoryDefinitionId?: number;
-  /** @nullable */
-  primaryScoringFishSpeciesId?: number | null;
-  /** @nullable */
-  specialCategories?: SpecialCategoryDefinitionCommandDto[] | null;
+  removeCurrentImage?: boolean;
 }

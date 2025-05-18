@@ -21,7 +21,6 @@ import type {
 } from '@tanstack/react-query';
 
 import { customInstance } from '../axios';
-import type { ErrorType } from '../axios';
 import type {
   CreateFisheryCommand,
   FisheryDto,
@@ -46,10 +45,7 @@ export const getGetAllFisheriesQueryKey = (params: GetAllFisheriesParams) => {
   return [`/api/fisheries`, ...(params ? [params] : [])] as const;
 };
 
-export const getGetAllFisheriesQueryOptions = <
-  TData = Awaited<ReturnType<typeof getAllFisheries>>,
-  TError = ErrorType<unknown>
->(
+export const getGetAllFisheriesQueryOptions = <TData = Awaited<ReturnType<typeof getAllFisheries>>, TError = unknown>(
   params: GetAllFisheriesParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllFisheries>>, TError, TData>>;
@@ -71,9 +67,9 @@ export const getGetAllFisheriesQueryOptions = <
 };
 
 export type GetAllFisheriesQueryResult = NonNullable<Awaited<ReturnType<typeof getAllFisheries>>>;
-export type GetAllFisheriesQueryError = ErrorType<unknown>;
+export type GetAllFisheriesQueryError = unknown;
 
-export function useGetAllFisheries<TData = Awaited<ReturnType<typeof getAllFisheries>>, TError = ErrorType<unknown>>(
+export function useGetAllFisheries<TData = Awaited<ReturnType<typeof getAllFisheries>>, TError = unknown>(
   params: GetAllFisheriesParams,
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllFisheries>>, TError, TData>> &
@@ -89,7 +85,7 @@ export function useGetAllFisheries<TData = Awaited<ReturnType<typeof getAllFishe
   },
   queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetAllFisheries<TData = Awaited<ReturnType<typeof getAllFisheries>>, TError = ErrorType<unknown>>(
+export function useGetAllFisheries<TData = Awaited<ReturnType<typeof getAllFisheries>>, TError = unknown>(
   params: GetAllFisheriesParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllFisheries>>, TError, TData>> &
@@ -105,7 +101,7 @@ export function useGetAllFisheries<TData = Awaited<ReturnType<typeof getAllFishe
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetAllFisheries<TData = Awaited<ReturnType<typeof getAllFisheries>>, TError = ErrorType<unknown>>(
+export function useGetAllFisheries<TData = Awaited<ReturnType<typeof getAllFisheries>>, TError = unknown>(
   params: GetAllFisheriesParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllFisheries>>, TError, TData>>;
@@ -114,7 +110,7 @@ export function useGetAllFisheries<TData = Awaited<ReturnType<typeof getAllFishe
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-export function useGetAllFisheries<TData = Awaited<ReturnType<typeof getAllFisheries>>, TError = ErrorType<unknown>>(
+export function useGetAllFisheries<TData = Awaited<ReturnType<typeof getAllFisheries>>, TError = unknown>(
   params: GetAllFisheriesParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllFisheries>>, TError, TData>>;
@@ -168,7 +164,7 @@ export const createFishery = (
 };
 
 export const getCreateFisheryMutationOptions = <
-  TError = ErrorType<HttpValidationProblemDetails | ProblemDetails>,
+  TError = HttpValidationProblemDetails | ProblemDetails,
   TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
@@ -199,9 +195,9 @@ export const getCreateFisheryMutationOptions = <
 
 export type CreateFisheryMutationResult = NonNullable<Awaited<ReturnType<typeof createFishery>>>;
 export type CreateFisheryMutationBody = CreateFisheryCommand;
-export type CreateFisheryMutationError = ErrorType<HttpValidationProblemDetails | ProblemDetails>;
+export type CreateFisheryMutationError = HttpValidationProblemDetails | ProblemDetails;
 
-export const useCreateFishery = <TError = ErrorType<HttpValidationProblemDetails | ProblemDetails>, TContext = unknown>(
+export const useCreateFishery = <TError = HttpValidationProblemDetails | ProblemDetails, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof createFishery>>,
@@ -225,10 +221,7 @@ export const getGetFisheryByIdQueryKey = (id: number) => {
   return [`/api/fisheries/${id}`] as const;
 };
 
-export const getGetFisheryByIdQueryOptions = <
-  TData = Awaited<ReturnType<typeof getFisheryById>>,
-  TError = ErrorType<void>
->(
+export const getGetFisheryByIdQueryOptions = <TData = Awaited<ReturnType<typeof getFisheryById>>, TError = void>(
   id: number,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFisheryById>>, TError, TData>>;
@@ -250,9 +243,9 @@ export const getGetFisheryByIdQueryOptions = <
 };
 
 export type GetFisheryByIdQueryResult = NonNullable<Awaited<ReturnType<typeof getFisheryById>>>;
-export type GetFisheryByIdQueryError = ErrorType<void>;
+export type GetFisheryByIdQueryError = void;
 
-export function useGetFisheryById<TData = Awaited<ReturnType<typeof getFisheryById>>, TError = ErrorType<void>>(
+export function useGetFisheryById<TData = Awaited<ReturnType<typeof getFisheryById>>, TError = void>(
   id: number,
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFisheryById>>, TError, TData>> &
@@ -268,7 +261,7 @@ export function useGetFisheryById<TData = Awaited<ReturnType<typeof getFisheryBy
   },
   queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetFisheryById<TData = Awaited<ReturnType<typeof getFisheryById>>, TError = ErrorType<void>>(
+export function useGetFisheryById<TData = Awaited<ReturnType<typeof getFisheryById>>, TError = void>(
   id: number,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFisheryById>>, TError, TData>> &
@@ -284,7 +277,7 @@ export function useGetFisheryById<TData = Awaited<ReturnType<typeof getFisheryBy
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetFisheryById<TData = Awaited<ReturnType<typeof getFisheryById>>, TError = ErrorType<void>>(
+export function useGetFisheryById<TData = Awaited<ReturnType<typeof getFisheryById>>, TError = void>(
   id: number,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFisheryById>>, TError, TData>>;
@@ -293,7 +286,7 @@ export function useGetFisheryById<TData = Awaited<ReturnType<typeof getFisheryBy
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-export function useGetFisheryById<TData = Awaited<ReturnType<typeof getFisheryById>>, TError = ErrorType<void>>(
+export function useGetFisheryById<TData = Awaited<ReturnType<typeof getFisheryById>>, TError = void>(
   id: number,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFisheryById>>, TError, TData>>;
@@ -344,7 +337,7 @@ export const updateExistingFishery = (
 };
 
 export const getUpdateExistingFisheryMutationOptions = <
-  TError = ErrorType<HttpValidationProblemDetails | ProblemDetails>,
+  TError = HttpValidationProblemDetails | ProblemDetails,
   TContext = unknown
 >(options?: {
   mutation?: UseMutationOptions<
@@ -381,12 +374,9 @@ export const getUpdateExistingFisheryMutationOptions = <
 
 export type UpdateExistingFisheryMutationResult = NonNullable<Awaited<ReturnType<typeof updateExistingFishery>>>;
 export type UpdateExistingFisheryMutationBody = UpdateFisheryCommand;
-export type UpdateExistingFisheryMutationError = ErrorType<HttpValidationProblemDetails | ProblemDetails>;
+export type UpdateExistingFisheryMutationError = HttpValidationProblemDetails | ProblemDetails;
 
-export const useUpdateExistingFishery = <
-  TError = ErrorType<HttpValidationProblemDetails | ProblemDetails>,
-  TContext = unknown
->(
+export const useUpdateExistingFishery = <TError = HttpValidationProblemDetails | ProblemDetails, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof updateExistingFishery>>,
@@ -411,10 +401,7 @@ export const deleteExistingFishery = (id: number, options?: SecondParameter<type
   return customInstance<void>({ url: `/api/fisheries/${id}`, method: 'DELETE' }, options);
 };
 
-export const getDeleteExistingFisheryMutationOptions = <
-  TError = ErrorType<ProblemDetails>,
-  TContext = unknown
->(options?: {
+export const getDeleteExistingFisheryMutationOptions = <TError = ProblemDetails, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteExistingFishery>>, TError, { id: number }, TContext>;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<Awaited<ReturnType<typeof deleteExistingFishery>>, TError, { id: number }, TContext> => {
@@ -436,9 +423,9 @@ export const getDeleteExistingFisheryMutationOptions = <
 
 export type DeleteExistingFisheryMutationResult = NonNullable<Awaited<ReturnType<typeof deleteExistingFishery>>>;
 
-export type DeleteExistingFisheryMutationError = ErrorType<ProblemDetails>;
+export type DeleteExistingFisheryMutationError = ProblemDetails;
 
-export const useDeleteExistingFishery = <TError = ErrorType<ProblemDetails>, TContext = unknown>(
+export const useDeleteExistingFishery = <TError = ProblemDetails, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteExistingFishery>>, TError, { id: number }, TContext>;
     request?: SecondParameter<typeof customInstance>;

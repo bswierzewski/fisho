@@ -18,7 +18,6 @@ import type {
 } from '@tanstack/react-query';
 
 import { customInstance } from '../axios';
-import type { ErrorType } from '../axios';
 import type {
   CategoryDefinitionDto,
   EnumValueDto,
@@ -38,7 +37,7 @@ export const getGetAllFishSpeciesQueryKey = () => {
 
 export const getGetAllFishSpeciesQueryOptions = <
   TData = Awaited<ReturnType<typeof getAllFishSpecies>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllFishSpecies>>, TError, TData>>;
   request?: SecondParameter<typeof customInstance>;
@@ -58,12 +57,9 @@ export const getGetAllFishSpeciesQueryOptions = <
 };
 
 export type GetAllFishSpeciesQueryResult = NonNullable<Awaited<ReturnType<typeof getAllFishSpecies>>>;
-export type GetAllFishSpeciesQueryError = ErrorType<unknown>;
+export type GetAllFishSpeciesQueryError = unknown;
 
-export function useGetAllFishSpecies<
-  TData = Awaited<ReturnType<typeof getAllFishSpecies>>,
-  TError = ErrorType<unknown>
->(
+export function useGetAllFishSpecies<TData = Awaited<ReturnType<typeof getAllFishSpecies>>, TError = unknown>(
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllFishSpecies>>, TError, TData>> &
       Pick<
@@ -78,10 +74,7 @@ export function useGetAllFishSpecies<
   },
   queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetAllFishSpecies<
-  TData = Awaited<ReturnType<typeof getAllFishSpecies>>,
-  TError = ErrorType<unknown>
->(
+export function useGetAllFishSpecies<TData = Awaited<ReturnType<typeof getAllFishSpecies>>, TError = unknown>(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllFishSpecies>>, TError, TData>> &
       Pick<
@@ -96,10 +89,7 @@ export function useGetAllFishSpecies<
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetAllFishSpecies<
-  TData = Awaited<ReturnType<typeof getAllFishSpecies>>,
-  TError = ErrorType<unknown>
->(
+export function useGetAllFishSpecies<TData = Awaited<ReturnType<typeof getAllFishSpecies>>, TError = unknown>(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllFishSpecies>>, TError, TData>>;
     request?: SecondParameter<typeof customInstance>;
@@ -107,10 +97,7 @@ export function useGetAllFishSpecies<
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-export function useGetAllFishSpecies<
-  TData = Awaited<ReturnType<typeof getAllFishSpecies>>,
-  TError = ErrorType<unknown>
->(
+export function useGetAllFishSpecies<TData = Awaited<ReturnType<typeof getAllFishSpecies>>, TError = unknown>(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllFishSpecies>>, TError, TData>>;
     request?: SecondParameter<typeof customInstance>;
@@ -145,7 +132,7 @@ export const getGetGlobalCategoryDefinitionsQueryKey = (params?: GetGlobalCatego
 
 export const getGetGlobalCategoryDefinitionsQueryOptions = <
   TData = Awaited<ReturnType<typeof getGlobalCategoryDefinitions>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   params?: GetGlobalCategoryDefinitionsParams,
   options?: {
@@ -170,11 +157,11 @@ export const getGetGlobalCategoryDefinitionsQueryOptions = <
 export type GetGlobalCategoryDefinitionsQueryResult = NonNullable<
   Awaited<ReturnType<typeof getGlobalCategoryDefinitions>>
 >;
-export type GetGlobalCategoryDefinitionsQueryError = ErrorType<unknown>;
+export type GetGlobalCategoryDefinitionsQueryError = unknown;
 
 export function useGetGlobalCategoryDefinitions<
   TData = Awaited<ReturnType<typeof getGlobalCategoryDefinitions>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   params: undefined | GetGlobalCategoryDefinitionsParams,
   options: {
@@ -193,7 +180,7 @@ export function useGetGlobalCategoryDefinitions<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetGlobalCategoryDefinitions<
   TData = Awaited<ReturnType<typeof getGlobalCategoryDefinitions>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   params?: GetGlobalCategoryDefinitionsParams,
   options?: {
@@ -212,7 +199,7 @@ export function useGetGlobalCategoryDefinitions<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetGlobalCategoryDefinitions<
   TData = Awaited<ReturnType<typeof getGlobalCategoryDefinitions>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   params?: GetGlobalCategoryDefinitionsParams,
   options?: {
@@ -224,7 +211,7 @@ export function useGetGlobalCategoryDefinitions<
 
 export function useGetGlobalCategoryDefinitions<
   TData = Awaited<ReturnType<typeof getGlobalCategoryDefinitions>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   params?: GetGlobalCategoryDefinitionsParams,
   options?: {
@@ -257,7 +244,7 @@ export const getGetCategoryTypeEnumValuesQueryKey = () => {
 
 export const getGetCategoryTypeEnumValuesQueryOptions = <
   TData = Awaited<ReturnType<typeof getCategoryTypeEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryTypeEnumValues>>, TError, TData>>;
   request?: SecondParameter<typeof customInstance>;
@@ -277,11 +264,11 @@ export const getGetCategoryTypeEnumValuesQueryOptions = <
 };
 
 export type GetCategoryTypeEnumValuesQueryResult = NonNullable<Awaited<ReturnType<typeof getCategoryTypeEnumValues>>>;
-export type GetCategoryTypeEnumValuesQueryError = ErrorType<unknown>;
+export type GetCategoryTypeEnumValuesQueryError = unknown;
 
 export function useGetCategoryTypeEnumValues<
   TData = Awaited<ReturnType<typeof getCategoryTypeEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryTypeEnumValues>>, TError, TData>> &
@@ -299,7 +286,7 @@ export function useGetCategoryTypeEnumValues<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetCategoryTypeEnumValues<
   TData = Awaited<ReturnType<typeof getCategoryTypeEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryTypeEnumValues>>, TError, TData>> &
@@ -317,7 +304,7 @@ export function useGetCategoryTypeEnumValues<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetCategoryTypeEnumValues<
   TData = Awaited<ReturnType<typeof getCategoryTypeEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryTypeEnumValues>>, TError, TData>>;
@@ -331,7 +318,7 @@ export function useGetCategoryTypeEnumValues<
 
 export function useGetCategoryTypeEnumValues<
   TData = Awaited<ReturnType<typeof getCategoryTypeEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryTypeEnumValues>>, TError, TData>>;
@@ -363,7 +350,7 @@ export const getGetCategoryMetricEnumValuesQueryKey = () => {
 
 export const getGetCategoryMetricEnumValuesQueryOptions = <
   TData = Awaited<ReturnType<typeof getCategoryMetricEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryMetricEnumValues>>, TError, TData>>;
   request?: SecondParameter<typeof customInstance>;
@@ -385,11 +372,11 @@ export const getGetCategoryMetricEnumValuesQueryOptions = <
 export type GetCategoryMetricEnumValuesQueryResult = NonNullable<
   Awaited<ReturnType<typeof getCategoryMetricEnumValues>>
 >;
-export type GetCategoryMetricEnumValuesQueryError = ErrorType<unknown>;
+export type GetCategoryMetricEnumValuesQueryError = unknown;
 
 export function useGetCategoryMetricEnumValues<
   TData = Awaited<ReturnType<typeof getCategoryMetricEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryMetricEnumValues>>, TError, TData>> &
@@ -407,7 +394,7 @@ export function useGetCategoryMetricEnumValues<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetCategoryMetricEnumValues<
   TData = Awaited<ReturnType<typeof getCategoryMetricEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryMetricEnumValues>>, TError, TData>> &
@@ -425,7 +412,7 @@ export function useGetCategoryMetricEnumValues<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetCategoryMetricEnumValues<
   TData = Awaited<ReturnType<typeof getCategoryMetricEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryMetricEnumValues>>, TError, TData>>;
@@ -439,7 +426,7 @@ export function useGetCategoryMetricEnumValues<
 
 export function useGetCategoryMetricEnumValues<
   TData = Awaited<ReturnType<typeof getCategoryMetricEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryMetricEnumValues>>, TError, TData>>;
@@ -477,7 +464,7 @@ export const getGetCategoryCalculationLogicEnumValuesQueryKey = () => {
 
 export const getGetCategoryCalculationLogicEnumValuesQueryOptions = <
   TData = Awaited<ReturnType<typeof getCategoryCalculationLogicEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryCalculationLogicEnumValues>>, TError, TData>>;
   request?: SecondParameter<typeof customInstance>;
@@ -499,11 +486,11 @@ export const getGetCategoryCalculationLogicEnumValuesQueryOptions = <
 export type GetCategoryCalculationLogicEnumValuesQueryResult = NonNullable<
   Awaited<ReturnType<typeof getCategoryCalculationLogicEnumValues>>
 >;
-export type GetCategoryCalculationLogicEnumValuesQueryError = ErrorType<unknown>;
+export type GetCategoryCalculationLogicEnumValuesQueryError = unknown;
 
 export function useGetCategoryCalculationLogicEnumValues<
   TData = Awaited<ReturnType<typeof getCategoryCalculationLogicEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryCalculationLogicEnumValues>>, TError, TData>> &
@@ -521,7 +508,7 @@ export function useGetCategoryCalculationLogicEnumValues<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetCategoryCalculationLogicEnumValues<
   TData = Awaited<ReturnType<typeof getCategoryCalculationLogicEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryCalculationLogicEnumValues>>, TError, TData>> &
@@ -539,7 +526,7 @@ export function useGetCategoryCalculationLogicEnumValues<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetCategoryCalculationLogicEnumValues<
   TData = Awaited<ReturnType<typeof getCategoryCalculationLogicEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryCalculationLogicEnumValues>>, TError, TData>>;
@@ -553,7 +540,7 @@ export function useGetCategoryCalculationLogicEnumValues<
 
 export function useGetCategoryCalculationLogicEnumValues<
   TData = Awaited<ReturnType<typeof getCategoryCalculationLogicEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryCalculationLogicEnumValues>>, TError, TData>>;
@@ -591,7 +578,7 @@ export const getGetCategoryEntityTypeEnumValuesQueryKey = () => {
 
 export const getGetCategoryEntityTypeEnumValuesQueryOptions = <
   TData = Awaited<ReturnType<typeof getCategoryEntityTypeEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryEntityTypeEnumValues>>, TError, TData>>;
   request?: SecondParameter<typeof customInstance>;
@@ -613,11 +600,11 @@ export const getGetCategoryEntityTypeEnumValuesQueryOptions = <
 export type GetCategoryEntityTypeEnumValuesQueryResult = NonNullable<
   Awaited<ReturnType<typeof getCategoryEntityTypeEnumValues>>
 >;
-export type GetCategoryEntityTypeEnumValuesQueryError = ErrorType<unknown>;
+export type GetCategoryEntityTypeEnumValuesQueryError = unknown;
 
 export function useGetCategoryEntityTypeEnumValues<
   TData = Awaited<ReturnType<typeof getCategoryEntityTypeEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryEntityTypeEnumValues>>, TError, TData>> &
@@ -635,7 +622,7 @@ export function useGetCategoryEntityTypeEnumValues<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetCategoryEntityTypeEnumValues<
   TData = Awaited<ReturnType<typeof getCategoryEntityTypeEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryEntityTypeEnumValues>>, TError, TData>> &
@@ -653,7 +640,7 @@ export function useGetCategoryEntityTypeEnumValues<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetCategoryEntityTypeEnumValues<
   TData = Awaited<ReturnType<typeof getCategoryEntityTypeEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryEntityTypeEnumValues>>, TError, TData>>;
@@ -667,7 +654,7 @@ export function useGetCategoryEntityTypeEnumValues<
 
 export function useGetCategoryEntityTypeEnumValues<
   TData = Awaited<ReturnType<typeof getCategoryEntityTypeEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCategoryEntityTypeEnumValues>>, TError, TData>>;
@@ -705,7 +692,7 @@ export const getGetCompetitionStatusEnumValuesQueryKey = () => {
 
 export const getGetCompetitionStatusEnumValuesQueryOptions = <
   TData = Awaited<ReturnType<typeof getCompetitionStatusEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompetitionStatusEnumValues>>, TError, TData>>;
   request?: SecondParameter<typeof customInstance>;
@@ -727,11 +714,11 @@ export const getGetCompetitionStatusEnumValuesQueryOptions = <
 export type GetCompetitionStatusEnumValuesQueryResult = NonNullable<
   Awaited<ReturnType<typeof getCompetitionStatusEnumValues>>
 >;
-export type GetCompetitionStatusEnumValuesQueryError = ErrorType<unknown>;
+export type GetCompetitionStatusEnumValuesQueryError = unknown;
 
 export function useGetCompetitionStatusEnumValues<
   TData = Awaited<ReturnType<typeof getCompetitionStatusEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompetitionStatusEnumValues>>, TError, TData>> &
@@ -749,7 +736,7 @@ export function useGetCompetitionStatusEnumValues<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetCompetitionStatusEnumValues<
   TData = Awaited<ReturnType<typeof getCompetitionStatusEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompetitionStatusEnumValues>>, TError, TData>> &
@@ -767,7 +754,7 @@ export function useGetCompetitionStatusEnumValues<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetCompetitionStatusEnumValues<
   TData = Awaited<ReturnType<typeof getCompetitionStatusEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompetitionStatusEnumValues>>, TError, TData>>;
@@ -781,7 +768,7 @@ export function useGetCompetitionStatusEnumValues<
 
 export function useGetCompetitionStatusEnumValues<
   TData = Awaited<ReturnType<typeof getCompetitionStatusEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompetitionStatusEnumValues>>, TError, TData>>;
@@ -816,7 +803,7 @@ export const getGetCompetitionTypeEnumValuesQueryKey = () => {
 
 export const getGetCompetitionTypeEnumValuesQueryOptions = <
   TData = Awaited<ReturnType<typeof getCompetitionTypeEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompetitionTypeEnumValues>>, TError, TData>>;
   request?: SecondParameter<typeof customInstance>;
@@ -838,11 +825,11 @@ export const getGetCompetitionTypeEnumValuesQueryOptions = <
 export type GetCompetitionTypeEnumValuesQueryResult = NonNullable<
   Awaited<ReturnType<typeof getCompetitionTypeEnumValues>>
 >;
-export type GetCompetitionTypeEnumValuesQueryError = ErrorType<unknown>;
+export type GetCompetitionTypeEnumValuesQueryError = unknown;
 
 export function useGetCompetitionTypeEnumValues<
   TData = Awaited<ReturnType<typeof getCompetitionTypeEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompetitionTypeEnumValues>>, TError, TData>> &
@@ -860,7 +847,7 @@ export function useGetCompetitionTypeEnumValues<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetCompetitionTypeEnumValues<
   TData = Awaited<ReturnType<typeof getCompetitionTypeEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompetitionTypeEnumValues>>, TError, TData>> &
@@ -878,7 +865,7 @@ export function useGetCompetitionTypeEnumValues<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetCompetitionTypeEnumValues<
   TData = Awaited<ReturnType<typeof getCompetitionTypeEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompetitionTypeEnumValues>>, TError, TData>>;
@@ -892,7 +879,7 @@ export function useGetCompetitionTypeEnumValues<
 
 export function useGetCompetitionTypeEnumValues<
   TData = Awaited<ReturnType<typeof getCompetitionTypeEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCompetitionTypeEnumValues>>, TError, TData>>;
@@ -927,7 +914,7 @@ export const getGetParticipantRoleEnumValuesQueryKey = () => {
 
 export const getGetParticipantRoleEnumValuesQueryOptions = <
   TData = Awaited<ReturnType<typeof getParticipantRoleEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getParticipantRoleEnumValues>>, TError, TData>>;
   request?: SecondParameter<typeof customInstance>;
@@ -949,11 +936,11 @@ export const getGetParticipantRoleEnumValuesQueryOptions = <
 export type GetParticipantRoleEnumValuesQueryResult = NonNullable<
   Awaited<ReturnType<typeof getParticipantRoleEnumValues>>
 >;
-export type GetParticipantRoleEnumValuesQueryError = ErrorType<unknown>;
+export type GetParticipantRoleEnumValuesQueryError = unknown;
 
 export function useGetParticipantRoleEnumValues<
   TData = Awaited<ReturnType<typeof getParticipantRoleEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getParticipantRoleEnumValues>>, TError, TData>> &
@@ -971,7 +958,7 @@ export function useGetParticipantRoleEnumValues<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetParticipantRoleEnumValues<
   TData = Awaited<ReturnType<typeof getParticipantRoleEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getParticipantRoleEnumValues>>, TError, TData>> &
@@ -989,7 +976,7 @@ export function useGetParticipantRoleEnumValues<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetParticipantRoleEnumValues<
   TData = Awaited<ReturnType<typeof getParticipantRoleEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getParticipantRoleEnumValues>>, TError, TData>>;
@@ -1003,7 +990,7 @@ export function useGetParticipantRoleEnumValues<
 
 export function useGetParticipantRoleEnumValues<
   TData = Awaited<ReturnType<typeof getParticipantRoleEnumValues>>,
-  TError = ErrorType<unknown>
+  TError = unknown
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getParticipantRoleEnumValues>>, TError, TData>>;
