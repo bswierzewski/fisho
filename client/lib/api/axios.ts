@@ -1,143 +1,101 @@
-import Axios, { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import Axios, {
+  type AxiosError,
+  type AxiosInstance,
+  type AxiosRequestConfig,
+  type InternalAxiosRequestConfig
+} from 'axios';
 
-// Dla Next.js, importujemy useAuth z @clerk/nextjs, ale pamiętaj, że nie można go użyć bezpośrednio tutaj.
-// import { useAuth } from "@clerk/nextjs";
-// Zamiast tego, będziemy polegać na globalnej instancji Clerk lub innym mechanizmie.
+export const axiosInstance: AxiosInstance = Axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000'
+});
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000'; // Ustaw na bazowy URL API
+// Przechowuj referencje do ID interceptorów, aby uniknąć duplikatów przy HMR
+let requestInterceptorId: number | undefined;
+let responseInterceptorId: number | undefined;
 
-export const AXIOS_INSTANCE = Axios.create({ baseURL: API_URL });
+// 2. Funkcja do konfiguracji interceptorów.
+//    Przyjmuje funkcje getToken i signOut z Clerk.
+type GetTokenFunction = (options?: { template?: string; skipCache?: boolean }) => Promise<string | null>;
+type SignOutFunction = (options?: { redirectUrl?: string; sessionId?: string }) => Promise<void>;
 
-export const customInstance = <T>(
-  config: AxiosRequestConfig,
-  options?: AxiosRequestConfig
-): Promise<AxiosResponse<T>> => {
-  const source = Axios.CancelToken.source();
-  const promise = AXIOS_INSTANCE({
-    ...config,
-    ...options,
-    cancelToken: source.token
-  }).then(({ data }) => data);
+export const setupClerkInterceptors = (
+  instance: AxiosInstance,
+  getToken: GetTokenFunction,
+  signOut: SignOutFunction
+) => {
+  // Usuń poprzednie interceptory, jeśli istnieją, aby uniknąć duplikatów
+  if (requestInterceptorId !== undefined) {
+    instance.interceptors.request.eject(requestInterceptorId);
+  }
+  if (responseInterceptorId !== undefined) {
+    instance.interceptors.response.eject(responseInterceptorId);
+  }
 
-  // @ts-ignore
-  promise.cancel = () => {
-    source.cancel('Query was cancelled by React Query');
-  };
+  requestInterceptorId = instance.interceptors.request.use(
+    async (config: InternalAxiosRequestConfig) => {
+      const token = await getToken({ template: process.env.NEXT_PUBLIC_CLARK_TOKEN_TEMPLATE }); // Użyj przekazanej funkcji getToken
+      // console.log('ApiClient: Token from interceptor:', token ? 'Exists' : 'Null');
+      // console.log('ApiClient: Request interceptor for:', config.url);
 
-  return promise;
-};
-
-// --- Interceptory Axios ---
-
-const requestInterceptor = async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
-  // W Next.js z @clerk/nextjs, dostęp do tokenu po stronie klienta
-  // jest zazwyczaj przez hook `useAuth().getToken()`.
-  // Ponieważ jesteśmy poza komponentem React, musimy użyć innego podejścia.
-
-  // Podejście 1: Sprawdź, czy Clerk automatycznie dołącza tokeny.
-  // Jeśli Twoje API (API_URL) jest skonfigurowane jako chroniony zasób w Clerk
-  // i używasz <ClerkProvider>, tokeny mogą być dołączane automatycznie.
-  // W takim przypadku ten interceptor może nie być potrzebny do dodawania tokenu.
-
-  // Podejście 2: Użycie globalnej instancji Clerk (jeśli dostępna)
-  // @clerk/nextjs używa @clerk/clerk-js pod spodem.
-  if (typeof window !== 'undefined' && (window as any).Clerk) {
-    const clerkInstance = (window as any).Clerk;
-    if (clerkInstance.session) {
-      try {
-        // `getToken` może przyjmować opcje, np. szablon, jeśli masz wiele backendów
-        const token = await clerkInstance.session.getToken();
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-          console.log('Token added to request by Axios interceptor (via window.Clerk)');
-        } else {
-          console.warn('Clerk session active, but no token returned by getToken().');
-        }
-      } catch (error) {
-        console.error('Error getting Clerk token in Axios interceptor:', error);
-        // Rozważ, czy żądanie powinno być kontynuowane bez tokenu, czy przerwane
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
       }
-    } else {
-      console.warn('Clerk instance found, but no active session. Token not added.');
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
     }
-  } else {
-    console.warn('Clerk instance not found on window object. Token cannot be added by Axios interceptor in this way.');
-  }
-  return config;
-};
+  );
 
-const requestErrorInterceptor = (error: AxiosError): Promise<AxiosError> => {
-  console.error('Axios Request Setup Error:', error.message, error.config);
-  return Promise.reject(error);
-};
+  responseInterceptorId = instance.interceptors.response.use(
+    (response) => response,
+    async (error: AxiosError) => {
+      if (Axios.isCancel(error)) {
+        // Jeśli chcesz, aby błąd anulowania był propagowany:
+        return Promise.reject(error);
+        // Jeśli chcesz go "połknąć" (niezalecane zazwyczaj):
+        // return new Promise(() => {}); // Tworzy "wiszącą" obietnicę
+      }
 
-const responseInterceptor = (response: AxiosResponse): AxiosResponse => {
-  return response;
-};
+      const axiosError = error as AxiosError;
 
-const responseErrorInterceptor = async (error: AxiosError): Promise<AxiosError> => {
-  const { response, request, message, config } = error;
-
-  if (response) {
-    // Serwer odpowiedział statusem błędu
-    const statusCode = response.status;
-    const problemDetails = response.data as any; // Zakładamy, że API zwraca ProblemDetails
-
-    console.error(
-      `API Error ${statusCode} for ${config?.method?.toUpperCase()} ${config?.url}:`,
-      problemDetails || response.data // Loguj problemDetails jeśli dostępne
-    );
-
-    // Twój CustomExceptionHandler na backendzie zwraca ProblemDetails lub ValidationProblemDetails.
-    // Możemy to wykorzystać na frontendzie.
-    if (statusCode === 400 && problemDetails?.errors) {
-      // To jest ValidationProblemDetails z Twojego API
-      console.warn('Validation errors:', problemDetails.errors);
-      // Możesz przekazać te błędy do formularza lub globalnego stanu błędów.
-      // React Query's onError callback otrzyma ten `error` obiekt.
-    } else if (statusCode === 401) {
-      console.warn('Unauthorized (401). Token may be invalid or session expired.');
-      // Clerk zazwyczaj obsługuje to przez przekierowanie do logowania,
-      // ale możesz dodać dodatkową logikę, np. wylogowanie z aplikacji.
-      // if (typeof window !== "undefined" && (window as any).Clerk) {
-      //   (window as any).Clerk.signOut(() => { window.location.href = '/sign-in'; });
-      // }
-    } else if (statusCode === 403) {
-      console.warn('Forbidden (403). User lacks permission.');
-      // Pokaż użytkownikowi odpowiedni komunikat.
-    } else if (statusCode === 404) {
-      console.warn('Resource not found (404).', problemDetails?.detail);
-    } else if (statusCode >= 500) {
-      console.error('Server error (5xx).', problemDetails?.detail);
-      // Pokaż ogólny komunikat o błędzie serwera.
+      if (!axiosError.response) {
+        console.error('ApiClient: Network error or no response:', axiosError.message);
+        // toast.error('Network error. Please check your connection.');
+      } else {
+        const { status } = axiosError.response;
+        // console.log('ApiClient: Response error status:', status);
+        if (status === 401) {
+          console.log('ApiClient: Unauthorized (401). Signing out...');
+          try {
+            // Użyj przekazanej funkcji signOut
+            await signOut({ redirectUrl: '/sign-in' }); // Możesz dostosować redirectUrl
+            // toast.error('Session expired. Please log in again.');
+          } catch (signOutError) {
+            console.error('ApiClient: Error during sign out:', signOutError);
+          }
+        } else if (status >= 500) {
+          console.error('ApiClient: Server error:', status, axiosError.response.data);
+          // toast.error('Something went wrong. Please try again later.');
+        }
+      }
+      return Promise.reject(axiosError);
     }
-    // Możesz dodać niestandardowe pola do obiektu błędu, jeśli chcesz przekazać więcej informacji
-    // error.customData = problemDetails;
-  } else if (request) {
-    console.error('Network error or no response from server:', message, config?.url);
-  } else {
-    console.error('Axios setup error:', message);
-  }
-
-  return Promise.reject(error);
+  );
 };
 
-AXIOS_INSTANCE.interceptors.request.use(requestInterceptor, requestErrorInterceptor);
-AXIOS_INSTANCE.interceptors.response.use(responseInterceptor, responseErrorInterceptor);
+// 3. Twoja funkcja `customInstance`.
+//    Będzie używać `axiosInstance`, która zostanie skonfigurowana z interceptorami.
+//    Orval może być skonfigurowany, aby używać tej funkcji jako mutatora.
+export const customInstance = async <T>(config: AxiosRequestConfig, options?: AxiosRequestConfig): Promise<T> => {
+  // `axiosInstance` będzie miała interceptory dodane przez `setupClerkInterceptors`
+  // w momencie, gdy ta funkcja zostanie wywołana z komponentu klienckiego.
+  return axiosInstance({
+    ...config,
+    ...options
+  }).then(({ data }) => data);
+};
 
-export interface ErrorType<ErrorData = any> extends AxiosError<ErrorData> {
-  // Możesz rozszerzyć typ błędu, jeśli Twoje API zwraca specyficzny format
-  // np. jeśli CustomExceptionHandler zawsze zwraca ProblemDetails
-  response?: AxiosResponse<
-    {
-      type?: string;
-      title?: string;
-      status?: number;
-      detail?: string;
-      errors?: Record<string, string[]>; // Dla ValidationProblemDetails
-      // inne pola z ProblemDetails
-    } & ErrorData
-  >;
-}
-
-export default customInstance;
+// Możesz również wyeksportować `axiosInstance` bezpośrednio, jeśli Orval
+// ma być skonfigurowany do używania instancji, a nie funkcji `customInstance`.
+// export default axiosInstance;

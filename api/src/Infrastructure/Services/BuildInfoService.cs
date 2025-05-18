@@ -1,4 +1,5 @@
 ﻿using Fishio.Application.About.Queries.GetApplicationInfo;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Fishio.Infrastructure.Services;
@@ -6,11 +7,13 @@ namespace Fishio.Infrastructure.Services;
 public class BuildInfoService : IBuildInfoService
 {
     private readonly ILogger<BuildInfoService> _logger;
+    private readonly IConfiguration _configuration;
     private BuildInformation? _buildInfoCache;
 
-    public BuildInfoService(ILogger<BuildInfoService> logger)
+    public BuildInfoService(ILogger<BuildInfoService> logger, IConfiguration configuration)
     {
         _logger = logger;
+        _configuration = configuration;
     }
 
     public BuildInformation GetBuildInformation()
@@ -22,8 +25,8 @@ public class BuildInfoService : IBuildInfoService
 
         _logger.LogInformation("Attempting to read build information from environment variables.");
 
-        var gitSha = Environment.GetEnvironmentVariable("APP_VERSION_SHA");
-        var buildTimestamp = Environment.GetEnvironmentVariable("APP_BUILD_TIMESTAMP");
+        var gitSha = _configuration["BuildInfo:GitSha"] ?? Environment.GetEnvironmentVariable("APP_VERSION_SHA");
+        var buildTimestamp = _configuration["BuildInfo:BuildTimestamp"] ?? Environment.GetEnvironmentVariable("APP_BUILD_TIMESTAMP");
 
         if (string.IsNullOrEmpty(gitSha) && string.IsNullOrEmpty(buildTimestamp))
         {

@@ -1,7 +1,10 @@
 import './globals.css';
+import TanstackQueryProvider from '@/providers/TanstackQueryProvider';
 import { plPL } from '@clerk/localizations';
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
+
+import { AxiosClientConfigurator } from '@/components/AxiosClientConfigurator';
 
 export const metadata: Metadata = {
   title: 'Fishio',
@@ -16,7 +19,10 @@ export default function RootLayout({
   return (
     <ClerkProvider localization={plPL}>
       <html lang="pl">
-        <body>{children}</body>
+        <body>
+          <AxiosClientConfigurator />
+          <TanstackQueryProvider>{children}</TanstackQueryProvider>
+        </body>
       </html>
     </ClerkProvider>
   );

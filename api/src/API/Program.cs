@@ -25,6 +25,8 @@ if (app.Environment.IsDevelopment())
 // Middleware do obsługi błędów
 app.UseExceptionHandler(options => { });
 
+app.UseCors();
+
 app.UseAuthentication();    // 1. Uwierzytelnianie (np. Clerk JWT validation)
 app.UseMiddleware<UserProvisioningMiddleware>();  // 2. Nasze middleware do mapowania/provisioningu użytkownika domenowego
 app.UseAuthorization();     // 3. Autoryzacja

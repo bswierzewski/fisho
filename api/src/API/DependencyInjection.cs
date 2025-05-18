@@ -128,13 +128,6 @@ public static class DependencyInjection
                                  .AllowAnyMethod()
                                  .AllowAnyHeader();
                 });
-                // Możesz dodać bardziej restrykcyjne nazwane polityki CORS dla produkcji
-                // options.AddPolicy("AllowFishioFrontend", policy =>
-                // {
-                //     policy.WithOrigins("https://twoj-frontend.com")
-                //           .AllowAnyMethod()
-                //           .AllowAnyHeader();
-                // });
             });
         }
     }
