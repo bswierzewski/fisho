@@ -1,66 +1,74 @@
 ﻿namespace Fishio.Application.PublicResults.Queries.GetPublicCompetitionResults;
 
-public record GetPublicCompetitionResultsQuery : IRequest<PublicCompetitionResultsDto>
+public class GetPublicCompetitionResultsQuery : IRequest<PublicCompetitionResultsDto?> // Może zwrócić null, jeśli token nieprawidłowy
 {
-    public string ResultToken { get; init; } = string.Empty;
+    public string ResultsToken { get; set; } = string.Empty;
+
+    public GetPublicCompetitionResultsQuery(string resultsToken)
+    {
+        ResultsToken = resultsToken;
+    }
 }
 
 public class GetPublicCompetitionResultsQueryValidator : AbstractValidator<GetPublicCompetitionResultsQuery>
 {
     public GetPublicCompetitionResultsQueryValidator()
     {
-        RuleFor(x => x.ResultToken)
+        RuleFor(x => x.ResultsToken)
                     .NotEmpty().WithMessage("Token wyników jest wymagany.")
                     .Length(10, 64).WithMessage("Token wyników musi mieć od 10 do 64 znaków.");
     }
 }
 
-public class PublicCompetitionResultsDto
+// --- DTOs składowe ---
+public record PublicResultParticipantDto
 {
-    public int CompetitionId { get; set; }
-    public required string CompetitionName { get; set; }
-    public DateTimeOffset CompetitionStartTime { get; set; }
-    public DateTimeOffset CompetitionEndTime { get; set; }
-    public CompetitionStatus CompetitionStatus { get; set; }
-    public string? CompetitionLocation { get; set; }
-    public string? CompetitionImageUrl { get; set; }
-    public string? OrganizerName { get; set; } // Optional: if you want to display it
-    public List<PublicCategoryResultDto> Categories { get; set; } = new();
+    public int ParticipantId { get; init; } // Może to być ID CompetitionParticipant
+    public string Name { get; init; } = string.Empty; // Imię/Nazwisko/Ksywka
+    public decimal TotalScore { get; init; } // Główny wynik (np. suma wag, suma długości)
+    public int FishCount { get; init; }
+    // Można dodać inne zagregowane dane, jeśli potrzebne
 }
 
-public class PublicCategoryResultDto
+public record PublicResultCategoryWinnerDto
 {
-    public int CompetitionCategoryId { get; set; } // Id from CompetitionCategory
-    public int CategoryDefinitionId { get; set; }
-    public required string CategoryName { get; set; }
-    public string? CategoryDescription { get; set; }
-    public CategoryType CategoryType { get; set; }
-    public CategoryMetric CategoryMetric { get; set; }
-    public CategoryCalculationLogic CategoryCalculationLogic { get; set; }
-    public string? SpecificFishSpeciesName { get; set; }
-    public int MaxWinnersToDisplay { get; set; }
-    public bool IsManuallyAssignedOrNotCalculated { get; set; } // True if manual or logic not yet implemented for auto-calc
-    public string? Note { get; set; } // e.g., "Winners announced by organizer"
-    public List<PublicParticipantStandingDto> Standings { get; set; } = new();
+    public int ParticipantId { get; init; }
+    public string ParticipantName { get; init; } = string.Empty;
+    public string? FishSpeciesName { get; init; } // Jeśli kategoria dotyczy konkretnej ryby
+    public decimal? Value { get; init; } // Wartość, która dała zwycięstwo (np. długość, waga)
+    public string? Unit { get; init; } // Jednostka dla wartości (cm, kg)
 }
 
-public class PublicParticipantStandingDto
+public record PublicResultSpecialCategoryDto
 {
-    public int Rank { get; set; }
-    public int ParticipantId { get; set; } // CompetitionParticipant.Id
-    public required string ParticipantName { get; set; }
-    public decimal? ScoreNumeric { get; set; }
-    public string? ScoreUnit { get; set; }
-    public required string ScoreDisplayText { get; set; }
-    public List<PublicFishCatchDto> RelevantCatches { get; set; } = new();
+    public string CategoryName { get; init; } = string.Empty;
+    public string? CategoryDescription { get; init; }
+    public List<PublicResultCategoryWinnerDto> Winners { get; init; } = new();
 }
 
-public class PublicFishCatchDto
+// --- Główne DTO ---
+public record PublicCompetitionResultsDto
 {
-    public int FishCatchId { get; set; }
-    public required string SpeciesName { get; set; }
-    public decimal? LengthCm { get; set; }
-    public decimal? WeightKg { get; set; }
-    public DateTimeOffset CatchTime { get; set; }
-    public string? PhotoUrl { get; set; }
+    // Informacje o zawodach
+    public int CompetitionId { get; init; }
+    public string CompetitionName { get; init; } = string.Empty;
+    public DateTimeOffset StartTime { get; init; }
+    public DateTimeOffset EndTime { get; init; }
+    public string? FisheryName { get; init; }
+    public string? CompetitionImageUrl { get; init; }
+    public CompetitionStatus Status { get; init; }
+    public string? Rules { get; init; }
+
+    // Informacje o głównej kategorii punktacji
+    public string? PrimaryScoringCategoryName { get; init; }
+    public CategoryMetric? PrimaryScoringMetric { get; init; } // Np. Długość, Waga
+
+    // Dane zależne od statusu
+    public string? UpcomingMessage { get; init; } // Dla statusu Upcoming
+
+    public List<PublicResultParticipantDto> MainRanking { get; init; } = new(); // Dla Ongoing i Finished
+    public string? LiveRankingPlaceholderMessage { get; init; } // Dla Ongoing
+
+    public List<PublicResultSpecialCategoryDto> SpecialCategoriesResults { get; init; } = new(); // Dla Finished
+    public string? FinishedChartsPlaceholderMessage { get; init; } // Dla Finished
 }
