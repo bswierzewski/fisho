@@ -6,17 +6,17 @@ public class GetDashboardDataQuery : IRequest<DashboardDto>
     private const int MaxPageSize = 20; // Maksymalna liczba elementów, jaką można zażądać
 
     private int _maxRecentItems = DefaultPageSize;
-    public int? MaxRecentItems
+    public int MaxRecentItems
     {
         get => _maxRecentItems;
-        set => _maxRecentItems = (value.HasValue && value.Value > 0 && value.Value <= MaxPageSize) ? value.Value : DefaultPageSize;
+        set => _maxRecentItems = (value > 0 && value <= MaxPageSize) ? value : DefaultPageSize;
     }
 
     private int _maxFeaturedItems = DefaultPageSize;
-    public int? MaxFeaturedItems
+    public int MaxFeaturedItems
     {
         get => _maxFeaturedItems;
-        set => _maxFeaturedItems = (value.HasValue && value.Value > 0 && value.Value <= MaxPageSize) ? value.Value : DefaultPageSize;
+        set => _maxFeaturedItems = (value > 0 && value <= MaxPageSize) ? value : DefaultPageSize;
     }
 }
 

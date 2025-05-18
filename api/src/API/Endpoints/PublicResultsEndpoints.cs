@@ -17,7 +17,7 @@ public static class PublicResultsEndpoints
 
     private static async Task<IResult> GetResultsByToken(ISender sender, [FromRoute] string token, CancellationToken ct)
     {
-        var query = new GetPublicCompetitionResultsQuery { ResultToken = token };
+        var query = new GetPublicCompetitionResultsQuery(token);
         var results = await sender.Send(query, ct);
         return results != null ? TypedResults.Ok(results) : TypedResults.NotFound();
     }

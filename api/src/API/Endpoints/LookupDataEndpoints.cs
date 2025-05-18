@@ -1,6 +1,6 @@
 ﻿using Fishio.Application.LookupData.Queries.GetCategoryDefinitions;
 using Fishio.Application.LookupData.Queries.GetFishSpeciesQuery;
-using Fishio.Application.LookupData.Queries.ListEnumValues;
+using Fishio.Application.LookupData.Queries.GetListEnumValues;
 
 namespace Fishio.API.Endpoints;
 
