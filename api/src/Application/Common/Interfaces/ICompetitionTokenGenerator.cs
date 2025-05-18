@@ -1,6 +1,6 @@
-﻿namespace Fishio.Application.Common.Interfaces
+﻿namespace Fishio.Application.Common.Interfaces;
+
+public interface ICompetitionTokenGenerator
 {
-    public interface ICompetitionTokenGenerator
-    {
-    }
+    string GenerateUniqueToken();
 }

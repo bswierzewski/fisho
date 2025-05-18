@@ -1,19 +1,16 @@
-namespace Fishio.Application.Competitions.Commands.RemoveParticipant;
+﻿namespace Fishio.Application.Competitions.Commands.RemoveParticipant;
 
-public record RemoveParticipantCommand : IRequest<Unit>
+public class RemoveParticipantCommand : IRequest<bool>
 {
-    public int CompetitionId { get; init; }
-    public int ParticipantId { get; init; }
+    public int CompetitionId { get; set; }
+    public int ParticipantEntryId { get; set; } // ID wpisu CompetitionParticipant
 }
 
 public class RemoveParticipantCommandValidator : AbstractValidator<RemoveParticipantCommand>
 {
     public RemoveParticipantCommandValidator()
     {
-        RuleFor(x => x.CompetitionId)
-            .GreaterThan(0).WithMessage("Competition ID is required");
-
-        RuleFor(x => x.ParticipantId)
-            .GreaterThan(0).WithMessage("Participant ID is required");
+        RuleFor(v => v.CompetitionId).NotEmpty();
+        RuleFor(v => v.ParticipantEntryId).NotEmpty();
     }
-} 
+}

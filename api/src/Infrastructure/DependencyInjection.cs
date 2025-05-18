@@ -31,10 +31,10 @@ public static class DependencyInjection
         builder.Services.AddScoped<ApplicationDbContextInitialiser>();
 
         builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-        builder.Services.AddScoped<ICompetitionTokenGenerator, CompetitionTokenGenerator>();
 
         builder.Services.AddSingleton<IBuildInfoService, BuildInfoService>();
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddSingleton<IImageStorageService, ImageStorageService>();
+        builder.Services.AddSingleton<ICompetitionTokenGenerator, CompetitionTokenGenerator>();
     }
 }
