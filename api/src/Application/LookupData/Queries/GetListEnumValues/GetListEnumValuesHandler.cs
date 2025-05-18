@@ -1,8 +1,8 @@
 using Application.Common.Extensions;
 
-namespace Fishio.Application.LookupData.Queries.ListEnumValues;
+namespace Fishio.Application.LookupData.Queries.GetListEnumValues;
 
-public class ListEnumValuesQueryHandler : IRequestHandler<ListEnumValuesQuery, IEnumerable<EnumValueDto>>
+public class GetListEnumValuesHandler : IRequestHandler<GetListEnumValuesQuery, IEnumerable<EnumValueDto>>
 {
     private static readonly Dictionary<string, Type> AllowedEnumTypes = new()
     {
@@ -16,7 +16,7 @@ public class ListEnumValuesQueryHandler : IRequestHandler<ListEnumValuesQuery, I
         // { nameof(YourEnumName), typeof(YourEnumType) }
     };
 
-    public Task<IEnumerable<EnumValueDto>> Handle(ListEnumValuesQuery request, CancellationToken cancellationToken)
+    public Task<IEnumerable<EnumValueDto>> Handle(GetListEnumValuesQuery request, CancellationToken cancellationToken)
     {
         if (!AllowedEnumTypes.TryGetValue(request.EnumName, out var enumType))
             throw new NotFoundException(nameof(request.EnumName), $"Enum o nazwie '{request.EnumName}' nie został znaleziony lub nie jest dozwolony.");
@@ -25,7 +25,7 @@ public class ListEnumValuesQueryHandler : IRequestHandler<ListEnumValuesQuery, I
             .Cast<Enum>()
             .Select(e => new EnumValueDto
             {
-                Id = Convert.ToInt32(e),
+                Value = Convert.ToInt32(e),
                 Name = e.ToString(),
                 Description = e.GetEnumDescription()
             })
