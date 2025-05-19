@@ -1,25 +1,19 @@
 'use client';
 
-// Formularze zazwyczaj wymagają stanu po stronie klienta
-import { staticFisheries } from '@/lib/static-data';
-// Dla wyboru łowiska
 import { ArrowLeft, Calendar, Fish, ImagePlus, MapPin, Ruler, StickyNote, Weight } from 'lucide-react';
 import Link from 'next/link';
-// Do wyboru łowiska
 import { useSearchParams } from 'next/navigation';
-// Do odczytu fisheryId z URL
 import { useEffect, useState } from 'react';
+
+import { useGetAllFisheries } from '@/lib/api/endpoints/fisheries';
+import { useCreateNewLogbookEntry } from '@/lib/api/endpoints/logbook';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-// Załóżmy, że masz Textarea
 import { Label } from '@/components/ui/label';
-// Załóżmy, że masz Label
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-// Załóżmy, że masz Input z shadcn
 import { Textarea } from '@/components/ui/textarea';
 
-// Style (dopasuj do reszty aplikacji)
 const cardBodyBgClass = 'bg-card';
 const cardTextColorClass = 'text-foreground';
 const cardMutedTextColorClass = 'text-muted-foreground';
@@ -28,25 +22,32 @@ export default function AddLogbookEntryPage() {
   const searchParams = useSearchParams();
   const preselectedFisheryId = searchParams.get('fisheryId');
   const [selectedImagePreview, setSelectedImagePreview] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+
+  const { data: fisheries } = useGetAllFisheries({ PageNumber: 1, PageSize: 20 });
+  const { mutate: createNewLogbookEntry } = useCreateNewLogbookEntry();
 
   // Symulacja obsługi zmiany pliku
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
       setSelectedImagePreview(URL.createObjectURL(file));
+      setSelectedImage(file);
       // W przyszłości: logika uploadu pliku
     } else {
       setSelectedImagePreview(null);
+      setSelectedImage(null);
     }
   };
 
   // Symulacja wysłania formularza
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // W przyszłości: logika walidacji i wysyłania danych
-    console.log('Formularz wysłany (placeholder)');
-    alert('Połów dodany (symulacja)!');
-    // Przekierowanie po sukcesie (np. do /logbook)
+    createNewLogbookEntry({
+      data: {
+        image: selectedImage
+      }
+    });
   };
 
   return (
@@ -175,8 +176,8 @@ export default function AddLogbookEntryPage() {
             </SelectTrigger>
             <SelectContent className="bg-popover">
               <SelectItem value="none">Brak / Nieokreślone</SelectItem>
-              {staticFisheries.map((fishery) => (
-                <SelectItem key={fishery.id} value={fishery.id}>
+              {fisheries?.items?.map((fishery) => (
+                <SelectItem key={fishery.id} value={fishery?.id?.toString() ?? ''}>
                   {fishery.name} ({fishery.location})
                 </SelectItem>
               ))}

@@ -7,6 +7,9 @@ import { Filter, Fish, Plus, Search } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { useGetCurrentUserLogbookEntries } from '@/lib/api/endpoints/logbook';
+import { UserLogbookEntryDto } from '@/lib/api/models';
+
 import { Button } from '@/components/ui/button';
 // Dodano ikony Search i Filter
 import { Input } from '@/components/ui/input';
@@ -17,10 +20,10 @@ const cardTextColorClass = 'text-foreground';
 const cardMutedTextColorClass = 'text-muted-foreground';
 
 export default function LogbookPage() {
-  // Na razie wyświetlamy wszystkie wpisy
-  const logEntries = staticLogbookEntries;
-
-  // TODO: Dodać logikę wyszukiwania i filtrowania
+  const { data: logEntries } = useGetCurrentUserLogbookEntries({
+    PageNumber: 1,
+    PageSize: 20
+  });
 
   return (
     <div className="space-y-6">
@@ -50,9 +53,9 @@ export default function LogbookPage() {
       </div>
 
       {/* Siatka Kart Połowów */}
-      {logEntries.length > 0 ? (
+      {logEntries?.items && logEntries?.items.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-          {logEntries.map((entry: LogbookEntry) => (
+          {logEntries.items.map((entry: UserLogbookEntryDto) => (
             <Link key={entry.id} href={`/logbook/${entry.id}`}>
               <div
                 // Można dodać Link do szczegółów wpisu, jeśli planujesz taki widok
@@ -65,8 +68,8 @@ export default function LogbookPage() {
                   {' '}
                   {/* Używamy aspect-square dla kwadratowych kart */}
                   <Image
-                    src={entry.photoUrl}
-                    alt={entry.species}
+                    src={entry.imageUrl ?? ''}
+                    alt={entry.fishSpeciesName ?? 'Zdjęcie ryby'}
                     layout="fill"
                     objectFit="cover"
                     className="transition-transform duration-300 group-hover:scale-105" // Efekt lekkiego zoomu na hover
@@ -74,14 +77,14 @@ export default function LogbookPage() {
                 </div>
                 {/* Treść Karty */}
                 <div className={`p-3 ${cardBodyBgClass}`}>
-                  <h3 className={`truncate text-base font-semibold ${cardTextColorClass}`}>{entry.species}</h3>
-                  <p className={`text-xs ${cardMutedTextColorClass}`}>{entry.catchTime.toLocaleDateString('pl-PL')}</p>
+                  <h3 className={`truncate text-base font-semibold ${cardTextColorClass}`}>{entry.fishSpeciesName}</h3>
+                  <p className={`text-xs ${cardMutedTextColorClass}`}>{entry.catchTime}</p>
                   {/* Opcjonalnie: Wyświetl wymiary, jeśli dostępne */}
-                  {(entry.lengthCm || entry.weightKg) && (
+                  {(entry.lengthInCm || entry.weightInKg) && (
                     <p className={`mt-1 truncate text-xs ${cardMutedTextColorClass}`}>
-                      {entry.lengthCm && `${entry.lengthCm} cm`}
-                      {entry.lengthCm && entry.weightKg && ' / '}
-                      {entry.weightKg && `${entry.weightKg} kg`}
+                      {entry.lengthInCm && `${entry.lengthInCm} cm`}
+                      {entry.lengthInCm && entry.weightInKg && ' / '}
+                      {entry.weightInKg && `${entry.weightInKg} kg`}
                     </p>
                   )}
                 </div>

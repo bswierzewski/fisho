@@ -22,7 +22,8 @@ public static class LogbookEndpoints
             .Produces<object>(StatusCodes.Status201Created)
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status401Unauthorized)
-            .ProducesProblem(StatusCodes.Status500InternalServerError);
+            .ProducesProblem(StatusCodes.Status500InternalServerError)
+            .DisableAntiforgery();
 
         group.MapGet("/", GetCurrentUserLogbookEntries)
             .WithName(nameof(GetCurrentUserLogbookEntries))

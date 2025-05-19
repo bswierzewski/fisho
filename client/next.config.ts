@@ -10,15 +10,15 @@ const nextConfig: NextConfig = {
         hostname: 'cdn.pixabay.com', // Hostname, z którego chcesz ładować obrazy
         port: '', // Zostaw puste dla standardowych portów (80, 443)
         pathname: '/**' // Pozwól na dowolną ścieżkę na tym hoście (np. /photo/...)
-      }
+      },
       // Możesz tu dodać inne dozwolone hostnames w przyszłości
       // np. dla Cloudinary, jeśli będziesz go używać
-      // {
-      //   protocol: 'https',
-      //   hostname: 'res.cloudinary.com',
-      //   port: '',
-      //   pathname: '/TWOJA_NAZWA_CHMURY/**', // Dostosuj do swojej nazwy chmury
-      // },
+      {
+        protocol: 'https', // Protokół używany przez Cloudinary
+        hostname: 'res.cloudinary.com', // Hostname, z którego chcesz ładować obrazy
+        port: '', // Zostaw puste dla standardowych portów (80, 443)
+        pathname: '/djmnsaieb/**' // Dostosuj do swojej nazwy chmury
+      }
     ]
   }
 };
