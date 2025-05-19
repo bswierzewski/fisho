@@ -9,8 +9,8 @@ export type CategoryType = (typeof CategoryType)[keyof typeof CategoryType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CategoryType = {
-  NUMBER_1: 1,
-  NUMBER_2: 2,
-  NUMBER_3: 3,
-  NUMBER_4: 4
+  MainScoring: 'MainScoring',
+  SpecialAchievement: 'SpecialAchievement',
+  FunChallenge: 'FunChallenge',
+  Custom: 'Custom'
 } as const;

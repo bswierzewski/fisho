@@ -9,9 +9,9 @@ export type MyCompetitionFilter = (typeof MyCompetitionFilter)[keyof typeof MyCo
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const MyCompetitionFilter = {
-  NUMBER_0: 0,
-  NUMBER_1: 1,
-  NUMBER_2: 2,
-  NUMBER_3: 3,
-  NUMBER_4: 4
+  All: 'All',
+  Upcoming: 'Upcoming',
+  Finished: 'Finished',
+  Organized: 'Organized',
+  Judged: 'Judged'
 } as const;

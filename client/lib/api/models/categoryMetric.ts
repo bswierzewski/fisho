@@ -9,10 +9,10 @@ export type CategoryMetric = (typeof CategoryMetric)[keyof typeof CategoryMetric
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CategoryMetric = {
-  NUMBER_0: 0,
-  NUMBER_1: 1,
-  NUMBER_2: 2,
-  NUMBER_3: 3,
-  NUMBER_4: 4,
-  NUMBER_5: 5
+  NotApplicable: 'NotApplicable',
+  LengthCm: 'LengthCm',
+  WeightKg: 'WeightKg',
+  FishCount: 'FishCount',
+  SpeciesVariety: 'SpeciesVariety',
+  TimeOfCatch: 'TimeOfCatch'
 } as const;

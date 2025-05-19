@@ -9,12 +9,12 @@ export type CompetitionStatus = (typeof CompetitionStatus)[keyof typeof Competit
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CompetitionStatus = {
-  NUMBER_0: 0,
-  NUMBER_1: 1,
-  NUMBER_2: 2,
-  NUMBER_3: 3,
-  NUMBER_4: 4,
-  NUMBER_5: 5,
-  NUMBER_6: 6,
-  NUMBER_7: 7
+  Draft: 'Draft',
+  PendingApproval: 'PendingApproval',
+  AcceptingRegistrations: 'AcceptingRegistrations',
+  Scheduled: 'Scheduled',
+  Upcoming: 'Upcoming',
+  Ongoing: 'Ongoing',
+  Finished: 'Finished',
+  Cancelled: 'Cancelled'
 } as const;

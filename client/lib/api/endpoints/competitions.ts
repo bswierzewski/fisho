@@ -60,7 +60,7 @@ export const createNewCompetition = (
     formData.append(`rules`, createCompetitionCommand.rules);
   }
   if (createCompetitionCommand.type !== undefined) {
-    formData.append(`type`, createCompetitionCommand.type.toString());
+    formData.append(`type`, createCompetitionCommand.type);
   }
   if (createCompetitionCommand.image !== undefined && createCompetitionCommand.image !== null) {
     formData.append(`image`, createCompetitionCommand.image);
@@ -517,7 +517,7 @@ export const updateExistingCompetition = (
     formData.append(`rules`, updateCompetitionCommand.rules);
   }
   if (updateCompetitionCommand.type !== undefined) {
-    formData.append(`type`, updateCompetitionCommand.type.toString());
+    formData.append(`type`, updateCompetitionCommand.type);
   }
   if (updateCompetitionCommand.image !== undefined && updateCompetitionCommand.image !== null) {
     formData.append(`image`, updateCompetitionCommand.image);

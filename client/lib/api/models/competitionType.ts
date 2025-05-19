@@ -9,6 +9,6 @@ export type CompetitionType = (typeof CompetitionType)[keyof typeof CompetitionT
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CompetitionType = {
-  NUMBER_0: 0,
-  NUMBER_1: 1
+  Public: 'Public',
+  Private: 'Private'
 } as const;

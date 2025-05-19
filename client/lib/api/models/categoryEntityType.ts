@@ -9,7 +9,7 @@ export type CategoryEntityType = (typeof CategoryEntityType)[keyof typeof Catego
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CategoryEntityType = {
-  NUMBER_1: 1,
-  NUMBER_2: 2,
-  NUMBER_3: 3
+  FishCatch: 'FishCatch',
+  ParticipantAggregateCatches: 'ParticipantAggregateCatches',
+  ParticipantProfile: 'ParticipantProfile'
 } as const;
