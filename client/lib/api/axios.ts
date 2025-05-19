@@ -6,7 +6,7 @@ import Axios, {
 } from 'axios';
 
 export const axiosInstance: AxiosInstance = Axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000'
+  baseURL: process.env.NEXT_PUBLIC_API_URL
 });
 
 // Przechowuj referencje do ID interceptorów, aby uniknąć duplikatów przy HMR
