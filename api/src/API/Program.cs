@@ -1,8 +1,8 @@
 ﻿using Application;
+using Fishio.API;
 using Fishio.API.Endpoints;
 using Fishio.API.Middlewares;
 using Infrastructure.Persistence;
-using Web;
 
 var builder = WebApplication.CreateBuilder(args);
 

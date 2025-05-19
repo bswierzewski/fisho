@@ -9,7 +9,7 @@ using Fishio.API.Infrastructure;
 using System.Text.Json.Serialization;
 using Fishio.Infrastructure.Filter; // Dla OpenApiSecurityScheme etc.
 
-namespace Web; // Zakładam, że namespace to 'Web' zgodnie z Twoim plikiem
+namespace Fishio.API;
 
 public static class DependencyInjection
 {
