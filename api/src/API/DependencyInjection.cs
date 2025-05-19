@@ -5,7 +5,9 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect; // Dla OpenIdConnectConfi
 using Microsoft.IdentityModel.Protocols;             // Dla ConfigurationManager
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Fishio.API.Infrastructure; // Dla OpenApiSecurityScheme etc.
+using Fishio.API.Infrastructure;
+using System.Text.Json.Serialization;
+using Fishio.Infrastructure.Filter; // Dla OpenApiSecurityScheme etc.
 
 namespace Web; // Zakładam, że namespace to 'Web' zgodnie z Twoim plikiem
 
@@ -24,7 +26,14 @@ public static class DependencyInjection
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options =>
         {
-            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Fishio API", Version = "v1" });          
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Fishio API", Version = "v1" });
+            options.SchemaFilter<EnumSchemaFilter>();
+        });
+
+        services.ConfigureHttpJsonOptions(services =>
+        {
+            // Ustawienia dla JSON, jeśli używasz System.Text.Json
+            services.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
         // --- Konfiguracja Zachowania API ---
