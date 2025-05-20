@@ -1,13 +1,11 @@
-﻿using Fishio.Infrastructure.Services;      // Dla CurrentUserService
+﻿using System.Text.Json.Serialization;
+using Fishio.API.Infrastructure;
+using Fishio.Infrastructure.Filter; // Dla OpenApiSecurityScheme etc.
+using Fishio.Infrastructure.Services;      // Dla CurrentUserService
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect; // Dla OpenIdConnectConfiguration
-using Microsoft.IdentityModel.Protocols;             // Dla ConfigurationManager
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Fishio.API.Infrastructure;
-using System.Text.Json.Serialization;
-using Fishio.Infrastructure.Filter; // Dla OpenApiSecurityScheme etc.
 
 namespace Fishio.API;
 
@@ -62,32 +60,25 @@ public static class DependencyInjection
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                options.Authority = clerkAuthority;
-                options.Audience = clerkAudience;
-                options.RequireHttpsMetadata = builder.Environment.IsProduction();
-
-                // Automatyczne pobieranie konfiguracji OpenID Connect (w tym JWKS URI)
-                // To jest preferowane podejście, zamiast ręcznego ustawiania JwksUri.
-                options.ConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
-                    $"{clerkAuthority.TrimEnd('/')}/.well-known/openid-configuration", // Upewnij się, że URL jest poprawny
-                    new OpenIdConnectConfigurationRetriever(),
-                    new HttpDocumentRetriever { RequireHttps = options.RequireHttpsMetadata }); // Użyj RequireHttps z opcji
+                options.Authority = clerkAuthority;     // Z pola "iss"
+                options.Audience = clerkAudience;      // Z pola "azp" (gdy "aud" brak)
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = clerkAuthority,
+                    ValidIssuer = clerkAuthority, // Powtórzenie dla jawnej walidacji
 
                     ValidateAudience = true,
-                    ValidAudience = clerkAudience,
+                    ValidAudience = clerkAudience,       // Powtórzenie dla jawnej walidacji
 
-                    ValidateIssuerSigningKey = true, // Kluczowe, JWKS URI zostanie użyte do pobrania kluczy
-                    // Klucze publiczne zostaną pobrane z JWKS URI dostarczonego przez Authority.
-                    // Nie ma potrzeby ręcznego ustawiania IssuerSigningKey, jeśli JWKS jest dostępne.
+                    ValidateIssuerSigningKey = true,
+                    // Klucze zostaną pobrane z JWKS URI dostarczonego przez Authority
+
+                    NameClaimType = "sub",
+                    RoleClaimType = "permissions", // Dostosuj, jeśli Clerk używa innego claimu dla ról/uprawnień
 
                     ValidateLifetime = true,
-                    ClockSkew = TimeSpan.FromSeconds(30) // Niewielka tolerancja dla różnic zegarów, standardowo 5 minut.
-                                                         // TimeSpan.Zero może być zbyt restrykcyjne.
+                    ClockSkew = TimeSpan.FromSeconds(30)
                 };
             });
 
