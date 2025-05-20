@@ -11,9 +11,11 @@ WORKDIR /app
 # Deklaruj argumenty budowania, które będą przekazywane z GitHub Actions
 # Te zmienne muszą być publiczne, ponieważ są używane podczas budowania frontendu
 ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+ARG NEXT_PUBLIC_CLERK_TOKEN_TEMPLATE
 
 # Ustaw je jako zmienne środowiskowe dla procesu budowania
 ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+ENV NEXT_PUBLIC_CLERK_TOKEN_TEMPLATE=$NEXT_PUBLIC_CLERK_TOKEN_TEMPLATE
 
 # Skopiuj pliki package.json i package-lock.json (lub yarn.lock, pnpm-lock.yaml)
 # Dockerfile jest w ./client, więc ścieżki są względem ./client
