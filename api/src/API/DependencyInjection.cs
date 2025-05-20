@@ -51,7 +51,6 @@ public static class DependencyInjection
         // Rejestracja ICurrentUserService
         services.AddScoped<ICurrentUserService, CurrentUserService>();
 
-
         // --- Konfiguracja Uwierzytelniania JWT (dla Clerk) ---
         // Pobieranie konfiguracji Clerk z appsettings.json lub zmiennych środowiskowych
         // Zmieniono nazwy kluczy konfiguracyjnych na bardziej spójne z moimi sugestiami
@@ -86,32 +85,10 @@ public static class DependencyInjection
                     // Klucze publiczne zostaną pobrane z JWKS URI dostarczonego przez Authority.
                     // Nie ma potrzeby ręcznego ustawiania IssuerSigningKey, jeśli JWKS jest dostępne.
 
-                    NameClaimType = "sub", // Standardowy claim dla ID użytkownika w OIDC (Clerk go używa)
-                                           // Możesz też użyć ClaimTypes.NameIdentifier, jeśli tak jest skonfigurowany Clerk.
-                    RoleClaimType = "permissions", // Jeśli Clerk używa claimu "permissions" dla ról/uprawnień.
-                                                   // Dostosuj, jeśli nazwa claimu jest inna.
-
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.FromSeconds(30) // Niewielka tolerancja dla różnic zegarów, standardowo 5 minut.
                                                          // TimeSpan.Zero może być zbyt restrykcyjne.
                 };
-
-                // Opcjonalnie: Obsługa zdarzeń walidacji tokenu dla debugowania
-                // options.Events = new JwtBearerEvents
-                // {
-                //     OnAuthenticationFailed = context =>
-                //     {
-                //         // Logowanie błędów
-                //         Console.WriteLine($"Authentication failed: {context.Exception.Message}");
-                //         return Task.CompletedTask;
-                //     },
-                //     OnTokenValidated = context =>
-                //     {
-                //         // Token pomyślnie zwalidowany
-                //         Console.WriteLine("Token validated for user: " + context.Principal?.Identity?.Name);
-                //         return Task.CompletedTask;
-                //     }
-                // };
             });
 
         // --- Konfiguracja Autoryzacji (Polityki) ---

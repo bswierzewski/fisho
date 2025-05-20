@@ -21,18 +21,15 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Fishio API V1"));
+
+    app.UseCors();
 }
 // Middleware do obsługi błędów
 app.UseExceptionHandler(options => { });
 
-app.UseCors();
-
 app.UseAuthentication();    // 1. Uwierzytelnianie (np. Clerk JWT validation)
 app.UseMiddleware<UserProvisioningMiddleware>();  // 2. Nasze middleware do mapowania/provisioningu użytkownika domenowego
 app.UseAuthorization();     // 3. Autoryzacja
-
-// Mapowanie endpointów - jeśli nie jest częścią AddWebServices
-// app.MapControllers(); // Jeśli używasz kontrolerów
 
 // Mapowanie endpointów
 app.MapAboutEndpoints();
