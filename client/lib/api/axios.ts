@@ -20,6 +20,7 @@ type SignOutFunction = (options?: { redirectUrl?: string; sessionId?: string }) 
 
 export const setupClerkInterceptors = (
   instance: AxiosInstance,
+  tokenTemplate: string,
   getToken: GetTokenFunction,
   signOut: SignOutFunction
 ) => {
@@ -33,7 +34,7 @@ export const setupClerkInterceptors = (
 
   requestInterceptorId = instance.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
-      const token = await getToken({ template: process.env.NEXT_PUBLIC_CLARK_TOKEN_TEMPLATE }); // Użyj przekazanej funkcji getToken
+      const token = await getToken({ template: tokenTemplate }); // Użyj przekazanej funkcji getToken
       // console.log('ApiClient: Token from interceptor:', token ? 'Exists' : 'Null');
       // console.log('ApiClient: Request interceptor for:', config.url);
 

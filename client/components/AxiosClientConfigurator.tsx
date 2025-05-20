@@ -12,12 +12,13 @@ import {
 export function AxiosClientConfigurator() {
   const { getToken } = useAuth();
   const { signOut } = useClerk();
+  const tokenTemplate = process.env.NEXT_PUBLIC_CLERK_TOKEN_TEMPLATE ?? 'default';
 
   useEffect(() => {
     // `getToken` i `signOut` są zazwyczaj stabilnymi referencjami z Clerk,
     // ale dodanie ich do tablicy zależności jest dobrą praktyką.
     // console.log("ApiClientConfigurator: Setting up Axios interceptors...");
-    setupClerkInterceptors(axiosInstance, getToken, signOut);
+    setupClerkInterceptors(axiosInstance, tokenTemplate, getToken, signOut);
 
     // Funkcja czyszcząca nie jest ściśle konieczna, jeśli interceptory
     // mają pozostać aktywne przez cały czas życia aplikacji,
