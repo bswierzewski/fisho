@@ -3,6 +3,7 @@ import TanstackQueryProvider from '@/providers/TanstackQueryProvider';
 import { plPL } from '@clerk/localizations';
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
+import { Toaster } from 'react-hot-toast';
 
 import { AxiosClientConfigurator } from '@/components/AxiosClientConfigurator';
 
@@ -21,7 +22,10 @@ export default function RootLayout({
       <html lang="pl">
         <body>
           <AxiosClientConfigurator />
-          <TanstackQueryProvider>{children}</TanstackQueryProvider>
+          <TanstackQueryProvider>
+            {children}
+            <Toaster />
+          </TanstackQueryProvider>
         </body>
       </html>
     </ClerkProvider>
