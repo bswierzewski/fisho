@@ -125,6 +125,48 @@ Następujące funkcjonalności są planowane w dalszym rozwoju aplikacji, po wdr
   - Implementacja menu bocznego (sidebar/drawer) otwieranego ikoną hamburgera.
   - Bardziej zaawansowane komponenty wyboru (np. MultiSelect dla gatunków ryb, kategorii specjalnych).
 
+### 💡 Nowe Kierunki Rozwoju (Wizja Długoterminowa)
+
+Poniższe funkcje reprezentują bardziej zaawansowane lub innowacyjne kierunki, które mogłyby zostać zaimplementowane w dalszej perspektywie, po ugruntowaniu pozycji aplikacji i zebraniu szerszego feedbacku:
+
+#### 🧠 Inteligentne Funkcje i Personalizacja (AI):
+
+- Automatyczne Rozpoznawanie Gatunku Ryby: Integracja z modelem AI umożliwiającym rozpoznawanie gatunku ryby na podstawie przesłanego zdjęcia, co mogłoby usprawnić proces dodawania połowów.
+- Spersonalizowane Rekomendacje: System rekomendujący łowiska, przynęty, techniki czy pory połowu, bazujący na historii użytkownika, danych pogodowych, fazach księżyca, aktywności innych wędkarzy (z pełnym poszanowaniem prywatności i anonimizacją danych zbiorczych) oraz popularności określonych metod na danym łowisku.
+- Predykcyjne Analizy Brań: Zaawansowane analizy sugerujące prawdopodobieństwo dobrych brań określonych gatunków na wybranych łowiskach w określonym czasie, uwzględniające wiele czynników.
+
+#### 🏆 Zaawansowana Gamifikacja i Elementy Społecznościowe:
+
+- Globalny System Osiągnięć i Odznak: Rozbudowany system nagradzania użytkowników za różnorodne aktywności (np. "Mistrz Okonia Mazowsza", "Odkrywca 100 Łowisk", "Ekspert Metody Spławikowej", "Ambasador C&R").
+- Wyzwania Wędkarskie: Możliwość tworzenia i uczestniczenia w cyklicznych lub jednorazowych wyzwaniach (np. "Złów największego szczupaka miesiąca w Polsce", "Skompletuj 5 gatunków ryb drapieżnych w sezonie").
+- Kluby/Drużyny Wędkarskie: Funkcjonalność tworzenia i zarządzania wirtualnymi klubami lub drużynami wędkarskimi w aplikacji, z własnymi forami dyskusyjnymi, wewnętrznymi rankingami i planowaniem wspólnych wypraw czy startów w zawodach.
+- Interaktywna Mapa Połowów (Heatmapa): Zanonimizowana, agregująca dane mapa pokazująca ogólne trendy i "gorące" miejsca połowów (wymagająca zgody użytkowników na udostępnianie zanonimizowanych danych lokalizacyjnych połowów).
+
+#### 🔗 Integracja z Ekosystemem Wędkarskim i IoT:
+
+- Zaawansowana Integracja Pogodowa: Szczegółowe dane pogodowe dla lokalizacji łowisk (temperatura wody, ciśnienie atmosferyczne, kierunek i siła wiatru, nasłonecznienie) oraz alerty pogodowe.
+- Kalendarz Brań i Fazy Księżyca: Zintegrowany, konfigurowalny kalendarz brań oparty o różne teorie i fazy księżyca.
+- Zgłaszanie Stanu Wody i Środowiska: Możliwość zgłaszania przez użytkowników i przeglądania informacji o stanie wody (np. przejrzystość, poziom), zanieczyszczeniach, zakwitach glonów czy innych ważnych czynnikach środowiskowych na łowiskach.
+- (Opcjonalnie) Integracja z Urządzeniami Zewnętrznymi: Możliwość importu danych z popularnych urządzeń wędkarskich (np. logi z echosond, dane z smartwatchy dotyczące aktywności).
+
+#### 📚 Edukacja, Bezpieczeństwo i Odpowiedzialne Wędkarstwo:
+
+- Rozbudowana Baza Wiedzy: Interaktywna encyklopedia gatunków ryb (z dokładnymi opisami, zdjęciami, mapami występowania, okresami i wymiarami ochronnymi obowiązującymi w różnych regionach/wodach PZW), technik połowu, sprzętu, przynęt.
+- Moduł Zgłaszania Nieprawidłowości: Dedykowany system zgłaszania przypadków kłusownictwa, zanieczyszczenia wód, czy innych nielegalnych działań, z możliwością (za zgodą użytkownika) przekazania informacji odpowiednim służbom (np. PSR, WIOŚ) lub organizacjom (np. PZW).
+- Promowanie Zasad "Złów i Wypuść" (Catch & Release): Specjalne oznaczenia dla wędkarzy i zawodów promujących C&R, dedykowane rankingi C&R, materiały edukacyjne na temat prawidłowego obchodzenia się z rybami.
+- Lokalne Regulaminy i Przepisy: Dostęp do aktualnych regulaminów amatorskiego połowu ryb (RAPR PZW) oraz specyficznych regulaminów dla poszczególnych łowisk (jeśli dostępne).
+
+#### 🌐 Funkcjonalności Offline i Dostępność:
+
+- Tryb Offline dla Kluczowych Funkcji: Możliwość dodawania wpisów do osobistego dziennika połowów, przeglądania pobranych wcześniej danych o łowiskach i gatunkach ryb bez dostępu do internetu, z automatyczną synchronizacją danych po odzyskaniu połączenia.
+- Ułatwienia Dostępu (Accessibility): Dalsze prace nad zapewnieniem zgodności z WCAG dla osób z niepełnosprawnościami.
+
+#### 💰 Zaawansowane Opcje Monetyzacji (jeśli aplikacja ma generować przychód):
+
+- Konta Premium (Subskrypcje): Wprowadzenie płatnych kont premium oferujących dodatkowe korzyści, np. zaawansowane statystyki i analizy, nielimitowane miejsce na zdjęcia, brak reklam (jeśli takowe się pojawią w wersji darmowej), wcześniejszy dostęp do nowych funkcji, ekskluzywne odznaki.
+- Płatne Promowanie: Możliwość płatnego wyróżniania zawodów, łowisk komercyjnych, sklepów wędkarskich czy usług przewodników wędkarskich w dedykowanych sekcjach aplikacji.
+- Marketplace Wędkarski: Stworzenie wewnątrz aplikacji bezpiecznej platformy do handlu nowym i używanym sprzętem wędkarskim, rękodziełem (np. przynęty) lub usługami (np. rezerwacja miejsc u przewodników wędkarskich).
+
 ---
 
 > Projekt przygotowany przez [Bartosz Świerzewski]
