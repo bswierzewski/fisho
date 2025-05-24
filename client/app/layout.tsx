@@ -24,7 +24,7 @@ export default function RootLayout({
           <AxiosClientConfigurator />
           <TanstackQueryProvider>
             {children}
-            <Toaster />
+            <Toaster position="bottom-right" />
           </TanstackQueryProvider>
         </body>
       </html>
