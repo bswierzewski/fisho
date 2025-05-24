@@ -31,7 +31,8 @@ public static class FisheriesEndpoints
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status500InternalServerError)
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .DisableAntiforgery();
 
         group.MapPut("/{id:int}", UpdateExistingFishery) // Zmieniono nazwę metody
             .WithName(nameof(UpdateExistingFishery))
@@ -40,7 +41,8 @@ public static class FisheriesEndpoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status403Forbidden)
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .DisableAntiforgery();
 
         group.MapDelete("/{id:int}", DeleteExistingFishery) // Zmieniono nazwę metody
             .WithName(nameof(DeleteExistingFishery))

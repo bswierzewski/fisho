@@ -43,7 +43,8 @@ public static class LogbookEndpoints
             .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
-            .ProducesProblem(StatusCodes.Status403Forbidden);
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .DisableAntiforgery();
 
         group.MapDelete("/{id:int}", DeleteExistingLogbookEntry) // Zmieniono nazwę metody
             .WithName(nameof(DeleteExistingLogbookEntry))

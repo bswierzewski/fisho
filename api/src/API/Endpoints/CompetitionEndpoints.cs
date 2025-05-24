@@ -31,7 +31,8 @@ public static class CompetitionsEndpoints
             .WithName(nameof(CreateNewCompetition))
             .Produces<object>(StatusCodes.Status201Created).ProducesValidationProblem().ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized).ProducesProblem(StatusCodes.Status500InternalServerError)
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .DisableAntiforgery();
 
         competitionsGroup.MapGet("/open", GetOpenCompetitionsList)
             .WithName(nameof(GetOpenCompetitionsList))
@@ -53,7 +54,8 @@ public static class CompetitionsEndpoints
             .Produces(StatusCodes.Status204NoContent).ProducesValidationProblem().ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound).ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status403Forbidden)
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .DisableAntiforgery();
 
         // --- Status Management ---
         var statusGroup = competitionsGroup.MapGroup("/{competitionId:int}/status")
@@ -125,7 +127,8 @@ public static class CompetitionsEndpoints
             .Produces<object>(StatusCodes.Status201Created) // Zwraca { fishCatchId = newId }
             .ProducesValidationProblem().ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound).ProducesProblem(StatusCodes.Status401Unauthorized)
-            .ProducesProblem(StatusCodes.Status403Forbidden);
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .DisableAntiforgery();
 
         // --- Category Management in Competition ---
         var categoryManagementGroup = competitionsGroup.MapGroup("/{competitionId:int}/categories")
