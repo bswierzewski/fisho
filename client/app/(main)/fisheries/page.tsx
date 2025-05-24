@@ -1,14 +1,12 @@
 'use client';
 
-// Dla przyszłych interakcji
-import { Fishery } from '@/lib/definitions';
-import { staticFisheries } from '@/lib/static-data';
-import { Filter, MapPin, Plus, Search } from 'lucide-react';
+import { useGetAllFisheries } from '@/lib/api/endpoints/fisheries';
+import { FisheryDto as Fishery } from '@/lib/api/models';
+import { Filter, MapPin, Plus, Search, AlertTriangle, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
-// Dodano ikony
 import { Input } from '@/components/ui/input';
 
 // Style karty (dopasuj do reszty)
@@ -20,7 +18,14 @@ const cardMutedTextColorClass = 'text-muted-foreground';
 
 export default function FisheriesPage() {
   // Na razie wyświetlamy wszystkie łowiska
-  const fisheries = staticFisheries;
+  const {
+    data: fisheriesResponse,
+    isLoading,
+    isError,
+    error,
+  } = useGetAllFisheries({ PageNumber: 1, PageSize: 20 });
+
+  const fisheries = fisheriesResponse?.items || [];
 
   // TODO: Dodać logikę wyszukiwania i filtrowania
 
@@ -52,7 +57,25 @@ export default function FisheriesPage() {
       </div>
 
       {/* Siatka Kart Łowisk */}
-      {fisheries.length > 0 ? (
+      {isLoading && (
+        <div className="flex justify-center items-center h-64">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <p className="ml-4 text-muted-foreground">Wczytywanie łowisk...</p>
+        </div>
+      )}
+
+      {isError && (
+        <div className="mt-8 rounded-lg border border-destructive bg-destructive/10 p-8 text-center">
+          <AlertTriangle className="mx-auto h-12 w-12 text-destructive mb-4" />
+          <p className="text-destructive mb-2 font-semibold">Wystąpił błąd podczas ładowania łowisk.</p>
+          <p className="text-sm text-destructive/80 mb-4">
+            {(error as Error)?.message || 'Spróbuj ponownie później.'}
+          </p>
+          {/* Można dodać przycisk do ponowienia próby */}
+        </div>
+      )}
+
+      {!isLoading && !isError && fisheries.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {fisheries.map((fishery: Fishery) => (
             <Link key={fishery.id} href={`/fisheries/${fishery.id}`}>
@@ -92,7 +115,9 @@ export default function FisheriesPage() {
             </Link>
           ))}
         </div>
-      ) : (
+      )}
+
+      {!isLoading && !isError && fisheries.length === 0 && (
         <div className="mt-8 rounded-lg border border-dashed border-border bg-card p-8 text-center">
           <MapPin className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
           <p className="text-muted-foreground mb-4">Brak dodanych łowisk w systemie.</p>

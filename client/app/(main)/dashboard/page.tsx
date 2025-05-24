@@ -33,7 +33,7 @@ const cardHeaderTextColorClass = 'text-secondary-foreground';
 const cardBodyBgClass = 'bg-card';
 const cardTextColorClass = 'text-foreground';
 const cardMutedTextColorClass = 'text-muted-foreground';
-const cardHeight = 'h-40';
+const cardHeight = 'h-44';
 
 // --- Komponent Pomocniczy dla Karty Akcji ---
 const ActionCard = ({

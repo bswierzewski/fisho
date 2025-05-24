@@ -5,7 +5,7 @@ alwaysApply: false
 ---
 # 🎣 Fishio Client (Frontend) - Rules for Cursor
 
-**Objective:** These rules are intended to ensure that code generated or modified by Cursor is consistent with the Fishio client architecture, project conventions, and the technologies used (Next.js App Router, React, TypeScript, shadcn/ui, TailwindCSS, Zustand, React Query, React Hook Form).
+**Objective:** These rules are intended to ensure that code generated or modified by Cursor is consistent with the Fishio client architecture, project conventions, and the technologies used (Next.js App Router, React, TypeScript, shadcn/ui, TailwindCSS, Zustand, React Query, React Hook Form, date-fns).
 
 ## 🏛️ 1. General Principles and Architecture
 
@@ -79,6 +79,7 @@ alwaysApply: false
 3.  **`config.ts`:** Client-side application configuration (e.g., API URL, public keys).
 4.  **`static-data.ts`:** Static data used in the application (e.g., options for selects that rarely change).
 5.  **`appVersion.ts`:** Logic related to the application version (if generated and used on the client-side).
+6.  **Date Formatting (`date-fns`):** Use the `date-fns` library for all date parsing, manipulation, and formatting tasks. Avoid using native `Date` methods directly for formatting where `date-fns` provides a more robust and explicit alternative.
 
 ## 🖼️ 7. Static Assets (`public/`)
 

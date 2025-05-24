@@ -1,17 +1,15 @@
 'use client';
 
-// Dla przyszłych interakcji
-import { LogbookEntry } from '@/lib/definitions';
-import { staticLogbookEntries } from '@/lib/static-data';
-import { Filter, Fish, Plus, Search } from 'lucide-react';
+import { Filter, Fish, Plus, Search, Ruler, Weight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { format } from 'date-fns';
 
 import { useGetCurrentUserLogbookEntries } from '@/lib/api/endpoints/logbook';
 import { UserLogbookEntryDto } from '@/lib/api/models';
 
 import { Button } from '@/components/ui/button';
-// Dodano ikony Search i Filter
+
 import { Input } from '@/components/ui/input';
 
 // Style karty (można przenieść do stałych, jeśli się powtarzają)
@@ -77,15 +75,24 @@ export default function LogbookPage() {
                 </div>
                 {/* Treść Karty */}
                 <div className={`p-3 ${cardBodyBgClass}`}>
-                  <h3 className={`truncate text-base font-semibold ${cardTextColorClass}`}>{entry.fishSpeciesName}</h3>
-                  <p className={`text-xs ${cardMutedTextColorClass}`}>{entry.catchTime}</p>
+                  <p className={`text-xs ${cardMutedTextColorClass}`}>
+                    {entry.catchTime ? format(new Date(entry.catchTime), 'yyyy-MM-dd HH:mm') : 'Brak daty'}
+                  </p>
                   {/* Opcjonalnie: Wyświetl wymiary, jeśli dostępne */}
                   {(entry.lengthInCm || entry.weightInKg) && (
-                    <p className={`mt-1 truncate text-xs ${cardMutedTextColorClass}`}>
-                      {entry.lengthInCm && `${entry.lengthInCm} cm`}
-                      {entry.lengthInCm && entry.weightInKg && ' / '}
-                      {entry.weightInKg && `${entry.weightInKg} kg`}
-                    </p>
+                    <div className={`mt-1 flex items-center gap-2 text-xs ${cardMutedTextColorClass}`}>
+                      {entry.lengthInCm && (
+                        <span className="flex items-center">
+                          <Ruler className="mr-1 h-3 w-3" /> {`${entry.lengthInCm} cm`}
+                        </span>
+                      )}
+                      {entry.lengthInCm && entry.weightInKg && <span>/</span>}
+                      {entry.weightInKg && (
+                        <span className="flex items-center">
+                          <Weight className="mr-1 h-3 w-3" /> {`${entry.weightInKg} kg`}
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
