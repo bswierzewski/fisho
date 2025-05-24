@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250518093257_Init")]
+    [Migration("20250524205533_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -517,6 +517,83 @@ namespace Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("FishSpecies");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Szczupak"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Okoń"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Płoć"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Leszcz"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Sandacz"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Węgorz"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Karaś"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "Lin"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "Karp"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Name = "Pstrąg"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Name = "Jaź"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Name = "Ukleja"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Name = "Sum"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Name = "Wzdręga"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Name = "Boleń"
+                        });
                 });
 
             modelBuilder.Entity("Fishio.Domain.Entities.Fishery", b =>

@@ -344,6 +344,28 @@ namespace Infrastructure.Persistence.Migrations
                     { 14, false, "MaxValue", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "Nagroda dla uczestnika, który złowił najwięcej różnych gatunków ryb.", "ParticipantAggregateCatches", true, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, "SpeciesVariety", "Największa Różnorodność Gatunków", false, "SpecialAchievement" }
                 });
 
+            migrationBuilder.InsertData(
+                table: "FishSpecies",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Szczupak" },
+                    { 2, "Okoń" },
+                    { 3, "Płoć" },
+                    { 4, "Leszcz" },
+                    { 5, "Sandacz" },
+                    { 6, "Węgorz" },
+                    { 7, "Karaś" },
+                    { 8, "Lin" },
+                    { 9, "Karp" },
+                    { 10, "Pstrąg" },
+                    { 11, "Jaź" },
+                    { 12, "Ukleja" },
+                    { 13, "Sum" },
+                    { 14, "Wzdręga" },
+                    { 15, "Boleń" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_CategoryDefinitions_Name",
                 table: "CategoryDefinitions",
