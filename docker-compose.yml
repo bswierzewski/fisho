@@ -42,8 +42,6 @@ services:
     container_name: fishio_client
     env_file:
       - ./.env # Explicitly load .env file variables
-    environment:
-      - CLERK_SECRET_KEY=sk_test_6meLAJeDCsQ0aW152FCLurom4ojQaUs7iV0nR5Awcs
     networks:
       - fishio_network
 
@@ -52,7 +50,7 @@ services:
     image: caddy:2-alpine
     container_name: fishio_caddy
     ports:
-      - "80:80"   # HTTP
+      - "80:80" # HTTP
       - "443:443" # HTTPS
       - "443:443/udp" # HTTP/3
     volumes:
@@ -74,5 +72,5 @@ networks:
 # Define persistent named volumes
 volumes:
   postgres_data: # For PostgreSQL data
-  caddy_data:    # For Caddy TLS certificates and other data
-  caddy_config:  # For Caddy configuration state 
+  caddy_data: # For Caddy TLS certificates and other data
+  caddy_config: # For Caddy configuration state
