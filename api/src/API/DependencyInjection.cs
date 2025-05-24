@@ -1,13 +1,14 @@
 ﻿using System.Text.Json.Serialization;
+using Application.Common.Options;
 using Fishio.API.Infrastructure;
+using Fishio.Application.Common.Options;
+using Fishio.Domain.Constants;
 using Fishio.Infrastructure.Filter; // Dla OpenApiSecurityScheme etc.
 using Fishio.Infrastructure.Services;      // Dla CurrentUserService
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Fishio.Application.Common.Options;
-using Fishio.Domain.Constants;
 
 namespace Fishio.API;
 
