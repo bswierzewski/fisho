@@ -41,7 +41,7 @@ services:
         - NEXT_PUBLIC_CLERK_TOKEN_TEMPLATE=${NEXT_PUBLIC_CLERK_TOKEN_TEMPLATE}
     container_name: fishio_client
     env_file:
-      - ./.env # Explicitly load .env file variables
+      - ./client/.env # Explicitly load .env file variables
     networks:
       - fishio_network
 

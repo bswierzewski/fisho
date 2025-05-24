@@ -99,6 +99,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: | # Przekazujemy klucz Clerk jako build-arg
             NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+            NEXT_PUBLIC_CLERK_TOKEN_TEMPLATE=${{ secrets.NEXT_PUBLIC_CLERK_TOKEN_TEMPLATE }}
             # Dodaj inne publiczne zmienne środowiskowe potrzebne podczas budowania klienta
             # NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL_PROD }}
           cache-from: type=gha
