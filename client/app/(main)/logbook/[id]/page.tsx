@@ -1,15 +1,16 @@
 // app/(main)/logbook/[catchId]/page.tsx
 "use client"; // Required for using client-side hooks
 
-import { useGetLogbookEntryDetailsById } from '@/lib/api/endpoints/logbook';
-import { LogbookEntryDto } from '@/lib/api/models';
+import { useDeleteExistingLogbookEntry, useGetLogbookEntryDetailsById, getGetCurrentUserLogbookEntriesQueryKey } from '@/lib/api/endpoints/logbook';
+import { LogbookEntryDto, HttpValidationProblemDetails, ProblemDetails } from '@/lib/api/models';
 import { ArrowLeft, CalendarDays, Edit, MapPin, Ruler, Trash2, Weight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, useRouter, useParams } from 'next/navigation'; // Import useParams & useRouter
+import { toast } from 'react-hot-toast';
+import { useQueryClient } from '@tanstack/react-query'; // Import useQueryClient
 
 import { Button } from '@/components/ui/button';
-import { useParams } from 'next/navigation'; // Import useParams
 import { Skeleton } from '@/components/ui/skeleton'; // For loading state
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // For error state
 import { Terminal } from "lucide-react"; // For error state icon
@@ -34,6 +35,8 @@ const formatDate = (date: Date | string) => {
 
 export default function LogbookEntryDetailPage() {
   const params = useParams();
+  const router = useRouter();
+  const queryClient = useQueryClient(); // Get queryClient instance
   const id = params.id as string;
 
   const { data: entry, isLoading, isError, error } = useGetLogbookEntryDetailsById(parseInt(id, 10), {
@@ -42,6 +45,11 @@ export default function LogbookEntryDetailPage() {
       refetchOnMount: "always",
     }
   });
+
+  const {
+    mutate: deleteLogbookEntry,
+    isPending: isDeletingEntry,
+  } = useDeleteExistingLogbookEntry();
 
   if (isLoading) {
     return (
@@ -109,6 +117,40 @@ export default function LogbookEntryDetailPage() {
   const fisheryName = entry.fisheryName;
   const fisheryId = entry.fisheryId;
 
+  const handleDeleteEntry = () => {
+    if (!entry || !entry.id) {
+      toast.error('Błąd: ID wpisu jest nieznane lub wpis nie istnieje.');
+      return;
+    }
+
+    if (window.confirm('Czy na pewno chcesz usunąć ten wpis z dziennika? Tej operacji nie można cofnąć.')) {
+      deleteLogbookEntry(
+        { id: entry.id },
+        {
+          onSuccess: () => {
+            toast.success('Wpis w dzienniku został pomyślnie usunięty!');
+            // Invalidate the query for the logbook entries list
+            queryClient.invalidateQueries({
+              queryKey: getGetCurrentUserLogbookEntriesQueryKey({ PageNumber: 1, PageSize: 20 }),
+            });
+            router.push('/logbook');
+          },
+          onError: (error: HttpValidationProblemDetails | ProblemDetails) => {
+            console.error('Error deleting logbook entry:', error);
+            let errorMessage = 'Nie udało się usunąć wpisu. Spróbuj ponownie.';
+            if ('title' in error && error.title) {
+              errorMessage = error.title;
+            } else if ('detail' in error && error.detail) {
+              errorMessage = error.detail;
+            } else if ('message' in error && typeof error.message === 'string') {
+              errorMessage = error.message;
+            }
+            toast.error(errorMessage);
+          },
+        }
+      );
+    }
+  };
 
   // Logika warunkowa dla przycisków (na razie uproszczona)
   const canEditOrDelete = true; // Załóżmy, że użytkownik jest właścicielem wpisu
@@ -133,10 +175,17 @@ export default function LogbookEntryDetailPage() {
                 <span className="sr-only">Edytuj</span>
               </Button>
             </Link>
-            <Button variant="destructive" size="icon" onClick={() => {/* TODO: Implement delete logic */}}>
-              {' '}
-              {/* Placeholder dla usuwania */}
-              <Trash2 className="h-4 w-4" />
+            <Button 
+              variant="destructive" 
+              size="icon" 
+              onClick={handleDeleteEntry}
+              disabled={isDeletingEntry || isLoading} // Disable if deleting or initial load in progress
+            >
+              {isDeletingEntry ? (
+                <span className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
               <span className="sr-only">Usuń</span>
             </Button>
           </div>

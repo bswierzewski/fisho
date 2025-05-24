@@ -4,9 +4,15 @@ import { ArrowLeft, Calendar, Fish, ImagePlus, MapPin, Ruler, StickyNote, Weight
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { useGetAllFisheries } from '@/lib/api/endpoints/fisheries';
-import { useGetLogbookEntryDetailsById, useUpdateExistingLogbookEntry } from '@/lib/api/endpoints/logbook';
+import { 
+  useGetLogbookEntryDetailsById, 
+  useUpdateExistingLogbookEntry, 
+  getGetCurrentUserLogbookEntriesQueryKey, 
+  getGetLogbookEntryDetailsByIdQueryKey 
+} from '@/lib/api/endpoints/logbook';
 import { UpdateLogbookEntryCommand, HttpValidationProblemDetails, ProblemDetails, LogbookEntryDto } from '@/lib/api/models';
 
 import { Button } from '@/components/ui/button';
@@ -23,6 +29,7 @@ const cardMutedTextColorClass = 'text-muted-foreground';
 export default function EditLogbookEntryPage() {
   const router = useRouter();
   const params = useParams();
+  const queryClient = useQueryClient();
   const entryId = params.id as string;
 
   const [selectedImagePreview, setSelectedImagePreview] = useState<string | null>(null);
@@ -109,6 +116,12 @@ export default function EditLogbookEntryPage() {
       {
         onSuccess: () => {
           toast.success('Wpis w dzienniku został pomyślnie zaktualizowany!');
+          queryClient.invalidateQueries({ 
+            queryKey: getGetCurrentUserLogbookEntriesQueryKey({ PageNumber: 1, PageSize: 20 }) 
+          });
+          queryClient.invalidateQueries({ 
+            queryKey: getGetLogbookEntryDetailsByIdQueryKey(Number(entryId)) 
+          });
           router.push('/logbook');
         },
         onError: (error: HttpValidationProblemDetails | ProblemDetails) => {

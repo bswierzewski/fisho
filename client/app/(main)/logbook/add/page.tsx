@@ -2,11 +2,14 @@
 
 import { ArrowLeft, Calendar, Fish, ImagePlus, MapPin, Ruler, StickyNote, Weight } from 'lucide-react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'react-hot-toast';
 
 import { useGetAllFisheries } from '@/lib/api/endpoints/fisheries';
-import { useCreateNewLogbookEntry } from '@/lib/api/endpoints/logbook';
+import { useCreateNewLogbookEntry, getGetCurrentUserLogbookEntriesQueryKey } from '@/lib/api/endpoints/logbook';
+import { CreateLogbookEntryCommand, HttpValidationProblemDetails, ProblemDetails } from '@/lib/api/models';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,12 +23,17 @@ const cardMutedTextColorClass = 'text-muted-foreground';
 
 export default function AddLogbookEntryPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const preselectedFisheryId = searchParams.get('fisheryId');
   const [selectedImagePreview, setSelectedImagePreview] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
   const { data: fisheries } = useGetAllFisheries({ PageNumber: 1, PageSize: 20 });
-  const { mutate: createNewLogbookEntry } = useCreateNewLogbookEntry();
+  const { 
+    mutate: createNewLogbookEntry, 
+    isPending: isCreatingEntry 
+  } = useCreateNewLogbookEntry();
 
   // Symulacja obsługi zmiany pliku
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,11 +51,48 @@ export default function AddLogbookEntryPage() {
   // Symulacja wysłania formularza
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    createNewLogbookEntry({
-      data: {
-        image: selectedImage
+    // Basic validation: ensure image is selected
+    if (!selectedImage) {
+      toast.error('Zdjęcie ryby jest wymagane.');
+      return;
+    }
+
+    const formData = new FormData(event.currentTarget);
+    const command: CreateLogbookEntryCommand = {
+      image: selectedImage,
+      lengthInCm: formData.get('length') ? parseFloat(formData.get('length') as string) : undefined,
+      weightInKg: formData.get('weight') ? parseFloat(formData.get('weight') as string) : undefined,
+      catchTime: formData.get('catch-time') ? new Date(formData.get('catch-time') as string).toISOString() : new Date().toISOString(),
+      fisheryId: formData.get('fishery') && formData.get('fishery') !== 'none' ? Number(formData.get('fishery') as string) : undefined,
+      notes: formData.get('notes') as string || undefined,
+    };
+
+    createNewLogbookEntry(
+      { data: command }, 
+      {
+        onSuccess: () => {
+          toast.success('Nowy połów został pomyślnie dodany do dziennika!');
+          queryClient.invalidateQueries({
+            queryKey: getGetCurrentUserLogbookEntriesQueryKey({ PageNumber: 1, PageSize: 20 })
+          });
+          router.push('/logbook');
+        },
+        onError: (error: HttpValidationProblemDetails | ProblemDetails | Error) => {
+          console.error('Error creating new logbook entry:', error);
+          let errorMessage = 'Nie udało się dodać nowego połowu. Spróbuj ponownie.';
+          if (error instanceof Error) {
+            errorMessage = error.message;
+          } else if (error && typeof error === 'object') {
+            if ('title' in error && error.title) {
+              errorMessage = error.title as string;
+            } else if ('detail' in error && error.detail) {
+              errorMessage = error.detail as string;
+            }
+          }
+          toast.error(errorMessage);
+        }
       }
-    });
+    );
   };
 
   return (
@@ -200,8 +245,12 @@ export default function AddLogbookEntryPage() {
 
         {/* --- Przycisk Zapisu --- */}
         <div className="pt-2">
-          <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-            Zapisz Połów w Dzienniku
+          <Button 
+            type="submit" 
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+            disabled={isCreatingEntry}
+          >
+            {isCreatingEntry ? 'Zapisywanie połowu...' : 'Zapisz Połów w Dzienniku'} 
           </Button>
         </div>
       </form>

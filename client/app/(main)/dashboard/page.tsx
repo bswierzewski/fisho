@@ -33,7 +33,7 @@ const cardHeaderTextColorClass = 'text-secondary-foreground';
 const cardBodyBgClass = 'bg-card';
 const cardTextColorClass = 'text-foreground';
 const cardMutedTextColorClass = 'text-muted-foreground';
-const cardHeight = 'h-44';
+const cardHeight = 'h-46';
 
 // --- Komponent Pomocniczy dla Karty Akcji ---
 const ActionCard = ({
@@ -252,7 +252,6 @@ export default function DashboardPage() {
             text="Dodaj Nowy Połów"
             icon={Plus}
             src="/koi.svg"
-            className={recentCatches.length === 0 ? 'ml-4' : ''}
           />
         </div>
       </section>
@@ -302,7 +301,6 @@ export default function DashboardPage() {
             text="Przeglądaj Zawody"
             icon={ArrowRight}
             src="/laurel_wreath_green.svg"
-            className={openCompetitions.length === 0 ? 'ml-4' : ''}
           />
         </div>
       </section>

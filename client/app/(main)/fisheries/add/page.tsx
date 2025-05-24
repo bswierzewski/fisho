@@ -17,6 +17,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { useGetAllFishSpecies } from '@/lib/api/endpoints/lookup-data';
 
 // Style (dopasuj do reszty aplikacji)
 const cardBodyBgClass = 'bg-card';
@@ -49,10 +50,7 @@ export default function AddFisheryPage() {
   });
 
   // Fetch all species, assuming PageSize large enough or a mechanism to get all if available
-  const { data: fishSpeciesPaginatedData, isLoading: isLoadingSpecies, isError: isErrorSpecies } = useGetAllFisheries({
-    PageNumber: 1,
-    PageSize: 100 // Or a more appropriate way to fetch all species if the API supports it
-  });
+  const { data: fishSpeciesPaginatedData, isLoading: isLoadingSpecies, isError: isErrorSpecies } = useGetAllFishSpecies();
 
   const form = useForm({
     defaultValues: {
@@ -214,8 +212,8 @@ export default function AddFisheryPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-2 max-h-60 overflow-y-auto p-2 border border-border rounded-md bg-card">
                   {isLoadingSpecies && <p className={`col-span-full text-sm ${cardMutedTextColorClass}`}>Ładowanie gatunków...</p>}
                   {isErrorSpecies && <p className={`col-span-full text-sm text-destructive ${cardMutedTextColorClass}`}>Nie udało się załadować gatunków ryb.</p>}
-                  {fishSpeciesPaginatedData?.items && fishSpeciesPaginatedData.items.length === 0 && <p className={`col-span-full text-sm ${cardMutedTextColorClass}`}>Brak dostępnych gatunków ryb.</p>}
-                  {fishSpeciesPaginatedData?.items?.map((species: FishSpeciesDto) => (
+                  {fishSpeciesPaginatedData && fishSpeciesPaginatedData.length === 0 && <p className={`col-span-full text-sm ${cardMutedTextColorClass}`}>Brak dostępnych gatunków ryb.</p>}
+                  {fishSpeciesPaginatedData?.map((species: FishSpeciesDto) => (
                     <div key={species.id} className="flex items-center space-x-2">
                       <Checkbox
                         id={`species-${species.id}`}

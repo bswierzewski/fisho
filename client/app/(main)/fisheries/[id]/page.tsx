@@ -1,55 +1,94 @@
-// app/(main)/fisheries/[id]/page.tsx
-import { FishSpecies as FishSpeciesType, Fishery, LogbookEntry } from '@/lib/definitions';
-import {
-  availableFishSpecies,
-  // Potrzebne do mapowania ID na nazwy
-  staticFisheries,
-  staticLogbookEntries
-} from '@/lib/static-data';
-// ... (reszta importów bez zmian) ...
-import { ArrowLeft, Edit, Fish as FishIcon, List, MapPin, Plus } from 'lucide-react';
+"use client";
+
+import { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation'; // Use useParams for client components
+import { ArrowLeft, Edit, Fish as FishIcon, List, MapPin, Plus } from 'lucide-react';
+import { format } from 'date-fns';
+import { pl } from 'date-fns/locale';
+
+// Assuming DTOs from generated API client
+import { FisheryDto, LogbookEntryDto, FishSpeciesDto } from '@/lib/api/models'; 
+// Assuming the hook is in this path, adjust if necessary
+import { useGetFisheryById } from '@/lib/api/endpoints/fisheries'; 
 
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton'; // For loading state
 
-// ... (Style i formatDateTime bez zmian) ...
+
 const sectionHeaderBgClass = 'bg-slate-800';
 const sectionHeaderTextColorClass = 'text-slate-100';
 const cardMutedTextColorClass = 'text-muted-foreground';
-const cardTextColorClass = 'text-foreground';
-const cardBodyBgClass = 'bg-card';
+// const cardTextColorClass = 'text-foreground'; // No longer used directly, can be removed if not needed elsewhere
+// const cardBodyBgClass = 'bg-card'; // No longer used directly, can be removed if not needed elsewhere
 
-const formatDate = (date: Date) => {
-  return date.toLocaleDateString('pl-PL', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric'
-  });
+const formatDateInternal = (dateInput: Date | string | number) => {
+  const date = typeof dateInput === 'string' || typeof dateInput === 'number' ? new Date(dateInput) : dateInput;
+  return format(date, 'dd MMMM yyyy', { locale: pl });
 };
 
-export default async function FisheryDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const fishery = staticFisheries.find((f) => f.id === id);
+export default function FisheryDetailPage() {
+  const params = useParams();
+  const idParam = params.id as string;
+  const fisheryId = parseInt(idParam, 10);
 
-  if (!fishery) {
-    notFound();
+  // Fetch fishery data using the hook
+  const { data: fishery, isLoading, error, isError } = useGetFisheryById(fisheryId, { query: { enabled: !isNaN(fisheryId) }});
+
+  useEffect(() => {
+    if (isNaN(fisheryId)) {
+      notFound(); // If id is not a number, navigate to notFound
+      return;
+    }
+    if (!isLoading && (isError || !fishery)) {
+      notFound();
+    }
+  }, [isLoading, isError, fishery, fisheryId]);
+
+  if (isLoading || isNaN(fisheryId)) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-12 w-1/4" />
+        <Skeleton className="h-64 w-full rounded-lg" />
+        <div className="flex gap-2">
+          <Skeleton className="h-10 w-32" />
+          <Skeleton className="h-10 w-48" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-48 w-full" />
+          </div>
+          <div className="space-y-6">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-32 w-full" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  const catchesFromThisFishery = staticLogbookEntries.filter((entry) => entry.fisheryId === fishery.id).slice(0, 5);
+  // Note: notFound() is called in useEffect, which handles redirection.
+  // We need to return null or some placeholder if fishery is not available yet
+  // or an error occurred, to prevent rendering with undefined data.
+  if (isError || !fishery) {
+    // This will be shown briefly before notFound() redirects if error or no fishery
+    // or if fisheryId was NaN and useEffect kicked in.
+    return null; 
+  }
+  
+  // FisheryDto does not seem to contain logbook entries directly.
+  // This will be empty unless fetched separately.
+  const catchesFromThisFishery: LogbookEntryDto[] = []; // fishery.logbookEntries || []).slice(0, 5);
+  const definedSpeciesForDisplay = fishery.fishSpecies || [];
 
-  // Pobierz nazwy gatunków na podstawie species_ids z obiektu fishery
-  const definedSpeciesForDisplay: FishSpeciesType[] = fishery.species_ids
-    ? availableFishSpecies.filter((species) => fishery.species_ids!.includes(species.id))
-    : [];
-
-  const canEdit = true;
-  const canAddCatchHere = true;
+  const canEdit = true; // This might come from user permissions or API in a real app
+  const canAddCatchHere = true; // Same as above
 
   return (
     <div className="space-y-6">
-      {/* ... (Nagłówek i Przyciski Akcji - bez zmian) ... */}
+      {/* Header and Action Buttons */}
       <div className="relative overflow-hidden rounded-lg border border-border shadow">
         {fishery.imageUrl ? (
           <div className="relative h-48 sm:h-64 w-full">
@@ -96,7 +135,7 @@ export default async function FisheryDetailPage({ params }: { params: Promise<{ 
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* ... (Kolumna Główna - Ostatnie Połowy - bez zmian) ... */}
+        {/* Main Column - Recent Catches */}
         <div className="lg:col-span-2 space-y-6">
           <section>
             <div
@@ -108,21 +147,24 @@ export default async function FisheryDetailPage({ params }: { params: Promise<{ 
             <div className={`p-4 border-x border-b rounded-b-lg bg-card`}>
               {catchesFromThisFishery.length > 0 ? (
                 <ul className="space-y-3">
-                  {catchesFromThisFishery.map((entry: LogbookEntry) => (
+                  {catchesFromThisFishery.map((entry: LogbookEntryDto) => (
                     <li
-                      key={entry.id}
+                      key={entry.id} // Assuming LogbookEntryDto has an id
                       className={`flex items-center space-x-3 p-2 rounded border border-border/50 bg-card shadow-sm`}
                     >
                       <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded bg-muted">
-                        <Image src={entry.photoUrl} alt={entry.species} layout="fill" objectFit="cover" />
+                        {/* LogbookEntryDto has imageUrl, fishSpeciesName */}
+                        <Image src={entry.imageUrl || '/placeholder-fish.svg'} alt={entry.fishSpeciesName || 'Złowiona ryba'} layout="fill" objectFit="cover" />
                       </div>
                       <div>
-                        <p className={`font-semibold text-foreground`}>{entry.species}</p>
-                        <p className={`text-xs ${cardMutedTextColorClass}`}>{formatDate(entry.catchTime)}</p>
+                        <p className={`font-semibold text-foreground`}>{entry.fishSpeciesName}</p> 
+                        {/* LogbookEntryDto has catchTime (string) */}
+                        <p className={`text-xs ${cardMutedTextColorClass}`}>{entry.catchTime ? formatDateInternal(entry.catchTime) : 'Brak danych'}</p>
                       </div>
                       <div className="ml-auto text-right">
-                        {entry.lengthCm && <p className={`text-xs ${cardMutedTextColorClass}`}>{entry.lengthCm} cm</p>}
-                        {entry.weightKg && <p className={`text-xs ${cardMutedTextColorClass}`}>{entry.weightKg} kg</p>}
+                        {/* LogbookEntryDto has lengthInCm, weightInKg */}
+                        {entry.lengthInCm && <p className={`text-xs ${cardMutedTextColorClass}`}>{entry.lengthInCm} cm</p>}
+                        {entry.weightInKg && <p className={`text-xs ${cardMutedTextColorClass}`}>{entry.weightInKg} kg</p>}
                       </div>
                     </li>
                   ))}
@@ -134,7 +176,7 @@ export default async function FisheryDetailPage({ params }: { params: Promise<{ 
           </section>
         </div>
 
-        {/* Kolumna Boczna (np. Gatunki Ryb) */}
+        {/* Sidebar (e.g., Fish Species) */}
         <div className="space-y-6">
           <section>
             <div
@@ -146,7 +188,8 @@ export default async function FisheryDetailPage({ params }: { params: Promise<{ 
             <div className={`p-4 border-x border-b rounded-b-lg bg-card`}>
               {definedSpeciesForDisplay.length > 0 ? (
                 <ul className="space-y-1 text-sm">
-                  {definedSpeciesForDisplay.map((species) => (
+                  {/* Assuming FishSpeciesDto has id and name */}
+                  {definedSpeciesForDisplay.map((species: FishSpeciesDto) => (
                     <li key={species.id} className={`flex items-center ${cardMutedTextColorClass}`}>
                       <FishIcon className="mr-2 h-4 w-4 flex-shrink-0 opacity-70" /> {species.name}
                     </li>
