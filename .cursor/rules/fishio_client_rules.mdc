@@ -1,3 +1,8 @@
+---
+description: 
+globs: client/*
+alwaysApply: false
+---
 # 🎣 Fishio Client (Frontend) - Rules for Cursor
 
 **Objective:** These rules are intended to ensure that code generated or modified by Cursor is consistent with the Fishio client architecture, project conventions, and the technologies used (Next.js App Router, React, TypeScript, shadcn/ui, TailwindCSS, Zustand, React Query, React Hook Form).

@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
 # 🎣 Fishio - General Application Rules for Cursor
 
 **Objective:** This document provides general context and overarching principles for the development of the Fishio application. It aims to ensure that Cursor understands the main project goals, key technologies, and the overall approach to software development, for both the backend (API) and frontend (Client) parts.
