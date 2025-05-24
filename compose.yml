@@ -1,11 +1,84 @@
+version: "3.8" # Specify a Docker Compose version
+
 services:
+  caddy:
+    container_name: caddy
+    image: caddy:2.9.1-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - caddy
+    volumes:
+      - ./.Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+    restart: unless-stopped # Added for robustness
+
   db:
     container_name: fishio_db
     image: postgres
     restart: always
     shm_size: 128mb
     ports:
-      - 5432:5432
+      - "5432:5432"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgrespw
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgrespw
+    networks:
+      - caddy
+
+  api:
+    container_name: fishio_api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    image: fishio_api:latest
+    restart: unless-stopped # Added for robustness
+    environment:
+      - Clerk__Authority=https://fitting-wasp-30.clerk.accounts.dev
+      - Clerk__Audience=authenticated
+      - ConnectionStrings__DefaultConnection=Server=db;User Id=postgres;Password=postgrespw;Database=fishio
+      - Cloudinary__CloudName=djmnsaieb
+      - Cloudinary__ApiKey=519757533962621
+      - Cloudinary__ApiSecret=SC1UT493ewR3msFvkQ4mPPwuA9o
+    depends_on:
+      db:
+        condition: service_started
+    expose:
+      - "7000"
+    networks:
+      - caddy
+
+  client:
+    container_name: fishio_client
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        # These ARGs are defined in your client/Dockerfile.
+        # Their values will be picked up from the .env file in your project root.
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+        NEXT_PUBLIC_CLERK_TOKEN_TEMPLATE: ${NEXT_PUBLIC_CLERK_TOKEN_TEMPLATE} # If you use this
+    image: fishio_client:latest
+    restart: unless-stopped # Added for robustness
+    volumes:
+      # This mounts the host path /var/lib/web/data to /var/lib/web/data inside the container.
+      # Adjust if this is not your intended use.
+      - /var/lib/web/data:/var/lib/web/data
+    environment:
+      # Runtime environment variables for the Next.js server (server.js)
+      # CLERK_SECRET_KEY is needed for server-side Clerk operations.
+      # Source it from the root .env file.
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+      # NODE_ENV is already set to production in your client/Dockerfile's runner stage.
+    expose:
+      - "3000"
+    networks:
+      - caddy
+
+volumes:
+  caddy_data:
+
+networks:
+  caddy:
+    driver: bridge

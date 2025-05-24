@@ -1,0 +1,111 @@
+version: '3.8'
+
+# This docker-compose file sets up a complete local development environment for Fishio.
+# It includes the API, Client, PostgreSQL Database, and Caddy reverse proxy.
+# Environment variables are expected to be in a .env file in the root directory.
+
+services:
+  # fishio_db: PostgreSQL Database Service
+  fishio_db:
+    image: postgres:16-alpine
+    container_name: fishio-db-dev
+    environment:
+      - POSTGRES_DB=fishio
+      - POSTGRES_USER=fishio_user
+      - POSTGRES_PASSWORD=${DB_PASSWORD} # Loaded from .env file
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persists database data
+    ports:
+      - "5432:5432" # Expose DB port for local development tools (e.g., pgAdmin)
+    networks:
+      - fishio_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fishio_user -d fishio"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped # Ensures DB stays up during development
+
+  # fishio_api: .NET API Service
+  fishio_api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: fishio-api-dev
+    env_file:
+      - ./.env # Explicitly load .env file variables
+    environment:
+      # .NET Core environment settings (ASPNETCORE_ENVIRONMENT is in .env)
+      - ASPNETCORE_URLS=http://+:7000 # Internal port for the API
+      # Database connection (ConnectionStrings__DefaultConnection is in .env)
+      # Clerk settings (Clerk__Authority, Clerk__Audience are in .env)
+      # Cloudinary settings (Cloudinary__CloudName, Cloudinary__ApiKey, Cloudinary__ApiSecret are in .env)
+    volumes:
+      - ./api:/app # Mount local API code for hot-reloading
+    depends_on:
+      fishio_db: # Ensures database is ready before API starts
+        condition: service_healthy
+    networks:
+      - fishio_network
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:7000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s # Give time for .NET app to start
+    restart: unless-stopped
+
+  # fishio_client: Next.js Client Service
+  fishio_client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        # Build-time arguments passed from .env file
+        - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+        - NEXT_PUBLIC_CLERK_TOKEN_TEMPLATE=${NEXT_PUBLIC_CLERK_TOKEN_TEMPLATE}
+    container_name: fishio-client-dev
+    env_file:
+      - ./.env # Explicitly load .env file variables
+    environment:
+      # NODE_ENV is in .env
+      # NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is in .env
+      # NEXT_PUBLIC_CLERK_TOKEN_TEMPLATE is in .env
+      # NEXT_PUBLIC_API_URL is in .env
+    volumes:
+      - ./client:/app # Mount local client code for hot-reloading
+      - /app/node_modules # Preserve node_modules installed in the container
+      - /app/.next # Preserve Next.js build cache
+    networks:
+      - fishio_network
+    restart: unless-stopped
+
+  # caddy: Reverse Proxy Service
+  caddy:
+    image: caddy:2-alpine
+    container_name: fishio-caddy-dev
+    ports:
+      - "80:80"   # HTTP
+      - "443:443" # HTTPS
+      - "443:443/udp" # HTTP/3
+    volumes:
+      - ./.Caddyfile:/etc/caddy/Caddyfile:ro # Mount local Caddyfile (read-only)
+      - caddy_data:/data # Persists Caddy's certificates and state
+      - caddy_config:/config # Persists Caddy's configuration
+    depends_on:
+      - fishio_api
+      - fishio_client
+    networks:
+      - fishio_network
+    restart: unless-stopped
+
+# Define shared network for service communication
+networks:
+  fishio_network:
+    driver: bridge
+
+# Define persistent named volumes
+volumes:
+  postgres_data: # For PostgreSQL data
+  caddy_data:    # For Caddy TLS certificates and other data
+  caddy_config:  # For Caddy configuration state 

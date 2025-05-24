@@ -1,0 +1,25 @@
+fishio.localhost {
+  # Enable Caddy's internal CA for local HTTPS (recommended)
+  tls internal
+
+  # Proxy requests to /api/* to the fishio_api service
+  # The path_regexp matcher is more precise for /api/*
+  @api path_regexp ^/api(/.*)?$
+  reverse_proxy @api fishio_api:7000
+
+  # Proxy all other requests to the fishio_client service
+  reverse_proxy fishio_client:3000
+}
+
+# If you also want to use fishio.local, you can duplicate the block
+# or use a more advanced Caddyfile structure if settings are identical.
+# For simplicity, here's a separate block:
+
+fishio.local {
+  tls internal
+
+  @api path_regexp ^/api(/.*)?$
+  reverse_proxy @api fishio_api:7000
+
+  reverse_proxy fishio_client:3000
+}
