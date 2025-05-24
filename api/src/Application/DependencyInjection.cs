@@ -8,10 +8,13 @@ public static class DependencyInjection
 {
     public static void AddApplicationServices(this IHostApplicationBuilder builder)
     {
+        // AutoMapper Configuration
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
+        // FluentValidation Configuration
         builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
+        // MediatR Configuration
         builder.Services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());

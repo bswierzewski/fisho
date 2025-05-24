@@ -1,8 +1,10 @@
 ﻿using Application.Common.Interfaces.Services; // Dodano dla logowania
+using Application.Common.Options; // Added for CloudinaryOptions
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration; // Keep for now, might remove if not used elsewhere
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options; // Added for IOptions
 
 namespace Fishio.Infrastructure.Services;
 
@@ -10,26 +12,28 @@ public class ImageStorageService : IImageStorageService
 {
     private readonly Cloudinary _cloudinary;
     private readonly ILogger<ImageStorageService> _logger;
+    private readonly CloudinaryOptions _cloudinaryOptions;
 
-    public ImageStorageService(IConfiguration configuration, ILogger<ImageStorageService> logger)
+    public ImageStorageService(IOptions<CloudinaryOptions> cloudinaryOptions, ILogger<ImageStorageService> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _cloudinaryOptions = cloudinaryOptions.Value ?? throw new ArgumentNullException(nameof(cloudinaryOptions));
 
-        var cloudName = configuration["Cloudinary:CloudName"];
-        var apiKey = configuration["Cloudinary:ApiKey"];
-        var apiSecret = configuration["Cloudinary:ApiSecret"];
-
-        if (string.IsNullOrWhiteSpace(cloudName) ||
-            string.IsNullOrWhiteSpace(apiKey) ||
-            string.IsNullOrWhiteSpace(apiSecret))
+        if (string.IsNullOrWhiteSpace(_cloudinaryOptions.CloudName) ||
+            string.IsNullOrWhiteSpace(_cloudinaryOptions.ApiKey) ||
+            string.IsNullOrWhiteSpace(_cloudinaryOptions.ApiSecret))
         {
             _logger.LogError("Cloudinary configuration (CloudName, ApiKey, ApiSecret) is missing or incomplete in application settings.");
-            throw new ArgumentNullException(nameof(configuration), "Cloudinary configuration is missing or incomplete.");
+            // Consider throwing a more specific custom configuration exception
+            throw new InvalidOperationException("Cloudinary configuration is missing or incomplete.");
         }
 
-        Account account = new Account(cloudName, apiKey, apiSecret);
+        Account account = new Account(
+            _cloudinaryOptions.CloudName,
+            _cloudinaryOptions.ApiKey,
+            _cloudinaryOptions.ApiSecret);
         _cloudinary = new Cloudinary(account);
-        _logger.LogInformation("ImageStorageService (Cloudinary) initialized for cloud: {CloudName}", cloudName);
+        _logger.LogInformation("ImageStorageService (Cloudinary) initialized for cloud: {CloudName}", _cloudinaryOptions.CloudName);
     }
 
     public async Task<Application.Common.Models.ImageUploadResult> UploadImageAsync(Stream imageStream, string fileName, string? folderName = null)

@@ -17,6 +17,18 @@ public static class DependencyInjection
     {
         var services = builder.Services; // Dla czytelności
 
+        // --- Configure Options ---
+        // This section centralizes the registration of all IOptions classes.
+        // Each .Configure<T> call binds a configuration section (e.g., from appsettings.json) to a strongly-typed options class.
+
+        // Clerk Authentication Settings
+        services.Configure<ClerkOptions>(builder.Configuration.GetSection(ClerkOptions.SectionName));
+        // Note: ClerkOptions are also retrieved directly below for immediate use in JWT Bearer config.
+        // Consider if this direct retrieval is still needed if IOptions<ClerkOptions> is injected elsewhere.
+
+        // Cloudinary Settings
+        services.Configure<CloudinaryOptions>(builder.Configuration.GetSection(CloudinaryOptions.SectionName));
+
         // --- Konfiguracja Kontrolerów (jeśli używasz, choć projekt jest Minimal API) ---
         // Jeśli projekt jest czysto Minimal API, ta linia może nie być potrzebna.
         // Jeśli masz jakieś kontrolery (np. dla widoków błędów), zostaw.
@@ -77,9 +89,7 @@ public static class DependencyInjection
         services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         // --- Konfiguracja Uwierzytelniania JWT (dla Clerk) ---
-        // Pobieranie konfiguracji Clerk z appsettings.json lub zmiennych środowiskowych
-        // Zmieniono nazwy kluczy konfiguracyjnych na bardziej spójne z moimi sugestiami
-        builder.Services.Configure<ClerkOptions>(builder.Configuration.GetSection(ClerkOptions.SectionName));
+        // The direct Get<ClerkOptions>() below might be redundant if IOptions is used consistently.
         var clerkOptions = builder.Configuration.GetSection(ClerkOptions.SectionName).Get<ClerkOptions>()
             ?? throw new InvalidOperationException($"Configuration section '{ClerkOptions.SectionName}' not found or empty.");
 
