@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Fishio.Application.Common.Options;
+using Fishio.Domain.Constants;
 
 namespace Fishio.API;
 
@@ -77,24 +79,32 @@ public static class DependencyInjection
         // --- Konfiguracja Uwierzytelniania JWT (dla Clerk) ---
         // Pobieranie konfiguracji Clerk z appsettings.json lub zmiennych środowiskowych
         // Zmieniono nazwy kluczy konfiguracyjnych na bardziej spójne z moimi sugestiami
-        var clerkAuthority = builder.Configuration["Clerk:Authority"]
-            ?? throw new ArgumentNullException("Clerk:Authority", "Clerk Authority URL must be configured.");
-        var clerkAudience = builder.Configuration["Clerk:Audience"]
-            ?? throw new ArgumentNullException("Clerk:Audience", "Clerk Audience must be configured.");
+        builder.Services.Configure<ClerkOptions>(builder.Configuration.GetSection(ClerkOptions.SectionName));
+        var clerkOptions = builder.Configuration.GetSection(ClerkOptions.SectionName).Get<ClerkOptions>()
+            ?? throw new InvalidOperationException($"Configuration section '{ClerkOptions.SectionName}' not found or empty.");
+
+        if (string.IsNullOrWhiteSpace(clerkOptions.Authority))
+        {
+            throw new InvalidOperationException($"'{nameof(ClerkOptions.Authority)}' must be configured in section '{ClerkOptions.SectionName}'.");
+        }
+        if (string.IsNullOrWhiteSpace(clerkOptions.Audience))
+        {
+            throw new InvalidOperationException($"'{nameof(ClerkOptions.Audience)}' must be configured in section '{ClerkOptions.SectionName}'.");
+        }
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                options.Authority = clerkAuthority;     // Z pola "iss"
-                options.Audience = clerkAudience;      // Z pola "azp" (gdy "aud" brak)
+                options.Authority = clerkOptions.Authority;     // Z pola "iss"
+                options.Audience = clerkOptions.Audience;      // Z pola "azp" (gdy "aud" brak)
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = clerkAuthority, // Powtórzenie dla jawnej walidacji
+                    ValidIssuer = clerkOptions.Authority, // Powtórzenie dla jawnej walidacji
 
                     ValidateAudience = true,
-                    ValidAudience = clerkAudience,       // Powtórzenie dla jawnej walidacji
+                    ValidAudience = clerkOptions.Audience,       // Powtórzenie dla jawnej walidacji
 
                     ValidateIssuerSigningKey = true,
                     // Klucze zostaną pobrane z JWKS URI dostarczonego przez Authority
@@ -111,9 +121,9 @@ public static class DependencyInjection
         services.AddAuthorization(options =>
         {
             // Przykładowe polityki - dostosuj do swoich potrzeb
-            options.AddPolicy("OrganizerPolicy", policy =>
+            options.AddPolicy(PolicyNames.OrganizerPolicy, policy =>
                 policy.RequireAuthenticatedUser()); // Możesz dodać .RequireClaim("permissions", "manage:competitions")
-            options.AddPolicy("JudgePolicy", policy =>
+            options.AddPolicy(PolicyNames.JudgePolicy, policy =>
                 policy.RequireAuthenticatedUser());
             // ... inne polityki ...
         });
