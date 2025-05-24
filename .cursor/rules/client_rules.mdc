@@ -1,6 +1,6 @@
 ---
 description: 
-globs: client/*
+globs: client/**
 alwaysApply: false
 ---
 # 🎣 Fishio Client (Frontend) - Rules for Cursor

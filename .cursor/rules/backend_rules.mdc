@@ -1,6 +1,6 @@
 ---
 description: 
-globs: api/*
+globs: api/**
 alwaysApply: false
 ---
 # 🎣 Fishio Backend - Rules for Cursor
